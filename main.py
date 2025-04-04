@@ -1,6 +1,6 @@
 # FACT_CHECK_API_TOOL = "AIzaSyBs2Tg-Xf0f_bRNRtUSGvFkRNZePd_y680"
 import json
-import requests
+from llmproxy import generate
 
 with open('config.json', 'r') as file:
     config = json.load(file)
@@ -41,20 +41,69 @@ params = {
     'languageCode' : 'en'
 }
 
-response = requests.get(url, params=params)
+# response = requests.get(url, params=params)
 
-# Check status and print results
-if response.status_code == 200:
-    data = response.json()
-    claims = data.get('claims', [])
-    for i, claim in enumerate(claims):
-        print(f"\nClaim {i + 1}:")
-        print(f"  Text: {claim.get('text')}")
-        print(f"  Claimant: {claim.get('claimant')}")
-        for review in claim.get('claimReview', []):
-            print(f"  Reviewed by: {review.get('publisher', {}).get('name')}")
-            print(f"  Rating: {review.get('textualRating')}")
-            print(f"  URL: {review.get('url')}")
-else:
-    print(f"Error: {response.status_code}")
-    print(response.text)
+# # Check status and print results
+# if response.status_code == 200:
+#     data = response.json()
+#     claims = data.get('claims', [])
+#     for i, claim in enumerate(claims):
+#         print(f"\nClaim {i + 1}:")
+#         print(f"  Text: {claim.get('text')}")
+#         print(f"  Claimant: {claim.get('claimant')}")
+#         for review in claim.get('claimReview', []):
+#             print(f"  Reviewed by: {review.get('publisher', {}).get('name')}")
+#             print(f"  Rating: {review.get('textualRating')}")
+#             print(f"  URL: {review.get('url')}")
+# else:
+#     print(f"Error: {response.status_code}")
+#     print(response.text)
+
+
+
+system_prompt = """ 
+You are a fact-checking assistant designed to analyze news articles, reports, or opinion pieces.
+
+Your task is to extract the **main theme** of the article and then identify key claims that support or challenge this theme. These should be claims that:
+
+- Directly relate to the article’s central argument or narrative.
+- Refer to real-world events, policies, statistics, or actors that can be verified.
+- May reflect political or ideological bias through word choice, framing, or selective context.
+
+Instructions:
+
+1. Read the article carefully and identify its **main theme** — the central issue or message it focuses on.
+2. Extract only the claims that are **core to this theme**. Ignore unrelated background facts or general context.
+3. For each claim, include:
+   - The full claim (rephrased clearly if needed).
+   - Type: Factual, Potentially Biased, or Both.
+   - Justification: Why this claim was selected — explain how it contributes to the article’s theme.
+
+Return your response as a JSON object with the following structure:
+
+```json
+{
+  "main_theme": "string (a one-sentence summary of the main theme)",
+  "claims": [
+    {
+      "claim": "string (a concise version of the claim)",
+      "type": "Factual | Potentially Biased | Both",
+      "justification": "string (why this claim supports or challenges the theme)"
+    },
+    ...
+  ]
+}
+"""
+
+
+response = generate(
+    model='4o-mini',
+    system=system_prompt,
+    query=f"Article:{article}",
+    temperature=0.2,
+    lastk=1,
+    session_id="GenericSessionID",
+    rag_usage=False
+)
+
+print(response['response'])
