@@ -9,25 +9,21 @@ with open('config.json', 'r') as file:
 with open('article.txt', 'r') as file:
     article = file.read()
 
-
-FACT_CHECK_API = config["googleFactCheckApiKey"]
-
 system_prompt = """
 
   You are a search assistant for a fact-checking system.
 
-  Given a news article, opinion piece, or report, generate one or two high-quality search queries that capture the core theme of the article. These queries will be used to retrieve relevant fact-checking resources from trusted databases.
+  Given a news article, opinion piece, or report, generate one high-quality 
+  search queries that capture the core theme of the article. The keywords you
+  output will be used to query the Google Fact Check Tools API.  
 
   Guidelines:
-  - The query should reflect the article’s main theme or central controversy.
+  - The query should reflect the article's main theme or central controversy.
   - Focus on the people, policies, events, or statistics mentioned in the article.
   - Remove any emotionally charged or biased language.
-  - Use search-friendly keywords and keep it concise (5–12 words).
+  - Use search-friendly keywords and keep it concise (5-12 words).
   - Return onlu one sentence.
 """
-
-
-
 response = generate(
     model='4o-mini',
     system=system_prompt,
@@ -38,13 +34,12 @@ response = generate(
     rag_usage=False
 )
 
-print(response['response'])
+print(f"Response from AI: {response['response']}")
 
+FACT_CHECK_API = config["googleFactCheckApiKey"]
+URL = config["factCheckApiUrl"]
 
-# query = response['response']
-query = "trump 2024 election fraud"
-
-
+query = response['response']
 
 # Define parameters
 params = {
@@ -54,8 +49,6 @@ params = {
     'languageCode' : 'en'
 }
 
-URL = config["factCheckApiUrl"]
-
 # Check status and print results
 try: 
   response = requests.get(URL, params=params)
@@ -64,11 +57,8 @@ except requests.exceptions.RequestException as e:
   print(f"Error: {e}")
   print(response.text)
 
-print(response.status_code)
 if response.status_code == 200:
   data = response.json()
-  # print('data', data)
-  # print(data.get('claims'))
   claims = data.get('claims', [])
   for i, claim in enumerate(claims):
       print(f"\nClaim {i + 1}:")
