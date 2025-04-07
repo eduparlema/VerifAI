@@ -13,9 +13,10 @@ system_prompt = """
 
   You are a search assistant for a fact-checking system.
 
-  Given a news article, opinion piece, or report, generate one high-quality 
-  search queries that capture the core theme of the article. The keywords you
-  output will be used to query the Google Fact Check Tools API.  
+  Given a news article, opinion piece, report, or a simple fact/opinion,
+  generate one high-quality search query that capture the core theme of the
+  content. The keywords you output will be used to query the Google Fact Check
+  Tools API.  
 
   Guidelines:
   - The query should reflect the article's main theme or central controversy.
