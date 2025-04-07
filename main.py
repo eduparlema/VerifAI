@@ -1,8 +1,9 @@
 from llmproxy_local import generate
 import json
 import requests
+from bs4 import BeautifulSoup
 
-SESSION = "GenericSession_3"
+SESSION = "GenericSession_11"
 
 with open('config.json', 'r') as file:
     config = json.load(file)
@@ -19,8 +20,14 @@ def generate_response(user_input: str):
       keywords = extract_keywords(user_input)
       print(f"Keywords: {keywords}")
       fact_check_data = query_fact_check_api(keywords)
-      if fact_check_data:
-          display_fact_check_results(fact_check_data)
+      if fact_check_data and fact_check_data.get('claims'):
+        context = prepare_fact_check_context(fact_check_data['claims'])
+        verdict = generate_verdict(user_input, context)
+
+        print("\n Final Verdict: \n")
+        print(verdict)
+      else:
+         print("No relevant fact checks found")
   else:
       print(response)
 
@@ -118,28 +125,109 @@ def query_fact_check_api(keywords: str):
     print(f"❌ Error querying Fact Check API: {e}")
     return None
   
-def display_fact_check_results(data):
-    claims = data.get('claims', [])
-    if not claims:
-        print("🔍 No fact checks found for this query.")
-        return
+# def display_fact_check_results(data):
+#     claims = data.get('claims', [])
+#     print(data)
+#     if not claims:
+#         print("🔍 No fact checks found for this query.")
+#         return
 
-    for i, claim in enumerate(claims):
-        print(f"\n📌 Claim {i + 1}:")
-        print(f"   🗣️ Text: {claim.get('text')}")
-        print(f"   👤 Claimant: {claim.get('claimant')}")
-        print(f"   📅 Claim Date: {claim.get('claimDate')}")
+#     for i, claim in enumerate(claims):
+#         print(f"\n📌 Claim {i + 1}:")
+#         print(f"   🗣️ Text: {claim.get('text')}")
+#         print(f"   👤 Claimant: {claim.get('claimant')}")
+#         print(f"   📅 Claim Date: {claim.get('claimDate')}")
 
-        for review in claim.get('claimReview', []):
-            print(f"   ✅ Reviewed by: {review.get('publisher', {}).get('name')}")
-            print(f"   📆 Review Date: {review.get('reviewDate')}")
-            print(f"   🧠 Rating: {review.get('textualRating')}")
-            print(f"   🔗 URL: {review.get('url')}")
+#         for review in claim.get('claimReview', []):
+#             print(f"   ✅ Reviewed by: {review.get('publisher', {}).get('name')}")
+#             print(f"   📆 Review Date: {review.get('reviewDate')}")
+#             print(f"   🧠 Rating: {review.get('textualRating')}")
+#             print(f"   🔗 URL: {review.get('url')}")
+
+def fetch_full_content(url: str, timeout: int = 10) -> str:
+  try:
+    response = requests.get(url, timeout=timeout, headers={"User-Agent": 'Mozilla/5.0'})
+    response.raise_for_status()
+    html = response.content
+  except Exception as e:
+    print(f"[ERROR] Error fetching {url}: {e}")
+    return ""
+  
+  soup = BeautifulSoup(html, "html.parser")
+  for unwanted in soup(["script", "style", "header", "footer", "nav", "aside"]):
+      unwanted.extract()
+
+  text = soup.get_text(separator=" ", strip=True)
+  clean_text = " ".join(text.split())
+  return clean_text
+
+def prepare_fact_check_context(claims):
+  evidence = []
+  for claim in claims:
+    claim_text = claim.get("text", "")
+    claimant = claim.get("claimant", "Unknown")
+    for review in claim.get("claimReview", []):
+      reviewer = review.get("publisher", {}).get("name", "Unknown")
+      rating = review.get("textualRating", "")
+      review_url = review.get("url", "")
+      review_date = review.get("reviewDate", "")
+      article_text = fetch_full_content(review_url)
+      content_block = f"""
+                      Claim: {claim_text}
+                      Claimant: {claimant}
+                      Reviewer: {reviewer}
+                      Review Date: {review_date}
+                      Rating: {rating}
+                      Source: {review_url}
+                      Extracted Article Content:
+                      {article_text}
+                      """
+      evidence.append(content_block)
+  return "\n\n--\n\n".join(evidence)
+
+def generate_verdict(user_claim: str, evidence: str):
+  system_prompt = """
+  You are a smart and friendly fact-checking assistant who helps users understand
+  whether claims they've seen are true, false, biased, misleading, exagerated, etc.
+  You are an objective judge, do NOT give any opinions and always refer to relevant
+  content when providing claims.
+
+  You are given:
+  - A claim submitted by the user
+  - Fact-check metadata (e.g. rating, review date, source)
+  - Full article content scraped from reliable sources
+
+  🎯 Your job:
+  1. Determine if the claim is **True**, **False**, or **Misleading** based on the evidence.
+  2. Respond with a clear, short, and **engaging** verdict in a friendly tone — like you're explaining something to a friend over coffee.
+  3. Use **emojis** to add warmth and help users scan the message quickly.
+  4. Pull in **useful details** or **direct quotes** from the source article to explain why the verdict is what it is.
+  5. Let the user know if the information is **recent or outdated**.
+  6. End with a list of **citations** for transparency.
+  """
+
+
+  response = generate(
+    model="4o-mini",
+    system=system_prompt,
+    query=f"""User Claim: {user_claim}
+          Fact-Check Evidence:
+          {evidence}
+          """,
+    temperature=0.4,
+    lastk=3,
+    session_id=SESSION,
+    rag_usage=False
+    )
+  
+  return response["response"]
+  
 
 def main():
   while True:
-      user_input = input("You: ")
-      generate_response(user_input)
+    print("\n")
+    user_input = input("You: ")
+    generate_response(user_input)
 
 if __name__ == "__main__":
     main()
