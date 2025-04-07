@@ -6,13 +6,13 @@ import requests
 end_point = os.environ.get("endPoint")
 api_key = os.environ.get("apiKey")
 
-with open('config.json', 'r') as file:
-    config = json.load(file)
+# with open('config.json', 'r') as file:
+#     config = json.load(file)
 
-if not end_point:
-    end_point = config["endPoint"]
-if not api_key:
-    api_key = config['apiKey']
+# if not end_point:
+#     end_point = config["endPoint"]
+# if not api_key:
+#     api_key = config['apiKey']
 
 def retrieve(
     query: str,

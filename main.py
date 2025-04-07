@@ -1,70 +1,51 @@
-# FACT_CHECK_API_TOOL = "AIzaSyBs2Tg-Xf0f_bRNRtUSGvFkRNZePd_y680"
-import json
 from llmproxy import generate
-import requests
-
-with open('config.json', 'r') as file:
-    config = json.load(file)
-
-with open('article.txt', 'r') as file:
-    article = file.read()
 
 system_prompt = """
+You are an assistant that detects whether a user message contains a fact-checkable claim.
+You must respond with only one word: "yes" or "no".
 
-  You are a search assistant for a fact-checking system.
+A fact-checkable claim is a statement about the world that can be verified or debunked using evidence.
+Examples include news headlines, political statements, or misinformation.
 
-  Given a news article, opinion piece, or report, generate one high-quality 
-  search queries that capture the core theme of the article. The keywords you
-  output will be used to query the Google Fact Check Tools API.  
-
-  Guidelines:
-  - The query should reflect the article's main theme or central controversy.
-  - Focus on the people, policies, events, or statistics mentioned in the article.
-  - Remove any emotionally charged or biased language.
-  - Use search-friendly keywords and keep it concise (5-12 words).
-  - Return onlu one sentence.
+DO NOT include any explanation or extra text. ONLY reply with "yes" or "no".
 """
-response = generate(
-    model='4o-mini',
-    system=system_prompt,
-    query=f"Article:{article}",
-    temperature=0.2,
-    lastk=1,
-    session_id="GenericSessionIDs1",
-    rag_usage=False
-)
 
-print(f"Response from AI: {response['response']}")
+# Friendly intro message
+friendly_intro = """🤖 Hey there! I’m your conversational fact-checking assistant.
+If you’ve seen a claim, news article, or social media post and you’re wondering,
+“Is this actually true?” — I’ve got you.
 
-FACT_CHECK_API = config["googleFactCheckApiKey"]
-URL = config["factCheckApiUrl"]
+You can send me:
+🧾 A statement you want checked
+🌐 A link to a news article
+🗣️ A quote or screenshot from social media
 
-query = response['response']
+Want to dig deeper? Ask me why something is false, check other sources, or even see what Reddit users are saying about it. I’ll keep each claim in a separate thread so it’s easy to follow the conversation.
 
-# Define parameters
-params = {
-    'query': query,
-    'key': FACT_CHECK_API,
-    'pageSize': 5,
-    'languageCode' : 'en'
-}
+🔍 Go ahead—what claim should we check today?
+"""
 
-# Check status and print results
-try: 
-  response = requests.get(URL, params=params)
-  response.raise_for_status()
-except requests.exceptions.RequestException as e: 
-  print(f"Error: {e}")
-  print(response.text)
+def is_fact_checkable(user_input: str) -> bool:
+    response = generate(
+        model="gpt-4",  # or your preferred model
+        system=system_prompt,
+        query=user_input,
+        temperature=0.0
+    )
 
-if response.status_code == 200:
-  data = response.json()
-  claims = data.get('claims', [])
-  for i, claim in enumerate(claims):
-      print(f"\nClaim {i + 1}:")
-      print(f"  Text: {claim.get('text')}")
-      print(f"  Claimant: {claim.get('claimant')}")
-      for review in claim.get('claimReview', []):
-          print(f"  Reviewed by: {review.get('publisher', {}).get('name')}")
-          print(f"  Rating: {review.get('textualRating')}")
-          print(f"  URL: {review.get('url')}")
+    if isinstance(response, dict) and 'response' in response:
+        reply = response['response'].strip().lower()
+        return reply == "yes"
+    return False
+
+def main():
+    user_input = input("You: ")
+
+    if is_fact_checkable(user_input):
+        print("✅ Fact-checkable claim detected. Proceeding with the pipeline...")
+        # TODO: Continue with Part 3
+    else:
+        print(friendly_intro)
+
+if __name__ == "__main__":
+    main()
