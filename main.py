@@ -3,7 +3,7 @@ import json
 import requests
 from bs4 import BeautifulSoup
 
-SESSION = "GenericSession_11"
+SESSION = "GenericSession_13"
 
 with open('config.json', 'r') as file:
     config = json.load(file)
@@ -146,7 +146,13 @@ def query_fact_check_api(keywords: str):
 
 def fetch_full_content(url: str, timeout: int = 10) -> str:
   try:
-    response = requests.get(url, timeout=timeout, headers={"User-Agent": 'Mozilla/5.0'})
+    response = requests.get(url, timeout=timeout, 
+                            headers={
+                               "User-Agent": 'Mozilla/5.0',
+                               "Accept-Language": "en-US,en;q=0.9",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+    "Referer": "https://www.google.com"
+                               })
     response.raise_for_status()
     html = response.content
   except Exception as e:
