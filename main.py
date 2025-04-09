@@ -23,6 +23,8 @@ with open('article.txt', 'r') as file:
 def generate_response(user_input: str):
   response = intent_detection(user_input).strip()
 
+  print(response)
+  print("[DEBUGGING] Genereated intent_detection!")
   if response == "__FACT_CHECKABLE__":
       print("✅ Fact-checkable claim detected. Proceeding with the pipeline...")
       

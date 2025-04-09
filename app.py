@@ -41,6 +41,8 @@ def main():
     # print(response_text)
     response = generate_response(message)
 
+    print(response)
+
     response_text = response["response"]
 
     return jsonify({"text": response_text})
