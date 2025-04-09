@@ -3,11 +3,19 @@ from llmproxy import generate
 import json
 import requests
 from bs4 import BeautifulSoup
+import os
 
 SESSION = "GenericSession_13"
 
-with open('config.json', 'r') as file:
-    config = json.load(file)
+# Read proxy config from environment
+end_point = os.environ.get("endPoint")
+api_key = os.environ.get("apiKey")
+
+FACT_CHECK_API = os.environ.get("googleFactCheckApiKey")
+URL = os.environ.get("factCheckApiUrl")
+
+# with open('config.json', 'r') as file:
+#     config = json.load(file)
 
 with open('article.txt', 'r') as file:
     article = file.read()
@@ -109,8 +117,6 @@ def extract_keywords(user_input: str):
   return response["response"]
 
 def query_fact_check_api(keywords: str):
-  FACT_CHECK_API = config["googleFactCheckApiKey"]
-  URL = config["factCheckApiUrl"]
 
   params = {
     'query': keywords,
