@@ -1,6 +1,7 @@
 import requests
 from flask import Flask, request, jsonify
 from llmproxy import generate
+from main import generate_response
 
 app = Flask(__name__)
 
@@ -22,22 +23,25 @@ def main():
     if data.get("bot") or not message:
         return jsonify({"status": "ignored"})
 
-    print(f"Message from {user} : {message}")
+    # print(f"Message from {user} : {message}")
 
-    # Generate a response using LLMProxy
-    response = generate(
-        model='4o-mini',
-        system='answer my question and add keywords',
-        query= message,
-        temperature=0.0,
-        lastk=0,
-        session_id='GenericSession'
-    )
+    # # Generate a response using LLMProxy
+    # response = generate(
+    #     model='4o-mini',
+    #     system='answer my question and add keywords',
+    #     query= message,
+    #     temperature=0.0,
+    #     lastk=0,
+    #     session_id='GenericSession'
+    # )
 
-    response_text = response['response']
+    # response_text = response['response']
     
-    # Send response back
-    print(response_text)
+    # # Send response back
+    # print(response_text)
+    response = generate_response(message)
+
+    response_text = response["response"]
 
     return jsonify({"text": response_text})
     
