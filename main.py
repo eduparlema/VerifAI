@@ -1,4 +1,5 @@
-from llmproxy_local import generate
+#from llmproxy_local import generate
+from llmproxy import generate
 import json
 import requests
 from bs4 import BeautifulSoup
