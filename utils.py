@@ -11,6 +11,9 @@ SESSION = "GenericSession_30"
 GOOGLE_API_KEY=os.environ.get("googleApiKey")
 SEARCH_ENGINE_ID=os.environ.get("searchEngineId")  
 NEWS_API_KEY=os.environ.get("newsApiKey")
+print("google api key", GOOGLE_API_KEY)
+print("search engine id", SEARCH_ENGINE_ID)
+print("newsapi key", NEWS_API_KEY)
 
 newsapi = NewsApiClient(api_key=NEWS_API_KEY)
 
@@ -177,6 +180,9 @@ def fetch_main_article(url: str, timeout: int = 10) -> str:
         return "ERROR"
 
 def summarize_facts(indicies, all_results, user_claim):
+    
+    print("indicies, ", indicies)
+    print("all_results", all_results)
     
     results = [all_results[i] for i in indicies]
 
