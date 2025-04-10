@@ -43,6 +43,7 @@ def main():
     })
 
     init_msg_data = init_msg.json()
+    print(init_msg_data)
     thread_id = init_msg_data.get("message", {}).get("_id")
 
     if not thread_id:
@@ -50,10 +51,10 @@ def main():
 
     response = generate_response(message)
 
-    # STEP 2: Get the fact-check response
+    #Get the fact-check response
     response_text = generate_response(message)
 
-    # STEP 3: Send actual response in the thread
+    #Send actual response in the thread
     requests.post(ROCKETCHAT_API, headers=ROCKETCHAT_AUTH, json={
         "roomId": room_id,
         "text": response_text,
