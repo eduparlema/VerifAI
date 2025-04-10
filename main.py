@@ -27,7 +27,7 @@ def generate_response(user_input: str):
   keywords = extract_keywords(user_input)
   print(f"Keywords: {keywords}")
   fact_check_data = query_fact_check_api(keywords)
-  
+
   # Check if we get something from Fact Checking API
   if fact_check_data and fact_check_data.get('claims'):
     context = prepare_fact_check_context(fact_check_data['claims'])
@@ -211,7 +211,7 @@ def generate_verdict(user_claim: str, evidence: str):
   - Full article content scraped from reliable sources
 
   🎯 Your job:
-  1. Determine if the claim is **True**, **False**, or **Misleading** based on the evidence.
+  1. Determine if the claim is **True**, **False**,**Misleading**, etc based on the evidence.
   2. Respond with a clear, short, and **engaging** verdict in a friendly tone — like you're explaining something to a friend over coffee.
   3. Use **emojis** to add warmth and help users scan the message quickly.
   4. Pull in **useful details** or **direct quotes** from the source article to explain why the verdict is what it is.
