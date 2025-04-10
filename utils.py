@@ -12,9 +12,9 @@ SESSION = "GenericSession_31"
 GOOGLE_API_KEY=os.environ.get("googleApiKey")
 SEARCH_ENGINE_ID=os.environ.get("searchEngineId")  
 NEWS_API_KEY=os.environ.get("newsApiKey")
-print("google api key", GOOGLE_API_KEY)
-print("search engine id", SEARCH_ENGINE_ID)
-print("newsapi key", NEWS_API_KEY)
+print(f"search: {GOOGLE_API_KEY}")
+print(f"search engine id: {SEARCH_ENGINE_ID}")
+print(f"newsapi key {NEWS_API_KEY}")
 
 newsapi = NewsApiClient(api_key=NEWS_API_KEY)
 
