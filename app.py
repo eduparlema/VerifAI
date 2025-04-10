@@ -80,6 +80,13 @@ def main():
                 }
             ]
         })
+        if message == "verify_again":
+            send_threaded_message(room_id, thread_id, "We will verify again!")
+            return '', 200
+
+        if message == "crowdsource":
+            send_threaded_message(room_id, thread_id, "Crowdsourcing!")
+            return '', 200
 
         #Send actual response in the thread
         # requests.post(ROCKETCHAT_API, headers=ROCKETCHAT_AUTH, json={
@@ -92,6 +99,14 @@ def main():
 
     # return jsonify({"text": response})
     
+
+def send_threaded_message(room_id, tmid, text):
+    requests.post(ROCKETCHAT_API, headers=ROCKETCHAT_AUTH, json={
+        "roomId": room_id,
+        "text": text,
+        "tmid": tmid
+    })
+
 @app.errorhandler(404)
 def page_not_found(e):
     return "Not Found", 404
