@@ -5,6 +5,8 @@ from bs4 import BeautifulSoup
 import os
 from dotenv import load_dotenv
 
+from utils import research
+
 load_dotenv()
 
 SESSION = "GenericSession_16"
@@ -37,8 +39,7 @@ def generate_response(user_input: str):
     return verdict
   else:
     print("No relevant fact checks found")
-    #TODO: ERIN's part here
-    return "No relevant fact checks found (TODO: ERIN)"
+    return research(user_input)
 
 def intent_detection(user_input:str):
   intent_system_prompt = """
