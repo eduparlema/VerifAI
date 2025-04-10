@@ -54,12 +54,39 @@ def main():
         #Get the fact-check response
         response_text = generate_response(message)
 
-        #Send actual response in the thread
+
+        # Send verdict + buttons
         requests.post(ROCKETCHAT_API, headers=ROCKETCHAT_AUTH, json={
             "roomId": room_id,
             "text": response_text,
-            "tmid": thread_id
+            "tmid": thread_id,
+            "attachments": [
+                {
+                    "text": "What would you like to do next?",
+                    "actions": [
+                        {
+                            "type": "button",
+                            "text": "🔍 Verify Again",
+                            "msg": "verify_again",
+                            "msg_in_chat_window": True
+                        },
+                        {
+                            "type": "button",
+                            "text": "🧠 Crowdsource",
+                            "msg": "crowdsource",
+                            "msg_in_chat_window": True
+                        }
+                    ]
+                }
+            ]
         })
+
+        #Send actual response in the thread
+        # requests.post(ROCKETCHAT_API, headers=ROCKETCHAT_AUTH, json={
+        #     "roomId": room_id,
+        #     "text": response_text,
+        #     "tmid": thread_id
+        # })
     else:
         return jsonify({"text": intent})
 
