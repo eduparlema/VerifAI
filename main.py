@@ -5,7 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 import os
 
-SESSION = "GenericSession_13"
+SESSION = "GenericSession_14"
 
 # Read proxy config from environment
 end_point = os.environ.get("endPoint")
@@ -24,7 +24,6 @@ def generate_response(user_input: str):
   response = intent_detection(user_input).strip()
 
   print(response)
-  print("[DEBUGGING] Genereated intent_detection!")
   if response == "__FACT_CHECKABLE__":
       print("✅ Fact-checkable claim detected. Proceeding with the pipeline...")
       
