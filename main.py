@@ -9,7 +9,7 @@ from utils import research
 
 load_dotenv()
 
-SESSION = "GenericSession_16"
+SESSION = "GenericSession_30"
 
 # Read proxy config from environment
 end_point = os.environ.get("endPoint")

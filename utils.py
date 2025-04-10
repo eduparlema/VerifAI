@@ -6,12 +6,12 @@ from bs4 import BeautifulSoup
 from readability import Document
 from llmproxy import generate
 import os
+from main import SESSION
 
 GOOGLE_API_KEY=os.environ.get("googleApiKey")
 SEARCH_ENGINE_ID=os.environ.get("searchEngineId")  
 NEWS_API_KEY=os.environ.get("newsApiKey")
 
-SESSION="GenericSession_23"
 newsapi = NewsApiClient(api_key=NEWS_API_KEY)
 
 def get_newsapi_data(query, num_results=5):
@@ -306,7 +306,7 @@ def answer_claim(claim: str, summaries: list[str]) -> str:
           query=f"""Claim: "{claim}"\n\nSummaries:\n\n{evidence_text}""",
           temperature=0.4,
           lastk=3,
-          session_id="GenericSession_24",
+          session_id=SESSION,
           rag_usage=False
         )
       
