@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-SESSION = "GenericSession_15"
+SESSION = "GenericSession_16"
 
 # Read proxy config from environment
 end_point = os.environ.get("endPoint")
