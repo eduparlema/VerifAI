@@ -3,7 +3,6 @@ from urllib.parse import urlparse
 import requests
 from newsapi import NewsApiClient
 from bs4 import BeautifulSoup
-from readability import Document
 from llmproxy import generate
 import os
 from main import SESSION
