@@ -154,6 +154,7 @@ def filter_sources(
     )
 
     verdict = response["response"]
+    print("verdict", verdict)
     indicies = [int(x.strip()) for x in verdict.split(",")]
 
     return indicies
@@ -324,17 +325,22 @@ def answer_claim(claim: str, summaries: list[str]) -> str:
     return response['response']
 
    
-def research(query: str):
-  google_results = google_search(query)
-  newsapi_results = get_newsapi_data(query)
-  all_results = combine_sources(newsapi_results, google_results)
-  indicies = filter_sources(query, all_results)
-  summaries = summarize_facts(indicies, all_results, query)
-  answer = answer_claim(query, summaries)
+# def research(query: str):
+#   google_results = google_search(query)
+#   print("google search",google_results)
+#   newsapi_results = get_newsapi_data(query)
+#   print("news api", newsapi_results)
+#   all_results = combine_sources(newsapi_results, google_results)
+#   print("all_results", all_results)
+#   indicies = filter_sources(query, all_results)
+#   print("indicies", indicies)
+#   summaries = summarize_facts(indicies, all_results, query)
+#   print("summaries", summaries)
+#   answer = answer_claim(query, summaries)
 
-  return answer
+#   return answer
 
 
-
-
+# if __name__ == "__main__":
+#   research("World Cup 2026 location Turkey")
 
