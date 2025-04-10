@@ -1,9 +1,22 @@
 import requests
+import os
 from flask import Flask, request, jsonify
 from llmproxy import generate
 from main import generate_response
 
 app = Flask(__name__)
+
+# Read proxy config from environment
+RC_token = os.environ.get("RC_token")
+RC_userId = os.environ.get("RC_userId")
+RC_API = os.environ.get("RC_API")
+
+ROCKETCHAT_AUTH = {
+    "X-Auth-Token": RC_token,
+    "X-User-Id": RC_userId,
+}
+
+ROCKETCHAT_API = RC_API
 
 @app.route('/', methods=['POST'])
 def hello_world():
@@ -16,30 +29,37 @@ def main():
     # Extract relevant information
     user = data.get("user_name", "Unknown")
     message = data.get("text", "")
-
+    room_id = data.get("rid")  # needed to send messages
     print(data)
 
     # Ignore bot messages
     if data.get("bot") or not message:
         return jsonify({"status": "ignored"})
-
-    # print(f"Message from {user} : {message}")
-
-    # # Generate a response using LLMProxy
-    # response = generate(
-    #     model='4o-mini',
-    #     system='answer my question and add keywords',
-    #     query= message,
-    #     temperature=0.0,
-    #     lastk=0,
-    #     session_id='GenericSession'
-    # )
-
-    # response_text = response['response']
     
-    # # Send response back
-    # print(response_text)
+    #Post initial message to initiate a thread
+    init_msg = requests.post(ROCKETCHAT_API, headers=ROCKETCHAT_AUTH, json={
+        "roomId": room_id,
+        "text": "🔎 Fact-checking your claim... please wait.",
+    })
+
+    init_msg_data = init_msg.json()
+    thread_id = init_msg_data.get("message", {}).get("_id")
+
+    if not thread_id:
+        return jsonify({"text": "Something went wrong."})
+
     response = generate_response(message)
+
+    # STEP 2: Get the fact-check response
+    response_text = generate_response(message)
+
+    # STEP 3: Send actual response in the thread
+    requests.post(ROCKETCHAT_API, headers=ROCKETCHAT_AUTH, json={
+        "roomId": room_id,
+        "text": response_text,
+        "tmid": thread_id
+    })
+
     return jsonify({"text": response})
     
 @app.errorhandler(404)
