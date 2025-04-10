@@ -29,7 +29,7 @@ def main():
     # Extract relevant information
     user = data.get("user_name", "Unknown")
     message = data.get("text", "")
-    room_id = data.get("rid")  # needed to send messages
+    room_id = data.get("channel_id")  # needed to send messages
     print(data)
 
     # Ignore bot messages
