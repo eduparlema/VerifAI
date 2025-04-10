@@ -7,10 +7,6 @@ from readability import Document
 from llmproxy import generate
 import os
 
-
-with open('config.json', 'r') as file:
-    config = json.load(file)
-
 GOOGLE_API_KEY=os.environ.get("googleApiKey")
 SEARCH_ENGINE_ID=os.environ.get("searchEngineId")  
 NEWS_API_KEY=os.environ.get("newsApiKey")
