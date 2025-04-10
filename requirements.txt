@@ -9,4 +9,4 @@ Werkzeug==2.2.2
 beautifulsoup4==4.13.3
 python-dotenv>=0.21.0
 newsapi-python==0.2.6
-readability-lxml==
+readability-lxml==0.8.1

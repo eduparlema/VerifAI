@@ -8,7 +8,7 @@ from utils import research
 
 load_dotenv()
 
-SESSION = "GenericSession_30"
+SESSION = "GenericSession_31"
 # Read proxy config from environment
 end_point = os.environ.get("endPoint")
 api_key = os.environ.get("apiKey")
