@@ -39,7 +39,7 @@ def main():
     intent = intent_detection(message)
 
     if intent == "__FACT_CHECKABLE__":
-        #Post initial message to initiate a thread
+        # Post initial message to initiate a thread
         init_msg = requests.post(ROCKETCHAT_API, headers=ROCKETCHAT_AUTH, json={
             "roomId": room_id,
             "text": "🔎 Fact-checking your claim... please wait.",
@@ -51,9 +51,6 @@ def main():
 
         if not thread_id:
             return jsonify({"text": "Something went wrong."})
-
-        response = generate_response(message)
-
         #Get the fact-check response
         response_text = generate_response(message)
 
