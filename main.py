@@ -4,13 +4,11 @@ import requests
 from bs4 import BeautifulSoup
 import os
 from dotenv import load_dotenv
-
 from utils import research
 
 load_dotenv()
 
 SESSION = "GenericSession_30"
-
 # Read proxy config from environment
 end_point = os.environ.get("endPoint")
 api_key = os.environ.get("apiKey")

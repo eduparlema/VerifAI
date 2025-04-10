@@ -5,7 +5,8 @@ from newsapi import NewsApiClient
 from bs4 import BeautifulSoup
 from llmproxy import generate
 import os
-from main import SESSION
+
+SESSION = "GenericSession_30"
 
 GOOGLE_API_KEY=os.environ.get("googleApiKey")
 SEARCH_ENGINE_ID=os.environ.get("searchEngineId")  
