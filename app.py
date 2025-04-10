@@ -2,7 +2,7 @@ import requests
 import os
 from flask import Flask, request, jsonify
 from llmproxy import generate
-from main import generate_response
+from main import generate_response, intent_detection
 
 app = Flask(__name__)
 
@@ -36,32 +36,37 @@ def main():
     if data.get("bot") or not message:
         return jsonify({"status": "ignored"})
     
-    #Post initial message to initiate a thread
-    init_msg = requests.post(ROCKETCHAT_API, headers=ROCKETCHAT_AUTH, json={
-        "roomId": room_id,
-        "text": "🔎 Fact-checking your claim... please wait.",
-    })
+    intent = intent_detection(message)
 
-    init_msg_data = init_msg.json()
-    print(init_msg_data)
-    thread_id = init_msg_data.get("message", {}).get("_id")
+    if intent == "__FACT_CHECKABLE__":
+        #Post initial message to initiate a thread
+        init_msg = requests.post(ROCKETCHAT_API, headers=ROCKETCHAT_AUTH, json={
+            "roomId": room_id,
+            "text": "🔎 Fact-checking your claim... please wait.",
+        })
 
-    if not thread_id:
-        return jsonify({"text": "Something went wrong."})
+        init_msg_data = init_msg.json()
+        print(init_msg_data)
+        thread_id = init_msg_data.get("message", {}).get("_id")
 
-    response = generate_response(message)
+        if not thread_id:
+            return jsonify({"text": "Something went wrong."})
 
-    #Get the fact-check response
-    response_text = generate_response(message)
+        response = generate_response(message)
 
-    #Send actual response in the thread
-    requests.post(ROCKETCHAT_API, headers=ROCKETCHAT_AUTH, json={
-        "roomId": room_id,
-        "text": response_text,
-        "tmid": thread_id
-    })
+        #Get the fact-check response
+        response_text = generate_response(message)
 
-    return jsonify({"text": response})
+        #Send actual response in the thread
+        requests.post(ROCKETCHAT_API, headers=ROCKETCHAT_AUTH, json={
+            "roomId": room_id,
+            "text": response_text,
+            "tmid": thread_id
+        })
+    else:
+        return jsonify({"text": intent})
+
+    # return jsonify({"text": response})
     
 @app.errorhandler(404)
 def page_not_found(e):

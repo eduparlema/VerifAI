@@ -20,28 +20,24 @@ with open('article.txt', 'r') as file:
     article = file.read()
 
 def generate_response(user_input: str):
-  response = intent_detection(user_input).strip()
+  # response = intent_detection(user_input).strip()
 
-  if response == "__FACT_CHECKABLE__":
-      print("✅ Fact-checkable claim detected. Proceeding with the pipeline...")
-      
-      keywords = extract_keywords(user_input)
-      print(f"Keywords: {keywords}")
-      fact_check_data = query_fact_check_api(keywords)
-      if fact_check_data and fact_check_data.get('claims'):
-        context = prepare_fact_check_context(fact_check_data['claims'])
-        verdict = generate_verdict(user_input, context)
+  print("✅ Fact-checkable claim detected. Proceeding with the pipeline...")
+  
+  keywords = extract_keywords(user_input)
+  print(f"Keywords: {keywords}")
+  fact_check_data = query_fact_check_api(keywords)
+  if fact_check_data and fact_check_data.get('claims'):
+    context = prepare_fact_check_context(fact_check_data['claims'])
+    verdict = generate_verdict(user_input, context)
 
-        print("\n Final Verdict: \n")
-        #print(verdict)
-        return verdict
-      else:
-        print("No relevant fact checks found")
-        #TODO: ERIN's part here
-        return "No relevant fact checks found (TODO: ERIN)"
+    print("\n Final Verdict: \n")
+    #print(verdict)
+    return verdict
   else:
-      print(response)
-      return response
+    print("No relevant fact checks found")
+    #TODO: ERIN's part here
+    return "No relevant fact checks found (TODO: ERIN)"
 
 def intent_detection(user_input:str):
   intent_system_prompt = """
