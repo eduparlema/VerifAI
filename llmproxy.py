@@ -1,18 +1,13 @@
 import os
 import json
 import requests
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Read proxy config from environment
 end_point = os.environ.get("endPoint")
 api_key = os.environ.get("apiKey")
-
-# with open('config.json', 'r') as file:
-#     config = json.load(file)
-
-# if not end_point:
-#     end_point = config["endPoint"]
-# if not api_key:
-#     api_key = config['apiKey']
 
 def retrieve(
     query: str,

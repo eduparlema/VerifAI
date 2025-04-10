@@ -1,9 +1,11 @@
-#from llmproxy_local import generate
 from llmproxy import generate
 import json
 import requests
 from bs4 import BeautifulSoup
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 SESSION = "GenericSession_14"
 
@@ -14,16 +16,12 @@ api_key = os.environ.get("apiKey")
 FACT_CHECK_API = os.environ.get("googleFactCheckApiKey")
 URL = os.environ.get("factCheckApiUrl")
 
-# with open('config.json', 'r') as file:
-#     config = json.load(file)
-
 with open('article.txt', 'r') as file:
     article = file.read()
 
 def generate_response(user_input: str):
   response = intent_detection(user_input).strip()
 
-  print(response)
   if response == "__FACT_CHECKABLE__":
       print("✅ Fact-checkable claim detected. Proceeding with the pipeline...")
       
@@ -35,11 +33,15 @@ def generate_response(user_input: str):
         verdict = generate_verdict(user_input, context)
 
         print("\n Final Verdict: \n")
-        print(verdict)
+        #print(verdict)
+        return verdict
       else:
-         print("No relevant fact checks found")
+        print("No relevant fact checks found")
+        #TODO: ERIN's part here
+        return "No relevant fact checks found (TODO: ERIN)"
   else:
       print(response)
+      return response
 
 def intent_detection(user_input:str):
   intent_system_prompt = """

@@ -40,9 +40,7 @@ def main():
     # # Send response back
     # print(response_text)
     response = generate_response(message)
-
-    # return jsonify({"text": response})
-    return response
+    return jsonify({"text": response})
     
 @app.errorhandler(404)
 def page_not_found(e):
