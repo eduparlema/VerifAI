@@ -46,7 +46,7 @@ def generate_response(user_input: str):
     return verdict
   else:
     print("No relevant fact checks found")
-    return research(user_input)
+    return research(user_input, keywords)
 
 def intent_detection(user_input:str):
   intent_system_prompt = """

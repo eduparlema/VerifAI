@@ -12,9 +12,9 @@ SESSION = "GenericSession_31"
 GOOGLE_API_KEY=os.environ.get("googleApiKey")
 SEARCH_ENGINE_ID=os.environ.get("searchEngineId")  
 NEWS_API_KEY=os.environ.get("newsApiKey")
-print(f"search: {GOOGLE_API_KEY}")
-print(f"search engine id: {SEARCH_ENGINE_ID}")
-print(f"newsapi key {NEWS_API_KEY}")
+# print(f"search: {GOOGLE_API_KEY}")
+# print(f"search engine id: {SEARCH_ENGINE_ID}")
+# print(f"newsapi key {NEWS_API_KEY}")
 
 newsapi = NewsApiClient(api_key=NEWS_API_KEY)
 
@@ -154,7 +154,6 @@ def filter_sources(
     )
 
     verdict = response["response"]
-    print("verdict", verdict)
     indicies = [int(x.strip()) for x in verdict.split(",")]
 
     return indicies
@@ -182,9 +181,6 @@ def fetch_main_article(url: str, timeout: int = 10) -> str:
         return "ERROR"
 
 def summarize_facts(indicies, all_results, user_claim):
-    
-    print("indicies, ", indicies)
-    print("all_results", all_results)
     
     results = [all_results[i] for i in indicies]
 
@@ -325,22 +321,22 @@ def answer_claim(claim: str, summaries: list[str]) -> str:
     return response['response']
 
    
-def research(query: str):
-  google_results = google_search(query)
-  print("google search",google_results)
-  newsapi_results = get_newsapi_data(query)
-  print("news api", newsapi_results)
+def research(query: str, keywords: str):
+  google_results = google_search(keywords)
+  print(f"google search:{google_results}\n\n")
+  newsapi_results = get_newsapi_data(keywords)
+  print(f"news api: {newsapi_results}\n\n")
   all_results = combine_sources(newsapi_results, google_results)
-  print("all_results", all_results)
-  indicies = filter_sources(query, all_results)
-  print("indicies", indicies)
-  summaries = summarize_facts(indicies, all_results, query)
-  print("summaries", summaries)
+  print(f"all_results:: {all_results}\n\n")
+  indices = filter_sources(query, all_results)
+  print(f"indices: {indices}\n\n")
+  summaries = summarize_facts(indices, all_results, query)
+  print(f"summaries: {summaries}\n\n")
   answer = answer_claim(query, summaries)
-
+  print(f"Answer: {answer}")
   return answer
 
 
-# if __name__ == "__main__":
-#   research("World Cup 2026 location Turkey")
+if __name__ == "__main__":
+  research("Trump revokes international student visas", "Trump international student visas policy")
 
