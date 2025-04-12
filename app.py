@@ -2,7 +2,7 @@ import requests
 import os
 from flask import Flask, request, jsonify
 from llmproxy import generate
-from main import generate_response, intent_detection
+from main import generate_response, intent_detection, extract_url, fetch_full_content
 
 app = Flask(__name__)
 
@@ -39,6 +39,14 @@ def main():
     intent = intent_detection(message)
 
     if intent == "__FACT_CHECKABLE__":
+        url = extract_url(message)
+        if url:
+            print(f"[INFO] Detected URL: {url}")
+            message = fetch_full_content(url)
+            print(f"\n[INFO] URL data: \n{message}")
+            if not message:
+                return jsonify({"text": "⚠️ Sorry, I couldn't access or extract content from that link."})
+
         # Post initial message to initiate a thread
         init_msg = requests.post(ROCKETCHAT_API, headers=ROCKETCHAT_AUTH, json={
             "roomId": room_id,

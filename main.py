@@ -5,6 +5,8 @@ from bs4 import BeautifulSoup
 import os
 from dotenv import load_dotenv
 from utils import research
+from readability import Document
+import re
 
 load_dotenv()
 
@@ -18,6 +20,13 @@ URL = os.environ.get("factCheckApiUrl")
 
 with open('article.txt', 'r') as file:
     article = file.read()
+
+
+def extract_url(text: str) -> str:
+   match = re.search(r'https?://[^\s]+', text)
+   if not match:
+      match = re.search(r'http?://[^\s]+', text)
+   return match.group(0) if match else None
 
 def generate_response(user_input: str):
   # response = intent_detection(user_input).strip()
@@ -45,6 +54,7 @@ def intent_detection(user_input:str):
 
   Your job is to:
   1. Detect if the user's message contains a fact-checkable claim (something that could be verified or debunked using evidence).
+     A url is a fact-checkable claim!
   2. If the message **does** contain a fact-checkable claim, respond with exactly: `__FACT_CHECKABLE__`
   3. If the message **does not** contain a fact-checkable claim, respond with a helpful and friendly message that guides the user.
     - Use a warm tone, emojis, and be engaging.
@@ -151,27 +161,33 @@ def query_fact_check_api(keywords: str):
 #             print(f"   🔗 URL: {review.get('url')}")
 
 def fetch_full_content(url: str, timeout: int = 10) -> str:
-  try:
-    response = requests.get(url, timeout=timeout, 
-                            headers={
-                               "User-Agent": 'Mozilla/5.0',
-                               "Accept-Language": "en-US,en;q=0.9",
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-    "Referer": "https://www.google.com"
-                               })
-    response.raise_for_status()
-    html = response.content
-  except Exception as e:
-    print(f"[ERROR] Error fetching {url}: {e}")
-    return ""
-  
-  soup = BeautifulSoup(html, "html.parser")
-  for unwanted in soup(["script", "style", "header", "footer", "nav", "aside"]):
-      unwanted.extract()
+    try:
+        headers = {
+            "User-Agent": 'Mozilla/5.0',
+            "Accept-Language": "en-US,en;q=0.9",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+            "Referer": "https://www.google.com"
+        }
+        response = requests.get(url, headers=headers, timeout=timeout)
+        response.raise_for_status()
+        html = response.text
+    except Exception as e:
+        print(f"[ERROR] Error fetching {url}: {e}")
+        return ""
 
-  text = soup.get_text(separator=" ", strip=True)
-  clean_text = " ".join(text.split())
-  return clean_text
+    try:
+        doc = Document(html)
+        summary_html = doc.summary()
+        soup = BeautifulSoup(summary_html, "html.parser")
+    except Exception as e:
+        print("[WARN] Readability failed, falling back to raw content.")
+        soup = BeautifulSoup(html, "html.parser")
+
+    for unwanted in soup(["script", "style", "header", "footer", "nav", "aside"]):
+        unwanted.extract()
+
+    text = soup.get_text(separator=" ", strip=True)
+    return " ".join(text.split())
 
 def prepare_fact_check_context(claims):
   evidence = []
