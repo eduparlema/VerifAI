@@ -40,6 +40,7 @@ def main():
         module = main_agent(response)
         print(f"[INFO] Agent calling: {module}")
         response = eval(module)
+        print(f"\n\nresponse from module {module}: {response}")
     return jsonify({"text": response})
     
 @app.errorhandler(404)

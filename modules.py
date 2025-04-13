@@ -64,9 +64,11 @@ def fact_check_tools(user_input: str):
     else:
         return "__NO_FACT_CHECK_API__"
 
-def all_search(input: str):
+def all_search(user_input: str):
     print("[INFO] all_search module activated!")
-    return "all_search module activated"
+    response = general_search(user_input)
+    print(f"Response from general search: \n{response}")
+    return response
     
 def general_search(input: str, num_results: int = 10):
     print("[INFO] general_search module activated!")
