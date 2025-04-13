@@ -37,7 +37,7 @@ def main():
     response = eval(module)
     print(f"Response from module: {response}")
 
-    if response == "__FACT_CHECKABLE__":
+    if response == "__FACT_CHECKABLE__" or response == "__NO_FACT_CHECK_API__":
         module = main_agent(response)
         print(f"[INFO] Agent calling: {module}")
         response = eval(module)
