@@ -1,6 +1,5 @@
 from llmproxy import generate
-
-SESSION = "VerifAI_Session_1"
+from utils import SESSION
 
 def main_agent(input: str):
     system_prompt = """
