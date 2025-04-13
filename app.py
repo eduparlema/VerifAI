@@ -33,7 +33,7 @@ def main():
     message = data.get("text", "")
     room_id = data.get("channel_id")
     print(data)
-    response = ""
+    response = message
 
     while response in special_responses:
         print(f"Reponse from agent: {response}")
