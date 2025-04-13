@@ -18,6 +18,8 @@ ROCKETCHAT_AUTH = {
 
 ROCKETCHAT_API = RC_API
 
+special_responses = ["__FACT_CHECKABLE__", "__NO_FACT_CHECK_API__"]
+
 @app.route('/', methods=['POST'])
 def hello_world():
    return jsonify({"text":'Hello from Koyeb - you reached the main page!'})
@@ -37,7 +39,7 @@ def main():
     response = eval(module)
     print(f"Response from module: {response}")
 
-    if response == "__FACT_CHECKABLE__" or response == "__NO_FACT_CHECK_API__":
+    while response in special_responses:
         module = main_agent(response)
         print(f"[INFO] Agent calling: {module}")
         response = eval(module)
