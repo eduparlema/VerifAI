@@ -33,6 +33,7 @@ def main():
     print(data)
 
     module = main_agent(message)
+    print(f"Response from agent: {module}")
     response = eval(module)
     print(f"Response from module: {response}")
 
