@@ -41,8 +41,18 @@ def main():
         print(f"[INFO] Agent calling: {module}")
         response = eval(module)
         print(f"\n\nresponse from module {module}: {response}")
+        if response == "__FACT_CHECKABLE__":
+            send_direct_message("🔎 Searching if your claim has been fact-checked... please wait", room_id)
+            
     return jsonify({"text": response})
     
+def send_direct_message(message: str, room_id):
+    # Post initial message to initiate a thread
+    requests.post(ROCKETCHAT_API, headers=ROCKETCHAT_AUTH, json={
+        "roomId": room_id,
+        "text": message,
+    })
+
 @app.errorhandler(404)
 def page_not_found(e):
     return "Not Found", 404

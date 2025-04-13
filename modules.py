@@ -69,7 +69,7 @@ def all_search(user_input: str):
     print(f"Response from general search: \n{response}")
     return response
     
-def general_search(input: str, num_results: int = 10):
+def general_search(input: str, num_results: int = 15):
     print("[INFO] general_search module activated!")
 
     # Perform a Google search
