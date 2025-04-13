@@ -52,6 +52,7 @@ def intent_detection(user_input: str):
 
 def fact_check_tools(input: str):
     print("[INFO] fact_check_tools module activated!")
+    return "fact_check_tools activated!"
 
 def all_search(input: str):
     print("[INFO] all_search module activated!")
