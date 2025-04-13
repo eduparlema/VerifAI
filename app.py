@@ -34,6 +34,7 @@ def main():
 
     module = main_agent(message)
     response = eval(module)
+    print(f"Response from module: {response}")
 
     if response == "__FACT_CHECKABLE__":
         module = main_agent(response)
