@@ -13,7 +13,7 @@ SEARCH_ENGINE_ID=os.environ.get("searchEngineId")
 FACT_CHECK_API=os.environ.get("googleFactCheckApiKey")
 FACT_CHECK_URL=os.environ.get("factCheckApiUrl")
 
-SESSION = "VerifAI_Session_8"
+SESSION = "VerifAI_Session_9"
 
 def google_search(query: str, num_results: int = 10) -> list:
     """

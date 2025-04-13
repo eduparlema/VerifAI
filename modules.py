@@ -10,7 +10,9 @@ def intent_detection(user_input: str):
         Your job is to:
         1. Detect if the user's message contains a fact-checkable claim (something
         that could be verified or debunked using evidence). A url is a
-        fact-checkable claim!
+        fact-checkable claim, and a question that contains a claim is also 
+        fact-checkable. Only claims that do not contain any claims at all (e.g.,
+        hello, how are you?) are not fact-checkable.
         2. If the message **does** contain a fact-checkable claim, respond with exactly: `__FACT_CHECKABLE__`
         3. If the message **does not** contain a fact-checkable claim, respond with
             a helpful and friendly message that guides the user.
