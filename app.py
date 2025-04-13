@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify
 from llmproxy import generate
 import os
 from mainAgent import main_agent
+from modules import *
 
 app = Flask(__name__)
 
