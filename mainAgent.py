@@ -7,7 +7,9 @@ def main_agent(input: str):
     using a variety of specialized tools.
 
     Your job is to understand user input and decide the most appropriate tool to
-    use. If no tool is relevant, you may reply directly.
+    use. If no tool seems irrelevant, fallback to the no_facts() module, which
+    performs an intent detection and decides if the user's input contains a claim
+    that is fact_checkable or not.
 
     Strictly respond with a tool call if a module should be activated. Do not 
     explain or justify the decision to the user — just invoke the tool. After 

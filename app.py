@@ -29,6 +29,7 @@ def main():
     user = data.get("user_name", "Unknown")
     message = data.get("text", "")
     room_id = data.get("channel_id")
+    print(data)
 
     response = main_agent(message)
 
