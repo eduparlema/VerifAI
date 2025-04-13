@@ -32,7 +32,7 @@ def main_agent(input: str):
     Use this tool to determine whether the user's input includes a verifiable
     factual claim. If no fact checkable claims are found, `__FACT_CHECKABLE__`
     will be provided to you which means that you should continue down the ideal
-    pipeline provided above. That is, use the fact_check_tools() module. Otherwise,
+    pipeline provided above. That is, use the fact_check_tools module. Otherwise,
     just respond with the answer provided by this module.
     ---
 
@@ -42,9 +42,11 @@ def main_agent(input: str):
     **Usage example:**  
     `fact_check_tools("Trump replaced Pride Month with Veterans Month")`  
     This tool searches for existing fact checks. If relevant results are found,
-    summarize the verdict and cite the source. If no suitable content is found,
-    you may proceed to a deeper investigation via `all_search`.
-
+    it summarizes the sources and provides a verdict citing all sources.If no
+    suitable content is found, "__NO_FACT_CHECK_API__" will be provided to you
+    which means that you should continue down the ideal pipeline provided above.
+    That is, use all_search module. Otherwise, just respond with the answer
+    provided by the tool.
     ---
 
     ##3. Tool to perform a comprehensive search  

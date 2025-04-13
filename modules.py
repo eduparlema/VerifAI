@@ -52,10 +52,21 @@ def intent_detection(user_input: str):
 
 def fact_check_tools(input: str):
     print("[INFO] fact_check_tools module activated!")
-    return "fact_check_tools activated!"
+    keywords = extract_keywords(input)
+    fact_check_data = query_fact_check_api(keywords)
+
+    # Check if we get something from Fact Checking API
+    if fact_check_data and fact_check_data.get('claims'):
+        context = prepare_fact_check_context(fact_check_data["claims"])
+        verdict = generate_verdict(user_input, context)
+        # TODO: ADD BUTTON FUNCTIONALITY HERE!
+        return verdict
+    else:
+        return "__NO_FACT_CHECK_API__"
 
 def all_search(input: str):
     print("[INFO] all_search module activated!")
+    return "all_search module activated"
     
 def general_search(input: str, num_results: int = 10):
     print("[INFO] general_search module activated!")

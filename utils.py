@@ -10,6 +10,8 @@ load_dotenv()
 
 GOOGLE_API_KEY=os.environ.get("1googleSearchApiKey")
 SEARCH_ENGINE_ID=os.environ.get("2searchEngineId")
+FACT_CHECK_API=os.environ.get("googleFactCheckApiKey")
+FACT_CHECK_URL=os.environ.get("factCheckApiUrl")
 
 SESSION = "VerifAI_Session_4"
 
@@ -239,6 +241,143 @@ def generate_fact_based_response(user_input: str, summaries: list) -> str:
         lastk=3,
         session_id=SESSION,
         rag_usage=False
+    )
+
+    return response["response"]
+
+def extract_keywords(user_input: str):
+    system_prompt = """
+        You are a search assistant for a fact-checking system.
+
+        Your task is to generate a concise, high-quality search query based on a claim,
+        article, or user statement. The goal is to capture the core idea so it can be
+        searched using the Google Fact Check Tools API.
+
+        Guidelines:
+        - Extract only the **essential keywords**: people, organizations, places, events, and topics.
+        - **Do not** include generic terms like "claim", "news article", "report", "statement", or "rumor".
+            Also, unless stated somewhere in the user input, do not include dates on the
+            keywords.
+        - Focus on the real-world entities or actions being mentioned (e.g., policies, laws, bans, replacements).
+        - Use neutral, objective language — avoid emotionally charged or speculative terms.
+        - Keep it short and search-friendly: ideally **5-10 words**.
+        - Output **only the final search query**, without quotes, prefixes, or explanations.
+    """
+
+    response = generate(
+        model="4o-mini",
+        system=system_prompt,
+        query=user_input,
+        temperature=0.2,
+        lastk=3,
+        session_id="keyword_session",
+        rag_usage=False
+    )
+
+    return response["response"]
+
+def query_fact_check_api(keywords: str):
+
+    params = {
+        "query": keywords,
+        "key": FACT_CHECK_API,
+        "pageSize": 5,
+        "languageCode": 'en'
+    }
+    try:
+        response = requests.get(FACT_CHECK_URL, params=params)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Error querying Fact Check API: {e}")
+        return None
+    
+def fetch_full_content(url: str, timeout: int = 10) -> str:
+    try:
+        headers = {
+            "User-Agent": 'Mozilla/5.0',
+            "Accept-Language": "en-US,en;q=0.9",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+            "Referer": "https://www.google.com"
+        }
+        response = requests.get(url, headers=headers, timeout=timeout)
+        response.raise_for_status()
+        html = response.text
+    except Exception as e:
+        print(f"[ERROR] Error fetching {url}: {e}")
+        return ""
+
+    try:
+        doc = Document(html)
+        summary_html = doc.summary()
+        soup = BeautifulSoup(summary_html, "html.parser")
+    except Exception as e:
+        print("[WARN] Readability failed, falling back to raw content.")
+        soup = BeautifulSoup(html, "html.parser")
+
+    for unwanted in soup(["script", "style", "header", "footer", "nav", "aside"]):
+        unwanted.extract()
+
+    text = soup.get_text(separator=" ", strip=True)
+    return " ".join(text.split())
+    
+def prepare_fact_check_context(claims):
+    evidence = []
+    for claim in claims:
+        claim_text = claim.get("text", "")
+        claimant = claim.get("claimant", "Unknown")
+        for review in claim.get("claimReview", []):
+            reviewer = review.get("publisher", {}).get("name", "Unknown")
+            rating = review.get("textualRating", "")
+            review_url = review.get("url", "")
+            review_date = review.get("reviewDate", "")
+            article_text = fetch_full_content(review_url)
+            content_block = f"""
+                            Claim: {claim_text}
+                            Claimant: {claimant}
+                            Reviewer: {reviewer}
+                            Review Date: {review_date}
+                            Rating: {rating}
+                            Source: {review_url}
+                            Extracted Article Content:
+                            {article_text}
+                            """
+            evidence.append(content_block)
+    return "\n\n--\n\n".join(evidence)
+
+def generate_verdict(user_claim: str, evidence: str):
+    system_prompt = """
+    You are a smart and friendly fact-checking assistant who helps users understand
+    whether claims they've seen are true, false, biased, misleading, exagerated, etc.
+    You are an objective judge, do NOT give any opinions and always refer to relevant
+    content when providing claims.
+
+    You are given:
+    - A claim submitted by the user
+    - Fact-check metadata (e.g. rating, review date, source)
+    - Full article content scraped from reliable sources
+
+    🎯 Your job:
+    1. Determine if the claim is **True**, **False**,**Misleading**, etc based on the evidence.
+    2. Respond with a clear, short, and **engaging** verdict in a friendly tone — like you're explaining something to a friend over coffee.
+    3. Use **emojis** to add warmth and help users scan the message quickly.
+    4. Pull in **useful details** or **direct quotes** from the source article to explain why the verdict is what it is.
+    5. Let the user know if the information is **recent or outdated**.
+    6. End with a list of **citations** for transparency.
+    """
+
+
+    response = generate(
+    model="4o-mini",
+    system=system_prompt,
+    query=f"""User Claim: {user_claim}
+            Fact-Check Evidence:
+            {evidence}
+            """,
+    temperature=0.4,
+    lastk=3,
+    session_id=SESSION,
+    rag_usage=False
     )
 
     return response["response"]
