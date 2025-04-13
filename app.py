@@ -35,7 +35,7 @@ def main():
     print(data)
     response = message
 
-    while response in special_responses:
+    while response in special_responses or response == message:
         print(f"Reponse from agent: {response}")
         module = main_agent(response)
         print(f"[INFO] Agent calling: {module}")
