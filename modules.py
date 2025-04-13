@@ -1,5 +1,3 @@
-import os
-import requests
 from llmproxy import generate
 from utils import *
 
