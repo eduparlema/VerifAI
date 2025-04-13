@@ -50,7 +50,7 @@ def intent_detection(user_input: str):
     )
     return response["response"]
 
-def fact_check_tools(input: str):
+def fact_check_tools(user_input: str):
     print("[INFO] fact_check_tools module activated!")
     keywords = extract_keywords(input)
     fact_check_data = query_fact_check_api(keywords)
