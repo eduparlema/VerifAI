@@ -280,3 +280,13 @@ def intent_detection(user_input: str):
         **OR**
         - a friendly message like the one above, appropriate for the input.
     """
+    response = generate(
+        model="4o-mini",
+        system=system_prompt,
+        query=user_input,
+        temperature=0.5,
+        lastk=1,
+        session_id=SESSION,
+        rag_usage=False
+    )
+    return response["response"]

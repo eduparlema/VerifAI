@@ -2,6 +2,7 @@ import requests
 from flask import Flask, request, jsonify
 from llmproxy import generate
 import os
+from mainAgent import main_agent
 
 app = Flask(__name__)
 
@@ -29,54 +30,13 @@ def main():
     message = data.get("text", "")
     room_id = data.get("channel_id")
 
-    print(data)
+    response = main_agent(message)
 
-    # Ignore bot messages
-    if data.get("bot") or not message:
-        return jsonify({"status": "ignored"})
-
-    print(f"Message from {user} : {message}")
-
-    # Generate a response using LLMProxy
-    response = generate(
-        model='4o-mini',
-        system='answer my question and add keywords',
-        query= message,
-        temperature=0.0,
-        lastk=0,
-        session_id='GenericSession'
-    )
-
-    response_text = response['response']
-    # Send verdict + buttons
-    requests.post(ROCKETCHAT_API, headers=ROCKETCHAT_AUTH, json={
-        "roomId": room_id,
-        "text": response_text,
-        "attachments": [
-            {
-                "text": "What would you like to do next?",
-                "actions": [
-                    {
-                        "type": "button",
-                        "text": "🔍 Verify Again",
-                        "msg": "verify_again",
-                        "msg_in_chat_window": True
-                    },
-                    {
-                        "type": "button",
-                        "text": "🧠 Crowdsource",
-                        "msg": "crowdsource",
-                        "msg_in_chat_window": True
-                    }
-                ]
-            }
-        ]
-    })
-    
-    # Send response back
-    print(response_text)
-
-    return jsonify({"text": response_text})
+    if response == "__FACT_CHECKABLE__":
+        module = main_agent(response)
+        print(f"[INFO] Agent calling: {module}")
+        response = eval(module)
+    return jsonify({"text": response})
     
 @app.errorhandler(404)
 def page_not_found(e):

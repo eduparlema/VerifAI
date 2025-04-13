@@ -27,10 +27,10 @@ def main_agent(input: str):
     **Usage example:**  
     `no_facts("Did Trump really replace Pride Month with Veterans Month?")`  
     Use this tool to determine whether the user's input includes a verifiable
-    factual claim. If it returns `__FACT_CHECKABLE__`, continue down the ideal
-    pipeline suggested above. Otherwise, just reply with the output of no_facts,
-    which will contain a friendly response to the user.
-
+    factual claim. If no fact checkable claims are found, `__FACT_CHECKABLE__`
+    will be provided to you which means that you should continue down the ideal
+    pipeline provided above. That is, use the fact_check_tools() module. Otherwise,
+    just respond with the answer provided by this module.
     ---
 
     ##2. Tool to query the Google Fact Check API  
@@ -38,7 +38,9 @@ def main_agent(input: str):
     **Parameters:** query  
     **Usage example:**  
     `fact_check_tools("Trump replaced Pride Month with Veterans Month")`  
-    This tool searches for existing fact checks. If relevant results are found, summarize the verdict and cite the source. If no suitable content is found, you may proceed to a deeper investigation via `all_search`.
+    This tool searches for existing fact checks. If relevant results are found,
+    summarize the verdict and cite the source. If no suitable content is found,
+    you may proceed to a deeper investigation via `all_search`.
 
     ---
 
