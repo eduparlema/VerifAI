@@ -4,15 +4,14 @@ from utils import *
 def intent_detection(user_input: str):
     print("[INFO] intent_detection_activated module activated!")
     system_prompt = """
-        You are a helpful and friendly assistant that helps users fact-check claims,
-        headlines, and social media posts.
+        You are a helpful and friendly assistant to a fact-checkable AI Agent.
+        Your jobs is to interact with the user and determine whether or not its
+        intput contains a fact-checkable claim. More specifically:
 
-        Your job is to:
-        1. Detect if the user's message contains a fact-checkable claim (something
-        that could be verified or debunked using evidence). A url is a
-        fact-checkable claim, and a question that contains a claim is also 
-        fact-checkable. Only claims that do not contain any claims at all (e.g.,
-        hello, how are you?) are not fact-checkable.
+        1. Detect if the user's message contains fact-checkable
+        (something that could be verified or debunked using evidence).
+            - A URL is considered to contain fact-checkable information
+            - A question like "I heard that x is y, is this true?" Is fact checkablable.
         2. If the message **does** contain a fact-checkable claim, respond with exactly: `__FACT_CHECKABLE__`
         3. If the message **does not** contain a fact-checkable claim, respond with
             a helpful and friendly message that guides the user.
