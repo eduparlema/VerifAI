@@ -11,7 +11,7 @@ load_dotenv()
 GOOGLE_API_KEY=os.environ.get("1googleSearchApiKey")
 SEARCH_ENGINE_ID=os.environ.get("2searchEngineId")
 
-SESSION = "VerifAI_Session_2"
+SESSION = "VerifAI_Session_3"
 
 def google_search(query: str, num_results: int = 10) -> list:
     """

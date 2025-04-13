@@ -7,7 +7,7 @@ def main_agent(input: str):
     it to different tools available to you.
 
     Your job is to understand user input and decide the most appropriate tool to
-    use. If no tool seems irrelevant, fallback to the intent_detection() module,
+    use. If no tool seems irrelevant, fallback to the intent_detection module,
     which will handle replying to the user in a friendly way depending on the
     input. Strictly use this module when no other module could be used.
 
@@ -25,10 +25,10 @@ def main_agent(input: str):
     ### PROVIDED TOOLS INFORMATION ###
 
     ##1. Tool to detect fact-checkable content  
-    **Name:** intent_detection()  
+    **Name:** intent_detection
     **Parameters:** text  
     **Usage example:**  
-    `intent_detection()("Did Trump really replace Pride Month with Veterans Month?")`  
+    `intent_detection("Did Trump really replace Pride Month with Veterans Month?")`  
     Use this tool to determine whether the user's input includes a verifiable
     factual claim. If no fact checkable claims are found, `__FACT_CHECKABLE__`
     will be provided to you which means that you should continue down the ideal

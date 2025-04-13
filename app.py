@@ -31,7 +31,8 @@ def main():
     room_id = data.get("channel_id")
     print(data)
 
-    response = main_agent(message)
+    module = main_agent(message)
+    response = eval(module)
 
     if response == "__FACT_CHECKABLE__":
         module = main_agent(response)
