@@ -33,13 +33,10 @@ def main():
     message = data.get("text", "")
     room_id = data.get("channel_id")
     print(data)
-
-    module = main_agent(message)
-    print(f"Response from agent: {module}")
-    response = eval(module)
-    print(f"Response from module: {response}")
+    response = ""
 
     while response in special_responses:
+        print(f"Reponse from agent: {response}")
         module = main_agent(response)
         print(f"[INFO] Agent calling: {module}")
         response = eval(module)
