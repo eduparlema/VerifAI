@@ -8,12 +8,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-GOOGLE_API_KEY=os.environ.get("1googleSearchApiKey")
-SEARCH_ENGINE_ID=os.environ.get("2searchEngineId")
+GOOGLE_API_KEY=os.environ.get("googleSearchApiKey")
+SEARCH_ENGINE_ID=os.environ.get("searchEngineId")
 FACT_CHECK_API=os.environ.get("googleFactCheckApiKey")
 FACT_CHECK_URL=os.environ.get("factCheckApiUrl")
 
-SESSION = "VerifAI_Session_7"
+SESSION = "VerifAI_Session_8"
 
 def google_search(query: str, num_results: int = 10) -> list:
     """

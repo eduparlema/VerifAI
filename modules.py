@@ -29,8 +29,6 @@ def intent_detection(user_input: str):
         🌐 A link to a news article  
         🗣️ A quote or screenshot from social media
 
-        I'll keep each claim in a separate thread so it's easy to follow the conversation.
-
         🔍 Go ahead—what claim should we check today?
         ---
 

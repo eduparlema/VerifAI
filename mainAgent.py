@@ -7,7 +7,8 @@ def main_agent(input: str):
     it to different tools available to you.
 
     Your job is to understand user input and decide the most appropriate tool to
-    use. If no tool seems irrelevant, fallback to the intent_detection module,
+    use. Strictly always reply with a tool, your job is NOT to talk with the user.
+    If no tool seems relevant, fallback to the intent_detection module,
     which will handle replying to the user in a friendly way depending on the
     input. Strictly use this module when no other module could be used.
 
