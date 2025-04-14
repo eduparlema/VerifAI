@@ -65,7 +65,7 @@ def fact_check_tools(user_input: str, room_id: str, user_name:str):
 
 def all_search(user_input: str, room_id: str, user_name:str):
     print("[INFO] all_search module activated!")
-    response = general_search(user_input)
+    response = general_search(user_input, room_id, user_name)
     print(f"Response from general search: \n{response}")
     return response
     
