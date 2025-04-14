@@ -49,6 +49,7 @@ def intent_detection(user_input: str, room_id: str, user_name: str):
         session_id=SESSION,
         rag_usage=False
     )
+    send_direct_message(response["response"], room_id)
     return response["response"]
 
 def fact_check_tools(user_input: str, room_id: str, user_name:str):
@@ -86,6 +87,8 @@ def all_search(user_input: str, room_id: str, user_name:str):
     print("[INFO] all_search module activated!")
     response = general_search(user_input, room_id, user_name)
     print(f"Response from general search: \n{response}")
+    
+    # Respond to the user
     send_direct_message(response, room_id)
     return response
     
