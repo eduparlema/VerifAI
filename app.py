@@ -40,7 +40,6 @@ def main():
             send_direct_message("🔎 Searching if your claim has been fact-checked... please wait", room_id)
         elif response == "__NO_FACT_CHECK_API__":
             send_direct_message("😕 Your claim hasn't been fact-checked yet... 🔎 Performing a general search to find relevant information — please hang tight! ⏳", room_id)
-    send_direct_message(response, room_id)
     
 @app.errorhandler(404)
 def page_not_found(e):

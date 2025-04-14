@@ -1,6 +1,8 @@
 from llmproxy import generate
 from utils import *
 
+RC_API = os.environ.get("RC_API")
+
 def intent_detection(user_input: str, room_id: str, user_name: str):
     print("[INFO] intent_detection_activated module activated!")
     system_prompt = """
@@ -58,7 +60,24 @@ def fact_check_tools(user_input: str, room_id: str, user_name:str):
     if fact_check_data and fact_check_data.get('claims'):
         context = prepare_fact_check_context(fact_check_data["claims"])
         verdict = generate_verdict(user_input, context)
-        # TODO: ADD BUTTON FUNCTIONALITY HERE!
+        # Send verdict + buttons
+        requests.post(RC_API, headers=ROCKETCHAT_AUTH, json={
+            "roomId": room_id,
+            "text": verdict,
+            "attachments": [
+                {
+                    "text": "Would you like me to search to web for you?",
+                    "actions": [
+                        {
+                            "type": "button",
+                            "text": "Search the web",
+                            "msg": "__NO_FACT_CHECK_API__",
+                            "msg_in_chat_window": True
+                        },
+                    ]
+                }
+            ]
+        })
         return verdict
     else:
         return "__NO_FACT_CHECK_API__"
@@ -67,6 +86,7 @@ def all_search(user_input: str, room_id: str, user_name:str):
     print("[INFO] all_search module activated!")
     response = general_search(user_input, room_id, user_name)
     print(f"Response from general search: \n{response}")
+    send_direct_message(response, room_id)
     return response
     
 def general_search(input: str, room_id: str, user_name:str, num_results: int = 10):
@@ -75,7 +95,7 @@ def general_search(input: str, room_id: str, user_name:str, num_results: int = 1
     print(f"[general_search_module] room_id: {room_id}, user: {user_name}")
     # Perform a Google search
     search_results = google_search(input, num_results)
-    send_direct_message("Retrieved results from Google, making a decision!", room_id)
+    send_direct_message("✅ Got some results from Google — taking a closer look at your claim now! 🔍", room_id)
     if not search_results:
         print("[ERROR] No results found.")
         return []
