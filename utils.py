@@ -13,7 +13,10 @@ SEARCH_ENGINE_ID=os.environ.get("searchEngineId")
 FACT_CHECK_API=os.environ.get("googleFactCheckApiKey")
 FACT_CHECK_URL=os.environ.get("factCheckApiUrl")
 
-SESSION = "VerifAI_Session_11"
+print(GOOGLE_API_KEY)
+print(SEARCH_ENGINE_ID)
+
+SESSION = "VerifAI_Session_12"
 
 def google_search(query: str, num_results: int = 10) -> list:
     """
@@ -56,14 +59,13 @@ def google_search(query: str, num_results: int = 10) -> list:
 
     return []
 
-def format_source(user_input, url, domain, title, article_text):
+def format_source(user_input, url, title, article_text):
     """
     Formats the claim and article text into a structured input for the LLM.
     """
     return {
         "Topic": user_input,
         "URL": url,
-        "Domain": domain,
         "Title": title,
         "Content": article_text
     }
@@ -93,7 +95,7 @@ def fetch_main_article(url: str, timeout: int = 10) -> str:
         print(f"[ERROR] Failed to parse article: {e}")
         return "ERROR"
     
-def summarize_article(user_input: str, sources: list) -> str:
+def summarize_source(user_input: str, source: dict) -> str:
     """
     Generate fact-focused summaries for a list of articles relevant to a given claim.
     """
@@ -124,66 +126,45 @@ def summarize_article(user_input: str, sources: list) -> str:
         📦 Output Format:
         This article is about <topic>. It provides the following information relevant to the user's claim or curiosity: <summary with key facts and any relevant quotes>.
     """
-
-    summaries = []
-
-    num_sources = 0
-    article_index = 0
-
-    while num_sources < 5:
-
-        source = sources[article_index]
-
-        print("Source", source)
     
-        title = source.get("Title", "unknown")
-        text = source.get("Content", "")
-        url = source.get("URL", "unknown")
-        domain = source.get("domain", "unknown")
+    title = source.get("Title", "unknown")
+    text = source.get("Content", "")
+    url = source.get("URL", "unknown")
 
-        query = f"""
-        Here is the topic or claim: {user_input}.
-        Here is the article name: {title}.
-        Here is the article text: {text}
-        """
+    query = f"""
+    Here is the topic or claim: {user_input}.
+    Here is the article name: {title}.
+    Here is the article text: {text}
+    """
 
-        try:
-            response = generate(
-                model='4o-mini',
-                system=system_prompt,
-                query=query,
-                temperature=0.2,
-                lastk=10,
-                session_id=SESSION,
-                rag_usage=False
-            )
+    try:
+        response = generate(
+            model='4o-mini',
+            system=system_prompt,
+            query=query,
+            temperature=0.2,
+            lastk=10,
+            session_id=SESSION,
+            rag_usage=False
+        )
 
+        article_summary = response.get("response", "")
 
-            article_summary = response.get("response", "")
+        if article_summary == "":
+            return "ERROR"
+        
+        summary = {
+        "title": title,
+        "url": url,
+        "summary": article_summary
+        }
 
-            if article_summary == "":
-                print(f"[ERROR] No summary generated for {title}.")
-                article_index += 1
-                continue
+    except Exception as e:
+        print(f"Error summarizing article '{title}': {e}")
+        return "ERROR"
+    
+    return summary
 
-
-            summaries.append({
-                "title": title,
-                "url": url,
-                "domain": domain,
-                "summary": article_summary
-            })
-
-
-            num_sources += 1
-            article_index += 1
-     
-
-        except Exception as e:
-            print(f"Error summarizing article '{title}': {e}")
-            continue
-
-    return summaries
 
 def generate_fact_based_response(user_input: str, summaries: list) -> str:
     """
@@ -223,7 +204,7 @@ def generate_fact_based_response(user_input: str, summaries: list) -> str:
     """
 
     formatted_summaries = "\n\n".join([
-        f"- Title: {item['title']}\n  URL: {item['url']}\n  Domain: {item['domain']}\n  Summary: {item['summary']}"
+        f"- Title: {item['title']}\n  URL: {item['url']}\n Summary: {item['summary']}"
         for item in summaries
     ])
 

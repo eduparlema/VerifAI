@@ -16,7 +16,7 @@ ROCKETCHAT_AUTH = {
     "X-User-Id": RC_userId,
 }
 
-ROCKETCHAT_API = RC_API
+ROCKETCHAT_API = "https://chat.genaiconnect.net/api/v1/chat.postEphemeral"
 
 special_responses = ["__FACT_CHECKABLE__", "__NO_FACT_CHECK_API__"]
 

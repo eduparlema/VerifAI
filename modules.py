@@ -69,7 +69,8 @@ def all_search(user_input: str):
     print(f"Response from general search: \n{response}")
     return response
     
-def general_search(input: str, num_results: int = 15):
+def general_search(input: str, num_results: int = 10):
+    TOTAL_RESULTS_DESIRED = 5
     print("[INFO] general_search module activated!")
 
     # Perform a Google search
@@ -78,40 +79,44 @@ def general_search(input: str, num_results: int = 15):
     if not search_results:
         print("[ERROR] No results found.")
         return []
+
+    all_summaries = []
+    total_summary = 0
+    index_search_results = 0
     
-    formatted_search_results = []
-    
-    # Fetch and format each article
-    for result in search_results:
+    while total_summary < 5:
+
+        # Retrieve the next website in all search results.
+        result = search_results[index_search_results]
+
+        # Extact the url, title, and content of the website.
         url = result["url"]
         title = result["title"]
-        domain = result["source"]
         content = fetch_main_article(url)
 
-        print("[INFO] Fetching article content...")
-        print(title)
-        print(url)
-        print(content)
-
+        # If fetching the content fails, skip this website.
         if content == "ERROR":
+            index_search_results += 1
             continue
+        # Else, Format the url, title, and content information properly.
+        else: 
+            formatted_result = format_source(input, url, title, content)
+            summary_result = summarize_source(input, formatted_result)
 
-        formatted_result = format_source(input, url, domain, title, content)
+            # If summarizing the content fails, skip this website.
+            if summary_result == "ERROR":
+                index_search_results += 1
+                continue
 
-        formatted_search_results.append(formatted_result)              
+            # Else, add the source to the all_summaries list.
+            else: 
+                total_summary += 1
+                index_search_results += 1
 
-    # Summarize the articles
-    summaries = summarize_article(input, formatted_search_results)
+                all_summaries.append(summary_result)
 
-    print("Summaries: ", summaries)
-
-    if not summaries:
-        print("[ERROR] No summaries found.")
-        return []
-    
-    # Generate a fact-based response
-    response = generate_fact_based_response(input, summaries)
-
+    # Generate a response based on all summarized sources.
+    response = generate_fact_based_response(input, all_summaries)
     if not response:
         print("[ERROR] No response generated.")
         return []
