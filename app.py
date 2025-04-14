@@ -35,11 +35,12 @@ def main():
         module = add_params_to_module(module, room_id, user)
         print(f"[INFO] Edited module: {module}")
         response = eval(module)
-        print(f"\n\nresponse from module {module}: {response}")
+        print(f"\n\nresponse from module {module}: \n\n{response}")
         if response == "__FACT_CHECKABLE__":
             send_direct_message("🔎 Searching if your claim has been fact-checked... please wait", room_id)
         elif response == "__NO_FACT_CHECK_API__":
             send_direct_message("😕 Your claim hasn't been fact-checked yet... 🔎 Performing a general search to find relevant information — please hang tight! ⏳", room_id)
+    print(f"About to return: \n\n{response}")
     return jsonify({"text": response})
     
 @app.errorhandler(404)

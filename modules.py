@@ -84,7 +84,7 @@ def general_search(input: str, room_id: str, user_name:str, num_results: int = 1
     total_summary = 0
     index_search_results = 0
     
-    while total_summary < 5:
+    while total_summary < TOTAL_RESULTS_DESIRED:
 
         # Retrieve the next website in all search results.
         result = search_results[index_search_results]
