@@ -27,7 +27,7 @@ FACT_CHECK_URL=os.environ.get("factCheckApiUrl")
 print(GOOGLE_API_KEY)
 print(SEARCH_ENGINE_ID)
 
-SESSION = "VerifAI_Session_14"
+SESSION = "VerifAI_Session_15"
 
 def google_search(query: str, num_results: int = 10) -> list:
     """
@@ -70,9 +70,86 @@ def google_search(query: str, num_results: int = 10) -> list:
 
     return []
 
-def custom_google_search(query: str, num_results: int = 10) -> list:
-    pass
+def custom_google_search(user_query: str, num_results: int = 10) -> list:
+    """
+    Performs a context-aware Google search using parameters suggested by the LLM,
+    such as local language and country, without limiting to specific sites.
+    """
+    system_prompt = """
+        You are a smart assistant supporting a fact-checking system by improving how user queries are searched on Google.
 
+        Your job is to suggest search parameters that will yield the most relevant and regionally appropriate results.
+
+        🧠 Task:
+        Based on the user's input, determine if the query should be searched in a specific language or country context.
+
+        If so, provide:
+        - A version of the query translated into the appropriate language (if needed).
+        - The most relevant **language code** (e.g., 'tr' for Turkish, 'en' for English).
+        - The most relevant **country code** (e.g., 'TR' for Turkey, 'US' for United States).
+
+        🚫 Do NOT include specific websites. Focus on general localization only.
+
+        📦 Output format (as a JSON dictionary):
+        {
+        "query": "<translated or original query>",
+        "language": "<language code>",
+        "country": "<country code>"
+        }
+    """
+
+    response = generate(
+        model="4o-mini",
+        system=system_prompt,
+        query=user_query,
+        temperature=0.2,
+        lastk=3,
+        session_id="search_param_suggester",
+        rag_usage=False
+    )
+
+    try:
+        suggestions = eval(response["response"])
+        language = suggestions.get("language", "en")
+        country = suggestions.get("country", "US")
+        query = suggestions.get("query", user_query).strip()
+
+        print("Custom Search:")
+        print(language)
+        print(country)
+        print(query)
+
+        params = {
+            "key": GOOGLE_API_KEY,
+            "cx": SEARCH_ENGINE_ID,
+            "q": query,
+            "num": num_results,
+            "lr": f"lang_{language}",
+            "cr": f"country{country}"
+        }
+
+        search_url = "https://www.googleapis.com/customsearch/v1"
+        response = requests.get(search_url, params=params, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        results = data.get("items", [])
+
+        google_results = []
+        for item in results:
+            url = item.get("link")
+            title = item.get("title")
+            domain = urlparse(url).netloc.replace("www.", "")
+            google_results.append({
+                "url": url,
+                "title": title,
+                "source": domain,
+            })
+
+        return google_results
+
+    except Exception as e:
+        print(f"❌ Failed to execute localized search: {e}")
+        return []
 
 def format_source(user_input, url, title, article_text):
     """
