@@ -4,19 +4,12 @@ from llmproxy import generate
 import os
 from mainAgent import main_agent
 from modules import *
+from utils import *
 
 app = Flask(__name__)
 
 RC_token = os.environ.get("RC_token")
 RC_userId = os.environ.get("RC_userId")
-RC_API = os.environ.get("RC_API")
-
-ROCKETCHAT_AUTH = {
-    "X-Auth-Token": RC_token,
-    "X-User-Id": RC_userId,
-}
-
-ROCKETCHAT_API = "https://chat.genaiconnect.net/api/v1/chat.postEphemeral"
 
 special_responses = ["__FACT_CHECKABLE__", "__NO_FACT_CHECK_API__"]
 
@@ -39,6 +32,8 @@ def main():
         print(f"Reponse from agent: {response}")
         module = main_agent(response)
         print(f"[INFO] Agent calling: {module}")
+        module = add_params_to_module(module, room_id, user)
+        print(f"[INFO] Edited module: {module}")
         response = eval(module)
         print(f"\n\nresponse from module {module}: {response}")
         if response == "__FACT_CHECKABLE__":
@@ -47,13 +42,6 @@ def main():
             send_direct_message("😕 Your claim hasn't been fact-checked yet... 🔎 Performing a general search to find relevant information — please hang tight! ⏳", room_id)
     return jsonify({"text": response})
     
-def send_direct_message(message: str, room_id):
-    # Post initial message to initiate a thread
-    requests.post(ROCKETCHAT_API, headers=ROCKETCHAT_AUTH, json={
-        "roomId": room_id,
-        "text": message,
-    })
-
 @app.errorhandler(404)
 def page_not_found(e):
     return "Not Found", 404

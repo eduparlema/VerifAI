@@ -5,6 +5,17 @@ from readability import Document
 from bs4 import BeautifulSoup
 from llmproxy import generate
 from dotenv import load_dotenv
+import re
+
+
+RC_API = os.environ.get("RC_API")
+RC_token = os.environ.get("RC_token")
+RC_userId = os.environ.get("RC_userId")
+
+ROCKETCHAT_AUTH = {
+    "X-Auth-Token": RC_token,
+    "X-User-Id": RC_userId,
+}
 
 load_dotenv()
 
@@ -362,3 +373,39 @@ def generate_verdict(user_claim: str, evidence: str):
     )
 
     return response["response"]
+
+def send_direct_message(message: str, room_id):
+    # Post initial message to initiate a thread
+    requests.post(RC_API, headers=ROCKETCHAT_AUTH, json={
+        "roomId": room_id,
+        "text": message,
+    })
+
+def add_params_to_module(module_str, *extra_params):
+    """
+    Adds extra parameters to a function call string before evaluation.
+
+    Args:
+        module_str (str): Original function call string, e.g., "fact_check_tools('Trump')"
+        *extra_params: Additional parameters to add, e.g., 'param2', 'param3'
+
+    Returns:
+        str: Modified function call string with all parameters
+    """
+    match = re.match(r"(\w+)\((.*)\)", module_str.strip())
+    if not match:
+        raise ValueError("Invalid function call string")
+
+    func_name, existing_param = match.groups()
+
+    # Ensure existing_param isn't empty and remove trailing commas/spaces
+    all_params = [existing_param.strip()] if existing_param.strip() else []
+
+    # Add extra parameters, stringify if not already strings
+    for param in extra_params:
+        if isinstance(param, str) and not param.strip().startswith(("'", '"')):
+            param = f"'{param}'"
+        all_params.append(str(param))
+
+    new_call = f"{func_name}({', '.join(all_params)})"
+    return new_call

@@ -49,7 +49,7 @@ def intent_detection(user_input: str):
     )
     return response["response"]
 
-def fact_check_tools(user_input: str):
+def fact_check_tools(user_input: str, room_id: str, user_name:str):
     print("[INFO] fact_check_tools module activated!")
     keywords = extract_keywords(user_input)
     fact_check_data = query_fact_check_api(keywords)
@@ -63,19 +63,19 @@ def fact_check_tools(user_input: str):
     else:
         return "__NO_FACT_CHECK_API__"
 
-def all_search(user_input: str):
+def all_search(user_input: str, room_id: str, user_name:str):
     print("[INFO] all_search module activated!")
     response = general_search(user_input)
     print(f"Response from general search: \n{response}")
     return response
     
-def general_search(input: str, num_results: int = 10):
+def general_search(input: str, room_id: str, user_name:str, num_results: int = 10):
     TOTAL_RESULTS_DESIRED = 5
     print("[INFO] general_search module activated!")
-
+    print(f"[general_search_module] room_id: {room_id}, user: {user_name}")
     # Perform a Google search
     search_results = google_search(input, num_results)
-
+    send_direct_message("Retrieved results from Google, making a decision!", room_id)
     if not search_results:
         print("[ERROR] No results found.")
         return []
@@ -101,6 +101,7 @@ def general_search(input: str, num_results: int = 10):
         # Else, Format the url, title, and content information properly.
         else: 
             formatted_result = format_source(input, url, title, content)
+            send_direct_message("Summarizing sources", room_id)
             summary_result = summarize_source(input, formatted_result)
 
             # If summarizing the content fails, skip this website.
@@ -114,7 +115,7 @@ def general_search(input: str, num_results: int = 10):
                 index_search_results += 1
 
                 all_summaries.append(summary_result)
-
+    send_direct_message("Generating a response...", room_id)
     # Generate a response based on all summarized sources.
     response = generate_fact_based_response(input, all_summaries)
     if not response:
@@ -124,10 +125,10 @@ def general_search(input: str, num_results: int = 10):
     print("[INFO] Response generated successfully!")
     return response
 
-def local_search(input: str):
+def local_search(input: str, room_id: str, user_name:str):
     print("[INFO] general_search module activated!")
 
-def social_search(input: str):
+def social_search(input: str, room_id: str, user_name:str):
     print("[INFO] social_search module activated!")
 
 
