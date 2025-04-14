@@ -73,7 +73,7 @@ def fact_check_tools(user_input: str, room_id: str, user_name:str):
                             "type": "button",
                             "text": "Search the web",
                             "msg": "__NO_FACT_CHECK_API__",
-                            "msg_in_chat_window": True
+                            "msg_in_chat_window": False
                         },
                     ]
                 }
