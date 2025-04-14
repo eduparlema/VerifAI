@@ -101,7 +101,6 @@ def general_search(input: str, room_id: str, user_name:str, num_results: int = 1
         # Else, Format the url, title, and content information properly.
         else: 
             formatted_result = format_source(input, url, title, content)
-            send_direct_message("Summarizing sources", room_id)
             summary_result = summarize_source(input, formatted_result)
 
             # If summarizing the content fails, skip this website.
