@@ -1,7 +1,7 @@
 from llmproxy import generate
 from utils import *
 
-def intent_detection(user_input: str):
+def intent_detection(user_input: str, room_id: str, user_name: str):
     print("[INFO] intent_detection_activated module activated!")
     system_prompt = """
         You are a helpful and friendly assistant to a fact-checkable AI Agent.
@@ -130,8 +130,6 @@ def local_search(input: str, room_id: str, user_name:str):
 
 def social_search(input: str, room_id: str, user_name:str):
     print("[INFO] social_search module activated!")
-
-
 
 if __name__ == "__main__":
     # Example usage
