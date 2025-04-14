@@ -70,6 +70,9 @@ def google_search(query: str, num_results: int = 10) -> list:
 
     return []
 
+def custom_google_search():
+
+
 def format_source(user_input, url, title, article_text):
     """
     Formats the claim and article text into a structured input for the LLM.
@@ -196,6 +199,7 @@ def generate_fact_based_response(user_input: str, summaries: list) -> str:
     4. Use inline citations with both the article **title** and a **clickable link** in this format:
     *(Source: [Title](URL))*
     5. Keep your tone factual, clear, and neutral.
+    6. Keep the answer under 3999 characters.
 
     📦 Output Format:
     - Start with a clear verdict (e.g., "The claim is partially supported based on current reporting...").
@@ -211,6 +215,7 @@ def generate_fact_based_response(user_input: str, summaries: list) -> str:
     These were some of the sources I looked at: [Title](URL). If you have a 
     source that you want me to check, please provide the URL. If you have any 
     other questions, feel free to ask."
+
 
     """
 
