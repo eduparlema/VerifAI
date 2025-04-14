@@ -1,5 +1,5 @@
 import requests
-from flask import Flask, request, jsonify, Response
+from flask import Flask, request, jsonify
 from llmproxy import generate
 import os
 from mainAgent import main_agent
@@ -27,7 +27,7 @@ def main():
     room_id = data.get("channel_id")
     print(data)
     response = message
-    
+
     while response in special_responses or response == message:
         print(f"Reponse from agent: {response}")
         module = main_agent(response)
@@ -40,9 +40,7 @@ def main():
             send_direct_message("🔎 Searching if your claim has been fact-checked... please wait", room_id)
         elif response == "__NO_FACT_CHECK_API__":
             send_direct_message("😕 Your claim hasn't been fact-checked yet... 🔎 Performing a general search to find relevant information — please hang tight! ⏳", room_id)
-    return Response(status=204)
-
-
+    
 @app.errorhandler(404)
 def page_not_found(e):
     return "Not Found", 404
