@@ -70,8 +70,6 @@ def google_search(query: str, num_results: int = 10) -> list:
 
     return []
 
-def custom_google_search():
-
 
 def format_source(user_input, url, title, article_text):
     """
