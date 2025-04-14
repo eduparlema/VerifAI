@@ -70,9 +70,89 @@ def google_search(query: str, num_results: int = 10) -> list:
 
     return []
 
-def custom_google_search(query: str, num_results: int = 10) -> list:
-    pass
+def custom_google_search(user_query: str, num_results: int = 10) -> list:
+    """
+    Performs a context-aware Google search using parameters suggested by the LLM,
+    such as local language and country, without limiting to specific sites.
+    """
+    system_prompt = """
+        You are a smart assistant supporting a fact-checking system by improving how user queries are searched on Google.
 
+        Your job is to suggest search parameters that will yield the most relevant and regionally appropriate results.
+
+        🧠 Task:
+        Based on the user's input, determine if the query should be searched in a specific language or country context.
+
+        If so, provide:
+        - A version of the query translated into the appropriate language (if needed).
+        (The query should be customized for retrieving better search results, using key words etc)
+        - The most relevant **language code** (e.g., 'tr' for Turkish, 'en' for English).
+        - The most relevant **country code** (e.g., 'TR' for Turkey, 'US' for United States).
+
+        🚫 Do NOT include specific websites. Focus on general localization only.
+
+        📦 Output format (as a JSON dictionary):
+        {
+        "query": "<query in Turkish>",
+        "language": "<tr>",
+        "country": "<TR>"
+        }
+    """
+
+    response = generate(
+        model="4o-mini",
+        system=system_prompt,
+        query=user_query,
+        temperature=0.2,
+        lastk=3,
+        session_id="search_param_suggester",
+        rag_usage=False
+    )
+
+    try:
+        suggestions = eval(response["response"])
+        language = suggestions.get("language", "en")
+        country = suggestions.get("country", "US")
+        query = suggestions.get("query", user_query).strip()
+
+        print("Custom Search:")
+        print(language)
+        print(country)
+        print(query)
+
+        params = {
+            "key": GOOGLE_API_KEY,
+            "cx": SEARCH_ENGINE_ID,
+            "q": query,
+            "num": num_results,
+            "lr": f"lang_{language}",
+            "cr": f"country{country}",
+            "excludeTerms": "pdf"
+
+        }
+
+        search_url = "https://www.googleapis.com/customsearch/v1"
+        response = requests.get(search_url, params=params, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        results = data.get("items", [])
+
+        google_results = []
+        for item in results:
+            url = item.get("link")
+            title = item.get("title")
+            domain = urlparse(url).netloc.replace("www.", "")
+            google_results.append({
+                "url": url,
+                "title": title,
+                "source": domain,
+            })
+
+        return google_results
+
+    except Exception as e:
+        print(f"❌ Failed to execute localized search: {e}")
+        return []
 
 def format_source(user_input, url, title, article_text):
     """
@@ -219,12 +299,14 @@ def generate_fact_based_response(user_input: str, summaries: list) -> str:
         - Introduce external knowledge or opinions.
         - Speculate beyond what's in the summaries.
 
+
         📦 Output Template:
         - Start with a verdict: "The claim that [...] is likely not true." (or true/partially true)
         - Follow up with reasoning: "I looked at the following sources..."
         - Explain key details or quotes that support the reasoning.
         - Include clickable citations.
         - End by offering to help further if needed.
+
     """
 
     formatted_summaries = "\n\n".join([
@@ -422,3 +504,114 @@ def add_params_to_module(module_str, *extra_params):
 
     new_call = f"{func_name}({', '.join(all_params)})"
     return new_call
+
+
+
+def generate_fact_based_response_custom(user_input: str, summaries: list) -> str:
+    """
+    Generate a fact-based answer to a user's question or claim by synthesizing
+    information from article summaries, using citations with URLs.
+    """
+
+    system_prompt = """
+        You are a fact-checking assistant helping users verify claims or understand current events. 
+        Assume that *you* conducted the research by reading multiple relevant news articles.
+
+        🎯 Goal:
+        Respond to the user's input — whether it's a claim or a general question — by using **only** the article summaries provided.
+
+        💬 Context Note (optional):
+        Sometimes, the query may be tied to a specific region or language. If provided, you'll see a brief explanation like:
+        > "Since this topic is particularly relevant to [region/language], we prioritized sources from that region to provide a more localized and accurate view."
+
+        If this message is present, **include it at the beginning of your response** to let the user know you're taking local context into account.
+
+        🧠 Instructions:
+        1. If the input is a **claim**, decide whether it is:
+        - Likely true
+        - Likely not true
+        - Partially true or misleading
+        - Unverifiable with the current sources
+
+        Start with a clear verdict:  
+        "The claim that [...] is likely not true."
+
+        2. If the input is a **general question**, explain the topic using the facts from the summaries.
+
+        3. Use a natural, helpful tone. For example:
+        - "I looked at several sources including [Title](URL), and here's what I found..."
+        - "Based on these reports, it seems that..."
+
+        4. Include **citations** in this format:  
+        *(Source: [Title](URL))*
+
+        ✅ DO:
+        - Use only the facts from the summaries.
+        - Highlight key quotes or statistics when relevant.
+        - Be clear, concise, and neutral.
+
+        🚫 DO NOT:
+        - Introduce outside knowledge or opinions.
+        - Speculate beyond the summaries.
+
+        📦 Output Format:
+        - If provided, begin with the custom context (e.g., local focus)
+        - State a verdict if applicable
+        - Explain your reasoning
+        - Include inline citations
+        - Offer to help with follow-up questions
+    """
+
+    formatted_summaries = "\n\n".join([
+        f"- Title: {item['title']}\n  URL: {item['url']}\n Summary: {item['summary']}"
+        for item in summaries
+    ])
+
+    query = f"""User Input: {user_input}
+
+    Summaries:
+    {formatted_summaries}
+    """
+
+    response = generate(
+        model="4o-mini",
+        system=system_prompt,
+        query=query,
+        temperature=0.4,
+        lastk=3,
+        session_id=SESSION,
+        rag_usage=False
+    )
+
+    return response["response"]
+
+def all_search_verdict(general_response, local_response, social_media_response):
+    system_prompt = f"""
+    You are a fact-checking assistant. You have just received search results from three domains: general web, local news, and social media.
+
+    Your task is to:
+    - Summarize key points from each domain separately.
+    - Highlight any agreements or contradictions.
+    - Include source links explicitly.
+    - Provide a concise verdict at the end if possible.
+    - Always cite your sources.
+    """
+    response = generate(
+        model='4o-mini',
+        system=system_prompt,
+        query=f"""
+                🧠 General Web Search Results:
+                    {general_response}
+
+                    📰 Local News Results:
+                    {local_response}
+
+                    💬 Social Media Results:
+                    {social_media_response}
+               """,
+        temperature=0.2,
+        lastk=3,
+        session_id=SESSION,
+        rag_usage=False
+    )
+    return response['response']

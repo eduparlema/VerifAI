@@ -28,7 +28,7 @@ def main():
     print(data)
     if message == "Search the web":
         message = "__NO_FACT_CHECK_API__"
-        
+
     response = message
 
     while response in special_responses or response == message:
