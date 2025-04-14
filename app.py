@@ -40,7 +40,7 @@ def main():
             send_direct_message("🔎 Searching if your claim has been fact-checked... please wait", room_id)
         elif response == "__NO_FACT_CHECK_API__":
             send_direct_message("😕 Your claim hasn't been fact-checked yet... 🔎 Performing a general search to find relevant information — please hang tight! ⏳", room_id)
-    print(f"About to return: \n\n{response}")
+    send_direct_message(response, room_id)
     return jsonify({"text": response})
     
 @app.errorhandler(404)
