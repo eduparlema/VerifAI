@@ -88,8 +88,8 @@ def custom_google_search(user_query: str, num_results: int = 10) -> list:
         (The query should be customized for retrieving better search results, using key words etc)
         - The most relevant **language code** (e.g., 'tr' for Turkish, 'en' for English).
         - The most relevant **country code** (e.g., 'TR' for Turkey, 'US' for United States).
-
-        🚫 Do NOT include specific websites. Focus on general localization only.
+        
+        Stick to the following structure:
 
         📦 Output format (as a JSON dictionary):
         {
@@ -123,12 +123,10 @@ def custom_google_search(user_query: str, num_results: int = 10) -> list:
         params = {
             "key": GOOGLE_API_KEY,
             "cx": SEARCH_ENGINE_ID,
-            "q": query,
+            "q": f'{query} -filetype:pdf -filetype:ppt -filetype:doc -site:twitter.com -site:facebook.com -site:instagram.com -site:pinterest.com -site:tiktok.com',
             "num": num_results,
             "lr": f"lang_{language}",
-            "cr": f"country{country}",
-            "excludeTerms": "pdf"
-
+            "cr": f"country{country}"
         }
 
         search_url = "https://www.googleapis.com/customsearch/v1"

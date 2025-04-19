@@ -90,10 +90,10 @@ def all_search(user_input: str, room_id: str, user_name:str):
     
     response_local = local_search(user_input, room_id, user_name)
 
-    response = all_search_verdict(response_general, response_local, "")
+    response = all_search_verdict(response_local, response_local, "")
     print(f"[INFO]\n\n all_search_veredict: \n\n{response}")
     # Respond to the user
-    send_direct_message(response_general, room_id)
+    send_direct_message(response_local, room_id)
     return response
     
 def general_search(input: str, room_id: str, user_name:str, num_results: int = 10):
