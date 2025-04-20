@@ -339,6 +339,8 @@ def send_direct_message(message: str, room_id: str) -> None:
         "roomId": room_id,
         "text": message,
     })
+    
+    return
 
 def add_params_to_module(module_str, *extra_params):
     """
