@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 from llmproxy import generate
 from dotenv import load_dotenv
 import re
+from prompt import *
 
 
 RC_API = os.environ.get("RC_API")
@@ -27,7 +28,7 @@ FACT_CHECK_URL=os.environ.get("factCheckApiUrl")
 print(GOOGLE_API_KEY)
 print(SEARCH_ENGINE_ID)
 
-SESSION = "VerifAI_Session_17"
+SESSION = "VerifAI_Session_18"
 
 def google_search(query: str, num_results: int = 10) -> list:
     """
@@ -70,38 +71,15 @@ def google_search(query: str, num_results: int = 10) -> list:
 
     return []
 
-def custom_google_search(user_query: str, num_results: int = 10) -> list:
+def local_google_search(user_query: str, num_results: int = 10) -> list:
     """
     Performs a context-aware Google search using parameters suggested by the LLM,
     such as local language and country, without limiting to specific sites.
     """
-    system_prompt = """
-        You are a smart assistant supporting a fact-checking system by improving how user queries are searched on Google.
-
-        Your job is to suggest search parameters that will yield the most relevant and regionally appropriate results.
-
-        🧠 Task:
-        Based on the user's input, determine if the query should be searched in a specific language or country context.
-
-        If so, provide:
-        - A version of the query translated into the appropriate language (if needed).
-        (The query should be customized for retrieving better search results, using key words etc)
-        - The most relevant **language code** (e.g., 'tr' for Turkish, 'en' for English).
-        - The most relevant **country code** (e.g., 'TR' for Turkey, 'US' for United States).
-        
-        Stick to the following structure:
-
-        📦 Output format (as a JSON dictionary):
-        {
-        "query": "<query in Turkish>",
-        "language": "<tr>",
-        "country": "<TR>"
-        }
-    """
-
+    
     response = generate(
         model="4o-mini",
-        system=system_prompt,
+        system=LOCAL_GOOGLE_SEARCH_PROMPT,
         query=user_query,
         temperature=0.2,
         lastk=3,
@@ -114,11 +92,6 @@ def custom_google_search(user_query: str, num_results: int = 10) -> list:
         language = suggestions.get("language", "en")
         country = suggestions.get("country", "US")
         query = suggestions.get("query", user_query).strip()
-
-        print("Custom Search:")
-        print(language)
-        print(country)
-        print(query)
 
         params = {
             "key": GOOGLE_API_KEY,
@@ -192,34 +165,6 @@ def summarize_source(user_input: str, source: dict) -> str:
     """
     Generate fact-focused summaries for a list of articles relevant to a given claim.
     """
-    system_prompt = """
-        You are a fact-focused news summarizer.
-
-        🎯 Goal:
-        Summarize a news article with a specific focus on the parts that are **most relevant to the user's topic or claim**. Your summary should be informative, clear, and focused — capturing important facts, context, and supporting details without unnecessary generalizations.
-
-        📝 Input:
-        You will receive:
-        - A topic or claim from the user.
-        - A news article, including its title and full text.
-
-        ✅ DO:
-        - Write a **detailed but concise** summary of the article, focusing only on content that relates to the user's topic or claim.
-        - Include important **facts, data points, events, or explanations** that help the user understand the article’s relevance to the claim.
-        - If there are any **quotes** relevant to the topic or claim, include them with the **speaker’s name** (e.g., "John Smith said, '...'").
-        - Use the article’s original phrasing when appropriate to maintain fidelity.
-        - Be accurate, objective, and free of speculation.
-
-        ❌ DON'T:
-        - Do NOT summarize unrelated parts of the article.
-        - Do NOT judge or speculate on whether the claim is true or false.
-        - Do NOT make inferences or assumptions beyond what's in the text.
-        - Do NOT include commentary or interpretation.
-
-        📦 Output Format:
-        This article is about <topic>. It provides the following information relevant to the user's claim or curiosity: <summary with key facts and any relevant quotes>.
-    """
-    
     title = source.get("Title", "unknown")
     text = source.get("Content", "")
     url = source.get("URL", "unknown")
@@ -233,7 +178,7 @@ def summarize_source(user_input: str, source: dict) -> str:
     try:
         response = generate(
             model='4o-mini',
-            system=system_prompt,
+            system=SUMMARIZE_SOURCE_PROMPT,
             query=query,
             temperature=0.2,
             lastk=10,
@@ -265,48 +210,6 @@ def generate_fact_based_response(user_input: str, summaries: list) -> str:
     information from article summaries, using citations with URLs.
     """
 
-    system_prompt = """
-        You are a fact-checking assistant helping users verify claims or learn more about current events. Assume that *you* conducted the research by reading multiple relevant news articles.
-
-        🎯 Goal:
-        Respond to the user's input — whether it's a claim or a general question — by using only the article summaries provided. 
-
-        🧠 Instructions:
-        1. If the input is a **claim**, decide whether it is:
-        - Likely true
-        - Likely not true
-        - Partially true or misleading
-        - Unverifiable with the current sources
-        Begin your response clearly, e.g., "The claim that [...] is likely not true."
-
-        2. If the input is a **general question**, explain the topic using the facts from the summaries.
-
-        3. Use a natural, human tone. For example:
-        - "I looked at several sources including [Title](URL), and here's what I found..."
-        - "Based on these reports, it seems that..."
-
-        4. Include **citations** using this format:
-        *(Source: [Title](URL))*
-
-        5. DO:
-        - Be clear, concise, and neutral.
-        - Use quotes or key facts from summaries when relevant.
-        - Limit output to 3999 characters.
-
-        6. DO NOT:
-        - Introduce external knowledge or opinions.
-        - Speculate beyond what's in the summaries.
-
-
-        📦 Output Template:
-        - Start with a verdict: "The claim that [...] is likely not true." (or true/partially true)
-        - Follow up with reasoning: "I looked at the following sources..."
-        - Explain key details or quotes that support the reasoning.
-        - Include clickable citations.
-        - End by offering to help further if needed.
-
-    """
-
     formatted_summaries = "\n\n".join([
         f"- Title: {item['title']}\n  URL: {item['url']}\n Summary: {item['summary']}"
         for item in summaries
@@ -320,7 +223,7 @@ def generate_fact_based_response(user_input: str, summaries: list) -> str:
 
     response = generate(
         model="4o-mini",
-        system=system_prompt,
+        system=GENERATE_FACT_BASED_RESPONSE_PROMPT,
         query=query,
         temperature=0.4,
         lastk=3,
@@ -331,27 +234,10 @@ def generate_fact_based_response(user_input: str, summaries: list) -> str:
     return response["response"]
 
 def extract_keywords(user_input: str):
-    system_prompt = """
-        You are a search assistant for a fact-checking system.
-
-        Your task is to generate a concise, high-quality search query based on a claim,
-        article, or user statement. The goal is to capture the core idea so it can be
-        searched using the Google Fact Check Tools API.
-
-        Guidelines:
-        - Extract only the **essential keywords**: people, organizations, places, events, and topics.
-        - **Do not** include generic terms like "claim", "news article", "report", "statement", or "rumor".
-            Also, unless stated somewhere in the user input, do not include dates on the
-            keywords.
-        - Focus on the real-world entities or actions being mentioned (e.g., policies, laws, bans, replacements).
-        - Use neutral, objective language — avoid emotionally charged or speculative terms.
-        - Keep it short and search-friendly: ideally **5-10 words**.
-        - Output **only the final search query**, without quotes, prefixes, or explanations.
-    """
 
     response = generate(
         model="4o-mini",
-        system=system_prompt,
+        system=EXTRACT_KEYWORDS_PROMPT,
         query=user_input,
         temperature=0.2,
         lastk=3,
@@ -431,30 +317,10 @@ def prepare_fact_check_context(claims):
     return "\n\n--\n\n".join(evidence)
 
 def generate_verdict(user_claim: str, evidence: str):
-    system_prompt = """
-    You are a smart and friendly fact-checking assistant who helps users understand
-    whether claims they've seen are true, false, biased, misleading, exagerated, etc.
-    You are an objective judge, do NOT give any opinions and always refer to relevant
-    content when providing claims.
-
-    You are given:
-    - A claim submitted by the user
-    - Fact-check metadata (e.g. rating, review date, source)
-    - Full article content scraped from reliable sources
-
-    🎯 Your job:
-    1. Determine if the claim is **True**, **False**,**Misleading**, etc based on the evidence.
-    2. Respond with a clear, short, and **engaging** verdict in a friendly tone — like you're explaining something to a friend over coffee.
-    3. Use **emojis** to add warmth and help users scan the message quickly.
-    4. Pull in **useful details** or **direct quotes** from the source article to explain why the verdict is what it is.
-    5. Let the user know if the information is **recent or outdated**.
-    6. End with a list of **citations** for transparency.
-    """
-
 
     response = generate(
     model="4o-mini",
-    system=system_prompt,
+    system=GENERATE_VERDICT_PROMPT,
     query=f"""User Claim: {user_claim}
             Fact-Check Evidence:
             {evidence}
@@ -613,3 +479,46 @@ def all_search_verdict(general_response, local_response, social_media_response):
         rag_usage=False
     )
     return response['response']
+
+def unified_search_pipeline(
+    query: str,
+    room_id: str,
+    user_name: str,
+    search_fn,
+    summarizer_fn,
+    message_prefix: str = ""
+) -> str:
+    print(f"[INFO] unified_search_pipeline using {search_fn.__name__}")
+    search_results = search_fn(query)
+    if not search_results:
+        print("[ERROR] No results found.")
+        return []
+
+    TOTAL_RESULTS = min(5, len(search_results))
+    all_summaries = []
+    idx = 0
+
+    while len(all_summaries) < TOTAL_RESULTS:
+        result = search_results[idx]
+        url, title = result["url"], result["title"]
+        content = fetch_main_article(url)
+
+        if content == "ERROR":
+            idx += 1
+            continue
+
+        formatted = format_source(query, url, title, content)
+        summary = summarize_source(query, formatted)
+
+        if summary == "ERROR":
+            idx += 1
+            continue
+
+        all_summaries.append(summary)
+        idx += 1
+
+    #if message_prefix:
+        #send_direct_message(message_prefix, room_id)
+
+    print("[INFO] Response generated successfully!")
+    return summarizer_fn(query, all_summaries)
