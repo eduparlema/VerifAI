@@ -333,7 +333,7 @@ def generate_verdict(user_claim: str, evidence: str):
 
     return response["response"]
 
-def send_direct_message(message: str, room_id):
+def send_direct_message(message: str, room_id: str) -> None:
     # Post initial message to initiate a thread
     requests.post(RC_API, headers=ROCKETCHAT_AUTH, json={
         "roomId": room_id,

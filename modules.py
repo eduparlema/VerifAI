@@ -4,10 +4,12 @@ from dotenv import load_dotenv
 import praw
 from prompt import *
 
+load_dotenv()
+
 RC_API = os.environ.get("RC_API")
-CLIENT_ID = os.environ.get("client_id")
-CLIENT_SECRET = os.environ.get("client_secret")
-USER_AGENT = os.environ.get("user_agent")
+CLIENT_ID = os.environ.get("praw_client_id")
+CLIENT_SECRET = os.environ.get("praw_client_secret")
+USER_AGENT = "script:misinfo-bot:v1.0"
 
 reddit = praw.Reddit(
     client_id=CLIENT_ID,
