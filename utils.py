@@ -347,12 +347,18 @@ def generate_verdict(user_claim: str, evidence: str):
 
 def send_direct_message(message: str, room_id: str, attachments: Optional[List[Dict]] = None) -> None:
     payload = {
-        "roomId": room_id
+        "roomId": room_id,
+        "text": message
     }
     if attachments:
         payload["attachments"] = attachments
 
     response = requests.post(RC_API, headers=ROCKETCHAT_AUTH, json=payload)
+
+    # Optional: handle errors
+    if response.status_code != 200:
+        print(f"Failed to send message: {response.status_code} - {response.text}")
+
     return
 
 def add_params_to_module(module_str, *extra_params):
