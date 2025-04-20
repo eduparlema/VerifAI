@@ -345,7 +345,7 @@ def generate_verdict(user_claim: str, evidence: str):
 
     return response["response"]
 
-def send_direct_message(message: str, room_id: str, attachments: Optional[List[Dict]]) -> None:
+def send_direct_message(message: str, room_id: str, attachments: Optional[List[Dict]] = None) -> None:
     payload = {
         "roomId": room_id
     }
