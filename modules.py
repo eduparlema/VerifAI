@@ -40,13 +40,9 @@ def fact_check_tools(user_input: str, room_id: str, user_name:str):
     if fact_check_data and fact_check_data.get('claims'):
         context = prepare_fact_check_context(fact_check_data["claims"])
         verdict = generate_verdict(user_input, context)
-        # Send verdict + buttons
-        requests.post(RC_API, headers=ROCKETCHAT_AUTH, json={
-            "roomId": room_id,
-            "text": verdict,
-            "attachments": [
+        attachements = [
                 {
-                    "text": "Would you like me to search to web for you?",
+                    "text": "Would you like me to search the web for you?",
                     "actions": [
                         {
                             "type": "button",
@@ -57,7 +53,8 @@ def fact_check_tools(user_input: str, room_id: str, user_name:str):
                     ]
                 }
             ]
-        })
+        # Send verdict + buttons
+        send_direct_message(verdict, room_id, attachments=attachements)
         return verdict
     else:
         return "__NO_FACT_CHECK_API__"

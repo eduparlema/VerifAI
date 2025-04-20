@@ -331,18 +331,6 @@ def generate_verdict(user_claim: str, evidence: str):
     session_id=SESSION,
     rag_usage=False
     )
-    send_direct_message(
-        message="Here's an image!",
-        room_id="abc123",
-        attachments=[
-            {
-                "title": "Sample Image",
-                "image_url": "https://example.com/image.jpg"
-            }
-        ]
-    )
-
-
     return response["response"]
 
 def send_direct_message(message: str, room_id: str, attachments: Optional[List[Dict]] = None) -> None:
