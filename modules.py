@@ -210,7 +210,7 @@ def all_search(user_input: str, room_id: str, user_name: str):
         rag_usage=False
     )
  
-    # send_direct_message(final_response, room_id)
+    send_direct_message(final_response, room_id)
     return response["response"]
 
 def handle_followup(user_input: str, room_id: str, username: str):
