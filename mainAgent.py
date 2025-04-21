@@ -114,14 +114,16 @@ def main_agent(input: str):
    ### TOOL USAGE RULES ###
     - First, always use `intent_detection` module to assess input.
     - If the input is not fact-checkable, do not use any tool. Respond naturally or end the thread.
+    - If the input does *not* seem to be fact-checkable OR none of the other modules seem appropriate:
+        - Use the 'intent_detection' module to asses the input. This module will
+        handle scenarios in which the user inputs messages with no fact-checkable
+        claims in it.
     - If the input *is* fact-checkable:
-    - If it seems like a **follow-up question**, use `handle_followup()`.
-    - Otherwise, start with `fact_check_tools()`.
+        - If it seems like a **follow-up question** from a conversation, use `handle_followup` module.
+        - Otherwise, start with `fact_check_tools`.
 
-    - If the Fact Check API fails or returns ambiguous results, call `all_search()` next.
+    - If the Fact Check API fails or returns ambiguous results, use the `all_search` module next.
     - If the user wants to go deeper on specific angles (e.g., local news), call `local_search`, `social_search`, or `general_search` accordingly.
-    - Cite sources wherever possible.
-    - Be concise, neutral, and helpful.
 
     You must respond ONLY with a tool call and its input, like:
     `handle_followup("What about Ankara?")`
