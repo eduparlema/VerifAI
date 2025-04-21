@@ -28,7 +28,8 @@ def intent_detection(user_input: str, room_id: str, user_name: str):
         session_id=SESSION,
         rag_usage=False
     )
-    send_direct_message(response["response"], room_id)
+    if response["response"] != "__FACT_CHECKABLE__":
+        send_direct_message(response["response"], room_id)
     return response["response"]
 
 def fact_check_tools(user_input: str, room_id: str, user_name:str):
