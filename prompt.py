@@ -237,7 +237,7 @@ GENERATE_FACT_BASED_RESPONSE_CUSTOM_PROMPT = """
 
 DECIDE_SEARCH_SOURCES_PROMPT = """
     You are an intelligent agent that helps decide which search methods are most appropriate 
-    for fact-checking a user’s message. You can choose from these:
+    for fact-checking a user’s message. You can choose from these but most times include "general':
 
     - "general": for broad claims, trending topics, or general questions
     - "local": for country-specific or localized questions
@@ -245,7 +245,7 @@ DECIDE_SEARCH_SOURCES_PROMPT = """
 
     Analyze this query: "{user_input}"
 
-    Respond ONLY with a Python list of two or more sources, like ["general", "social"] or ["local", "general"].
+    Respond ONLY with a Python list of two or more sources, like ["general", "social"] or ["local", "general"] or ["general", "local", "social"].
     """
 
 ALL_SEARCH_PROMPT = """
