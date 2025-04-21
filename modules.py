@@ -246,7 +246,7 @@ def handle_followup(user_input: str, room_id: str, username: str):
     )
 
     reply = response["response"].strip()
-
+    send_direct_message(reply, room_id)
     return reply
 
 
