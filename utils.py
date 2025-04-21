@@ -29,7 +29,7 @@ FACT_CHECK_URL=os.environ.get("factCheckApiUrl")
 print(GOOGLE_API_KEY)
 print(SEARCH_ENGINE_ID)
 
-SESSION = "VerifAI_Session_18"
+SESSION = "VerifAI_Session_19"
 
 def google_search(query: str, num_results: int = 10) -> list:
     """
@@ -182,7 +182,7 @@ def summarize_source(user_input: str, source: dict) -> str:
             system=SUMMARIZE_SOURCE_PROMPT,
             query=query,
             temperature=0.2,
-            lastk=10,
+            lastk=3,
             session_id=SESSION,
             rag_usage=False
         )

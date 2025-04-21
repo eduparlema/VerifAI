@@ -18,7 +18,7 @@ def main_agent(input: str):
     its output sometimes to decide further action.
 
     The ideal pipeline would go as follows:
-    no_facts -> fact_check_tools -> all_search -> <any of the three search categoies
+    intent_detection -> fact_check_tools -> all_search -> <any of the three search categoies
     or just a new search>
 
     The available tools are:
@@ -43,7 +43,7 @@ def main_agent(input: str):
     **Usage example:**  
     `fact_check_tools("Trump replaced Pride Month with Veterans Month")`  
     This tool searches for existing fact checks. If relevant results are found,
-    it summarizes the sources and provides a verdict citing all sources.If no
+    it summarizes the sources and provides a verdict citing all sources. If no
     suitable content is found, "__NO_FACT_CHECK_API__" will be provided to you
     which means that you should continue down the ideal pipeline provided above.
     That is, use all_search module. Otherwise, just respond with the answer
@@ -55,7 +55,8 @@ def main_agent(input: str):
     **Parameters:** query  
     **Usage example:**  
     `all_search("Trump replaced Pride Month with Veterans Month")`  
-    Use this when the Fact Check API did not return useful content or when a deeper multi-source search is explicitly requested. It includes:
+    Use this when the Fact Check API did not return useful content or when a deeper
+    multi-source search is explicitly requested. It includes:
     - General Google Search  
     - Local News Search  
     - Social Media Search  
@@ -96,18 +97,22 @@ def main_agent(input: str):
     **Usage example:**  
     `handle_followup("What about Ankara?")`  
 
-    Use this tool when the user is asking a follow-up question related to a recent conversation, and the answer can be derived from already retrieved summaries (from general, local, or social search).  
-    Do NOT use this if the user is asking a brand new question. This tool works only with the context from recent assistant replies.
+    Use this tool when the user is asking a follow-up question related to a recent
+    conversation, and the answer can be derived from already retrieved summaries
+    (from general, local, or social search).
+
+    Strictly do NOT use this if the user is asking a brand new question.
+    This tool works only with the context from recent assistant replies.
 
     IMPORTANT:  
     If `handle_followup()` is used but determines that the information is insufficient to answer the question, it will return:  
     `__NEED_WEB_SEARCH__`  
     In that case, you must continue the pipeline by calling `all_search()` using the same input.
-
     ---
 
+    
    ### TOOL USAGE RULES ###
-    - First, always use `no_facts()` to assess input.
+    - First, always use `intent_detection` module to assess input.
     - If the input is not fact-checkable, do not use any tool. Respond naturally or end the thread.
     - If the input *is* fact-checkable:
     - If it seems like a **follow-up question**, use `handle_followup()`.
@@ -128,7 +133,7 @@ def main_agent(input: str):
         system=system_prompt,
         query=input,
         temperature=0.2,
-        lastk=15,
+        lastk=10,
         session_id=SESSION,
         rag_usage=False
     )

@@ -59,18 +59,18 @@ def fact_check_tools(user_input: str, room_id: str, user_name:str):
     else:
         return "__NO_FACT_CHECK_API__"
 
-def all_search(user_input: str, room_id: str, user_name:str):
-    print("[INFO] all_search module activated!")
-    response_general = general_search(user_input, room_id, user_name)
-    print(f"Response from general search: \n{response_general}")
+# def all_search(user_input: str, room_id: str, user_name:str):
+#     print("[INFO] all_search module activated!")
+#     response_general = general_search(user_input, room_id, user_name)
+#     print(f"Response from general search: \n{response_general}")
     
-    response_local = local_search(user_input, room_id, user_name)
+#     response_local = local_search(user_input, room_id, user_name)
 
-    response = all_search_verdict(response_local, response_local, "")
-    print(f"[INFO]\n\n all_search_veredict: \n\n{response}")
-    # Respond to the user
-    send_direct_message(response_local, room_id)
-    return response
+#     response = all_search_verdict(response_local, response_local, "")
+#     print(f"[INFO]\n\n all_search_veredict: \n\n{response}")
+#     # Respond to the user
+#     send_direct_message(response_local, room_id)
+#     return response
 
 def local_search(input: str, room_id: str, user_name: str):
     print("[INFO] local_search module activated!")
@@ -239,8 +239,8 @@ def handle_followup(user_input: str, room_id: str, username: str):
         system=FOLLOWUP_FROM_CONTEXT_PROMPT,
         query=user_input,
         temperature=0.3,
-        lastk=3,
-        session_id="followup_from_context",
+        lastk=5,
+        session_id=SESSION, # This must share same session with main agent
         rag_usage=False
     )
 
