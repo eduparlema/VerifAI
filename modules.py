@@ -153,17 +153,118 @@ def should_crowdsource(claim, fact_check_result, search_summary):
 def crowdsourcing(input: str, room_id: str, user_name: str):
     pass
 
+def decide_search_sources(user_input: str) -> list:
+    print("[INFO] Deciding search strategy via LLM...")
+
+    response = generate(
+        model="4o-mini",
+        system=DECIDE_SEARCH_SOURCES_PROMPT,
+        query= "Here is the user input: \n" + user_input,
+        temperature=0,
+        lastk=3,
+        session_id="search_planner_v1",
+        rag_usage=False
+    )
+    
+    try:
+        sources = eval(response["response"].strip())  # Safe only if you trust the output
+        assert isinstance(sources, list) and all(s in {"general", "local", "social"} for s in sources)
+        print(f"[INFO] Strategy selected: {sources}")
+        return sources
+    except Exception as e:
+        print(f"[WARN] Failed to parse LLM response: {e}")
+        return ["general", "local"]  # Fallback
+
+
+def all_search(user_input: str, room_id: str, user_name: str):
+    print("[INFO] all_search module activated!")
+    
+    strategy = decide_search_sources(user_input)
+    results = {}
+
+    if "general" in strategy:
+        results["General"] = general_search(user_input, room_id, user_name)
+    if "local" in strategy:
+        results["Local"] = local_search(user_input, room_id, user_name)
+    if "social" in strategy:
+        results["Social"] = social_search(user_input, room_id, user_name)
+
+    # Filter empty responses
+    non_empty = {k: v for k, v in results.items() if v and len(v.strip()) > 0}
+
+    if not non_empty:
+        fallback = "❌ Sorry, I couldn't find relevant information to verify this claim."
+        # send_direct_message(fallback, room_id)
+        return fallback
+
+    combined = "\n\n".join([f"🔹 {k}:\n{v}" for k, v in non_empty.items()])
+    final_response = f"✅ Here's a summary combining results from {', '.join(non_empty.keys())} sources:\n\n{combined}"
+    
+    response = generate(
+        model="4o-mini",
+        system=ALL_SEARCH_PROMPT,
+        query=final_response,
+        temperature=0.4,
+        lastk=3,
+        session_id="final_summary_synthesis",
+        rag_usage=False
+    )
+ 
+    # send_direct_message(final_response, room_id)
+    return response["response"]
+
+def handle_followup(user_input: str, room_id: str, username: str):
+    print("[INFO] handle_followup module activated (via last_k)!")
+
+    FOLLOWUP_FROM_CONTEXT_PROMPT = """
+    You are a fact-checking assistant. A user has asked a follow-up question. 
+    You must answer **only** using the information in the prior conversation.
+
+    📦 Input:
+    - The previous assistant responses may contain summaries from general, local, or social sources.
+    - You will also see the user's new question at the end.
+
+    🎯 Goal:
+    - Answer the follow-up using only facts mentioned earlier.
+    - Be concise and cite the original sources when possible.
+    - Do not go back to the web or assume new facts.
+    - Use inline citations like *(Source: [Article Title](URL))*
+
+    If the answer is not available in the previous conversation, respond ONLY with:
+    `__NEED_WEB_SEARCH__`
+    """
+
+    response = generate(
+        model="4o-mini",
+        system=FOLLOWUP_FROM_CONTEXT_PROMPT,
+        query=user_input,
+        temperature=0.3,
+        lastk=3,
+        session_id="followup_from_context",
+        rag_usage=False
+    )
+
+    reply = response["response"].strip()
+
+    return reply
+
+
 
 if __name__ == "__main__":
     # Example usage
     # user_input = "Trump replaced Pride Month with Veterans Month"
-
     # print("[INFO] User input:", user_input)
     # response = general_search(user_input)
     # print(response)
     # Example usage
-    user_input = "Turkey's earthquake response"
-    print("[INFO] User input:", user_input)
+    # user_input = "Turkey's earthquake response"
+    # print("[INFO] User input:", user_input)
     # response = local_search(user_input, "sss", "sasa")
-    response = social_search(user_input, "sss", "aaa")
-    print(response)
+    # response = social_search(user_input, "sss", "aaa")
+    # print(response)
+    # print(all_search("Turkey's earthquake response", "room_id", "user_name"))
+    print(handle_followup("how many people died in the earthquakle", "room_id", "user_name"))
+
+
+
+

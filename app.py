@@ -11,7 +11,7 @@ app = Flask(__name__)
 RC_token = os.environ.get("RC_token")
 RC_userId = os.environ.get("RC_userId")
 
-special_responses = ["__FACT_CHECKABLE__", "__NO_FACT_CHECK_API__"]
+special_responses = ["__FACT_CHECKABLE__", "__NO_FACT_CHECK_API__", "__NEED_WEB_SEARCH__"]
 
 @app.route('/', methods=['POST'])
 def hello_world():
@@ -39,7 +39,9 @@ def main():
         print(f"[INFO] Edited module: {module}")
         response = eval(module)
         print(f"\n\nresponse from module {module}: \n\n{response}")
-        if response == "__FACT_CHECKABLE__":
+        if response == "__NEED_WEB_SEARCH__":
+            send_direct_message("🔎 Searching for more information... please wait", room_id)
+        elif response == "__FACT_CHECKABLE__":
             send_direct_message("🔎 Searching if your claim has been fact-checked... please wait", room_id)
         elif response == "__NO_FACT_CHECK_API__":
             send_direct_message("😕 Your claim hasn't been fact-checked yet... 🔎 Performing a general search to find relevant information — please hang tight! ⏳", room_id)

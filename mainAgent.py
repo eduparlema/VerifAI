@@ -90,16 +90,36 @@ def main_agent(input: str):
 
     ---
 
-    ### TOOL USAGE RULES ###
+    ##7. Tool for answering a follow-up question using previously gathered summaries  
+    **Name:** handle_followup  
+    **Parameters:** query  
+    **Usage example:**  
+    `handle_followup("What about Ankara?")`  
+
+    Use this tool when the user is asking a follow-up question related to a recent conversation, and the answer can be derived from already retrieved summaries (from general, local, or social search).  
+    Do NOT use this if the user is asking a brand new question. This tool works only with the context from recent assistant replies.
+
+    IMPORTANT:  
+    If `handle_followup()` is used but determines that the information is insufficient to answer the question, it will return:  
+    `__NEED_WEB_SEARCH__`  
+    In that case, you must continue the pipeline by calling `all_search()` using the same input.
+
+    ---
+
+   ### TOOL USAGE RULES ###
     - First, always use `no_facts()` to assess input.
     - If the input is not fact-checkable, do not use any tool. Respond naturally or end the thread.
-    - If the input *is* fact-checkable, start with `fact_check_tools()`.
+    - If the input *is* fact-checkable:
+    - If it seems like a **follow-up question**, use `handle_followup()`.
+    - Otherwise, start with `fact_check_tools()`.
+
     - If the Fact Check API fails or returns ambiguous results, call `all_search()` next.
     - If the user wants to go deeper on specific angles (e.g., local news), call `local_search`, `social_search`, or `general_search` accordingly.
     - Cite sources wherever possible.
     - Be concise, neutral, and helpful.
 
-    Remember: if a tool should be called, reply **only** with the tool invocation (e.g., `fact_check_tools("Trump replaced Pride Month with Veterans Month")`).
+    You must respond ONLY with a tool call and its input, like:
+    `handle_followup("What about Ankara?")`
 
     """
 
@@ -108,7 +128,7 @@ def main_agent(input: str):
         system=system_prompt,
         query=input,
         temperature=0.2,
-        lastk=10,
+        lastk=15,
         session_id=SESSION,
         rag_usage=False
     )
