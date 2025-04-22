@@ -503,7 +503,7 @@ def unified_search_pipeline(
         print("[ERROR] No results found.")
         return []
 
-    TOTAL_RESULTS = min(5, len(search_results))
+    TOTAL_RESULTS = min(3, len(search_results))
     all_summaries = []
     idx = 0
 
