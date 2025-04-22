@@ -119,6 +119,7 @@ def social_search(input: str, room_id: str, user_name:str, limit_posts: int=3, l
         rag_usage=False
     )
     # send_direct_message(response["response"], room_id)
+    print(f"[INFO] Social response: {response["response"]}")
     return response["response"]
 
 def should_crowdsource(claim, search_summary):
@@ -199,6 +200,8 @@ def all_search(user_input: str, room_id: str, user_name: str):
 
     combined = "\n\n".join([f"🔹 {k}:\n{v}" for k, v in non_empty.items()])
     final_response = f"✅ Here's a summary combining results from {', '.join(non_empty.keys())} sources:\n\n{combined}"
+
+    print(f"[INFO] Final response in all_search: {final_response}")
     
     response = generate(
         model="4o-mini",
@@ -241,7 +244,7 @@ def all_search(user_input: str, room_id: str, user_name: str):
                 ]
             }
         )
-    send_direct_message(response["response"], room_id)
+    send_direct_message(response["response"], room_id, attachments=attachments)
     return response["response"]
 
 def handle_followup(user_input: str, room_id: str, username: str):
