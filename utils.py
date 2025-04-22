@@ -531,3 +531,32 @@ def unified_search_pipeline(
 
     print("[INFO] Response generated successfully!")
     return summarizer_fn(query, all_summaries)
+
+
+def get_relevant_questions(content: str):
+    GET_RELEVANT_QUESTIONS_PROMPT = """
+    You are a helpful assistant for an AI Agent that helps user detect
+    missinformation. You should generaterelevant follow-up questions based
+    on some content. You will be given a summary combining results from possibly
+    a general google search, a local search, and a social media search. Your goal
+    is to anticipate what a curious user might want to know next.
+
+    Generate 2 or 3 thoughtful follow-up questions that are directly related to
+    the main topic.
+
+    Strictly respond ONLY with a Python list of the questions you come up with,
+    like ["[question1]", "questions2"].
+    """
+    response = generate(
+        model="4o-mini",
+        system=GET_RELEVANT_QUESTIONS_PROMPT,
+        query=f"Here is the content {content}",
+        temperature=0.3,
+        lastk=1,
+        session_id="get_relevan_questions_0",
+        rag_usage=False,
+    )
+    questions = eval(response["response"].strip())  # Safe only if you trust the output
+    assert isinstance(questions, list)
+    print(f"[INFO] Generated questions: {questions}")
+    return questions

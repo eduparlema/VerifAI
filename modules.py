@@ -210,7 +210,38 @@ def all_search(user_input: str, room_id: str, user_name: str):
         session_id="final_summary_synthesis",
         rag_usage=False
     )
- 
+
+    followup_questions = get_relevant_questions(response["response"])
+
+    attachments = [
+        {
+            "text": f"❓ *{question}*",
+            "actions": [
+                {
+                    "type": "button",
+                    "text": "Answer this",
+                    "msg": f"Question {i+1}",
+                    "msg_in_chat_window": True
+                }
+            ]
+        }
+        for i, question in enumerate(followup_questions)
+    ]
+
+    if should_crowdsource(user_input, final_response):
+        attachments.append(
+            {
+                "text": "🙋‍♀️ Want to ask the community? \n Get input from others in the chat! 🗣️",
+                "actions": [
+                    {
+                        "type": "button",
+                        "text": "Crowdsourcing",
+                        "msg": "Crowdsourcing",
+                        "msg_in_chat_window": True
+                    }
+                ]
+            }
+        )
     send_direct_message(response["response"], room_id)
     return response["response"]
 
@@ -265,7 +296,3 @@ if __name__ == "__main__":
     # print(response)
     # print(all_search("Turkey's earthquake response", "room_id", "user_name"))
     print(handle_followup("how many people died in the earthquakle", "room_id", "user_name"))
-
-
-
-

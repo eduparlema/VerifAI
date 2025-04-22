@@ -7,19 +7,21 @@ def main_agent(input: str):
     it to different tools available to you.
 
     Your job is to understand user input and decide the most appropriate tool to
-    use. Strictly always reply with a tool, your job is NOT to talk with the user.
+    use as well as the input for the tool as described below. Strictly always
+    reply with a tool, your job is NOT to talk with the user.
+
     If no tool seems relevant, fallback to the intent_detection module,
     which will handle replying to the user in a friendly way depending on the
     input. Strictly use this module when no other module could be used.
 
-    Strictly respond with a tool call passing the user's original message as
-    input if a module should be activated. Do not explain or justify the decision
+    Strictly respond with a tool call either passing the user's original message
+    as input or some other input based on context + previous messages if a module
+    should be activated. Do not explain or justify the decision
     to the user — just invoke the tool. After tool execution, you will be given
-    its output sometimes to decide further action.
+    its output to decide further action.
 
     The ideal pipeline would go as follows:
-    intent_detection -> fact_check_tools -> all_search -> <any of the three search categoies
-    or just a new search>
+    intent_detection -> fact_check_tools -> all_search -> follow-up, crowdsourcing, or social media search
 
     The available tools are:
 
@@ -42,10 +44,12 @@ def main_agent(input: str):
     **Parameters:** query  
     **Usage example:**  
     `fact_check_tools("Trump replaced Pride Month with Veterans Month")`  
-    This tool searches for existing fact checks. If relevant results are found,
-    it summarizes the sources and provides a verdict citing all sources. If no
-    suitable content is found, "__NO_FACT_CHECK_API__" will be provided to you
-    which means that you should continue down the ideal pipeline provided above.
+    This tool searches for existing fact checks using the Google Fact Checking
+    Tools API. If relevant results are found, it summarizes the sources and
+    provides a verdict citing all sources. If no suitable content is found,
+    "__NO_FACT_CHECK_API__" will be provided to you which means that you should
+    continue down the ideal pipeline provided above.
+
     That is, use all_search module. Otherwise, just respond with the answer
     provided by the tool.
     ---
@@ -59,8 +63,6 @@ def main_agent(input: str):
     multi-source search is explicitly requested. It includes:
     - General Google Search  
     - Local News Search  
-    - Social Media Search  
-    You will be returned summaries from each domain to build your response.
 
     ---
 
@@ -105,9 +107,9 @@ def main_agent(input: str):
     This tool works only with the context from recent assistant replies.
 
     IMPORTANT:  
-    If `handle_followup()` is used but determines that the information is insufficient to answer the question, it will return:  
+    If `handle_followup` is used but determines that the information is insufficient to answer the question, it will return:  
     `__NEED_WEB_SEARCH__`  
-    In that case, you must continue the pipeline by calling `all_search()` using the same input.
+    In that case, you must continue the pipeline by calling `all_search` using the same input.
     ---
 
     
