@@ -121,21 +121,12 @@ def social_search(input: str, room_id: str, user_name:str, limit_posts: int=3, l
     # send_direct_message(response["response"], room_id)
     return response["response"]
 
-def should_crowdsource(claim, fact_check_result, search_summary):
-    system_prompt = f"""
-        You are part of a fact-checking assistant pipeline. A user has submitted
-        the following claim:
-
-        Claim:
-        \"\"\"{claim}\"\"\"
-
-        We attempted to verify the claim using fact-checking tools and search:
-
-        Fact Check Result:
-        \"\"\"{fact_check_result}\"\"\"
-
-        Search Summary:
-        \"\"\"{search_summary}\"\"\"
+def should_crowdsource(claim, search_summary):
+    SHOULD_CROWDSOURCE_PROMPT = f"""
+        You are part of a fact-checking assistant pipeline. You will be given a
+        claim / statement / question submitted by a user. We attempted to verify
+        the claim using fact-checking tools and google search. You will be provided
+        with these results.
 
         Your task is to decide whether this claim should be sent to human users
         (a crowdsourcing module) to gather public opinion.
@@ -146,10 +137,18 @@ def should_crowdsource(claim, fact_check_result, search_summary):
         - "NO" → if the claim is clearly factual and has already been resolved
         with high confidence.
 
-        Do NOT explain your answer — only respond with "YES" or "NO".
+        Do NOT explain your answer — STRICTLY only respond with "YES" or "NO".
         """
-    # TODO: Implement the rest and integrate with pipeline
-    pass
+    response = generate(
+        model="4o-mini",
+        system=SHOULD_CROWDSOURCE_PROMPT,
+        query=f"User input: {claim}, Fact-checkin results: {search_summary}",
+        temperature=0.1,
+        lastk=1,
+        session_id="crowdsoursing_0",
+        rag_usage=False
+    )
+    return True if response["response"] == "YES" else False
 
 def crowdsourcing(input: str, room_id: str, user_name: str):
     pass

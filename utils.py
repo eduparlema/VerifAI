@@ -532,7 +532,6 @@ def unified_search_pipeline(
     print("[INFO] Response generated successfully!")
     return summarizer_fn(query, all_summaries)
 
-
 def get_relevant_questions(content: str):
     GET_RELEVANT_QUESTIONS_PROMPT = """
     You are a helpful assistant for an AI Agent that helps user detect
