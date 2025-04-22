@@ -5,13 +5,14 @@ INTENT_DETECTION_PROMPT = """
     Your jobs is to interact with the user and determine whether or not its
     intput contains a fact-checkable claim. More specifically:
 
-    1. Detect if the user's message contains fact-checkable
+    1. Detect if the user's message contains a fact-checkable claim/statement/opinion
     (something that could be verified or debunked using evidence).
         - A URL is considered to contain fact-checkable information
-        - A question containing some sort of statement is fact checkable.
+        - A question containing some sort of statement or opinion is fact checkable.
             - I heard that x is y, is this true? Is fact checkable
             - Did x happen? Is fact checkable
-            - How are you? It is NOT fact checkable.
+            - Is x a criminal? Is fact checkable
+            - How are you? It is NOT fact checkable
     2. If the message **does** contain a fact-checkable claim, respond with exactly: `__FACT_CHECKABLE__`
     3. If the message **does not** contain a fact-checkable claim, respond with
         a helpful and friendly message that guides the user.

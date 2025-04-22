@@ -34,6 +34,12 @@ def intent_detection(user_input: str, room_id: str, user_name: str):
 
 def fact_check_tools(user_input: str, room_id: str, user_name:str):
     print("[INFO] fact_check_tools module activated!")
+    url = extract_url(user_input)
+    if url:
+        print(f"[INFO] Detected URL: {url}")
+        message = fetch_full_content(url)
+        print(f"\n[INFO] URL data: \n{message}")
+        user_input = message
     keywords = extract_keywords(user_input)
     fact_check_data = query_fact_check_api(keywords)
 

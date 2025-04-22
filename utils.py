@@ -559,3 +559,9 @@ def get_relevant_questions(content: str):
     assert isinstance(questions, list)
     print(f"[INFO] Generated questions: {questions}")
     return questions
+
+def extract_url(text: str) -> str:
+    match = re.search(r'https?://[^\s]+', text)
+    if not match:
+        match = re.search(r'http?://[^\s]+', text)
+    return match.group(0) if match else None
