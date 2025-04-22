@@ -37,6 +37,10 @@ def main_agent(input: str):
     will be provided to you which means that you should continue down the ideal
     pipeline provided above. That is, use the fact_check_tools module. Otherwise,
     just respond with the answer provided by this module.
+
+    IMPORTANT: Whenever you call this module, do NOT change the input of the user
+    at all. Just call this module with the exact message you received from the
+    user.
     ---
 
     ##2. Tool to query the Google Fact Check API  
@@ -48,10 +52,7 @@ def main_agent(input: str):
     Tools API. If relevant results are found, it summarizes the sources and
     provides a verdict citing all sources. If no suitable content is found,
     "__NO_FACT_CHECK_API__" will be provided to you which means that you should
-    continue down the ideal pipeline provided above.
-
-    That is, use all_search module. Otherwise, just respond with the answer
-    provided by the tool.
+    continue down the ideal pipeline provided above. That is, use all_search module.
     ---
 
     ##3. Tool to perform a comprehensive search  

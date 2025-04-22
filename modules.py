@@ -37,9 +37,9 @@ def fact_check_tools(user_input: str, room_id: str, user_name:str):
     url = extract_url(user_input)
     if url:
         print(f"[INFO] Detected URL: {url}")
-        message = fetch_full_content(url)
-        print(f"\n[INFO] URL data: \n{message}")
-        user_input = message
+        url_content = fetch_full_content(url)
+        print(f"\n[INFO] URL data: \n{url_content}")
+        user_input += f"\n Url Content: {url_content}"
     keywords = extract_keywords(user_input)
     fact_check_data = query_fact_check_api(keywords)
 
@@ -47,6 +47,8 @@ def fact_check_tools(user_input: str, room_id: str, user_name:str):
     if fact_check_data and fact_check_data.get('claims'):
         context = prepare_fact_check_context(fact_check_data["claims"])
         verdict = generate_verdict(user_input, context)
+        if verdict == "__NO_FACT_CHECK_API__":
+            return "__NO_FACT_CHECK_API__"
         attachements = [
                 {
                     "text": "Would you like me to search the web for you?",
@@ -236,10 +238,12 @@ def all_search(user_input: str, room_id: str, user_name: str):
         for i, question in enumerate(followup_questions)
     ]
 
+    
+    send_direct_message(response["response"], room_id, attachments=attachments)
+
     if should_crowdsource(user_input, final_response):
-        attachments.append(
+        attachments = [
             {
-                "text": "🙋‍♀️ Want to ask the community? \n Get input from others in the chat! 🗣️",
                 "actions": [
                     {
                         "type": "button",
@@ -249,8 +253,8 @@ def all_search(user_input: str, room_id: str, user_name: str):
                     }
                 ]
             }
-        )
-    send_direct_message(response["response"], room_id, attachments=attachments)
+        ]
+        send_direct_message("🙋‍♀️ Want to ask the community? \n Get input from others in the chat! 🗣️", room_id, attachments)
     return response["response"]
 
 def handle_followup(user_input: str, room_id: str, username: str):
@@ -285,7 +289,8 @@ def handle_followup(user_input: str, room_id: str, username: str):
     )
 
     reply = response["response"].strip()
-    send_direct_message(reply, room_id)
+    if reply != "__NEED_WEB_SEARCH__":
+        send_direct_message(reply, room_id)
     return reply
 
 
