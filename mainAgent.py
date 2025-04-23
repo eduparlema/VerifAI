@@ -149,8 +149,8 @@ def main_agent(user_input: str):
         model='4o-mini',
         system=system_prompt,
         query=f"User input: {user_input}",
-        temperature=0.2,
-        lastk=10,
+        temperature=0.1,
+        lastk=15,
         session_id=SESSION,
         rag_usage=False
     )
