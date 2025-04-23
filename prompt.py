@@ -150,6 +150,7 @@ EXTRACT_KEYWORDS_PROMPT = """
     - **Do not** include generic terms like "claim", "news article", "report", "statement", or "rumor".
         Also, unless stated somewhere in the user input, do not include dates on the
         keywords.
+    - Avoid including verbs unless it is absolutely necessary.
     - Focus on the real-world entities or actions being mentioned (e.g., policies, laws, bans, replacements).
     - Use neutral, objective language — avoid emotionally charged or speculative terms.
     - Keep it short and search-friendly: ideally **5-10 words**.
