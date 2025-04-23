@@ -474,13 +474,13 @@ def unified_search_pipeline(
             continue
 
         formatted = format_source(query, url, title, content)
-        summary = summarize_source(query, formatted)
+        # summary = summarize_source(query, formatted)
 
         if summary == "ERROR":
             idx += 1
             continue
 
-        all_summaries.append(summary)
+        all_summaries.append(formatted)
         idx += 1
 
     #if message_prefix:
