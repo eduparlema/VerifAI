@@ -37,9 +37,9 @@ def fact_check_tools(user_input: str, room_id: str, user_name:str):
         verdict = generate_verdict(user_input, context)
         if verdict == "__NO_FACT_CHECK_API__":
             return "__NO_FACT_CHECK_API__"
+        send_direct_message(verdict, room_id)
         attachements = [
                 {
-                    "text": "Would you like me to search the web for you?",
                     "actions": [
                         {
                             "type": "button",
@@ -51,7 +51,7 @@ def fact_check_tools(user_input: str, room_id: str, user_name:str):
                 }
             ]
         # Send verdict + buttons
-        send_direct_message(verdict, room_id, attachments=attachements)
+        send_direct_message("Want me to look this up online for you? 🌐🔍", room_id, attachments=attachements)
         return verdict
     else:
         return "__NO_FACT_CHECK_API__"
