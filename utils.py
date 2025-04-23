@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 import re
 from prompt import *
 from typing import Optional, List, Dict
+import praw
 
 
 RC_API = os.environ.get("RC_API")
