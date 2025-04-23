@@ -105,7 +105,7 @@ def social_search(input: str, room_id: str, user_name:str, limit_posts: int=3, l
     print("[INFO] social_search module activated!")
     summaries = []
     posts = reddit.subreddit("all").search(input, sort='relevance', limit=limit_posts)
-
+    comments = []
     for post in posts:
         post.comments.replace_more(limit=0)
         comments = [comment.body for comment in post.comments[:limit_comments]]
