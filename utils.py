@@ -22,7 +22,7 @@ GOOGLE_API_KEY=os.environ.get("googleSearchApiKey")
 SEARCH_ENGINE_ID=os.environ.get("searchEngineId")
 FACT_CHECK_API=os.environ.get("googleFactCheckApiKey")
 FACT_CHECK_URL=os.environ.get("factCheckApiUrl")
-SEARCH_ENGINE_ID_REDDIT=os.environ.get("searchEngineIdReddit")
+SEARCH_ENGINE_ID_REDDIT=os.environ.get("searchEngineIDReddit")
 
 ROCKETCHAT_AUTH = {
     "X-Auth-Token": RC_token,
