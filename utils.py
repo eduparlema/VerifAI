@@ -35,7 +35,7 @@ reddit = praw.Reddit(
     user_agent=USER_AGENT
 )
 
-SESSION = "VerifAI_Session_37"
+SESSION = "VerifAI_Session_38"
 
 def google_search(query: str, num_results: int = 10) -> list:
     """
@@ -547,7 +547,7 @@ def extract_post_id(url: str) -> str:
     else:
         raise ValueError(f"Could not extract post ID from URL: {url}")
 
-def get_reddit_comment_summaries_from_urls(urls: list[str], limit_comments: int = 20):
+def get_reddit_comment_summaries_from_urls(urls: list[str], limit_comments: int):
     """Takes a list of Reddit post URLs and returns comment summaries."""
     summaries = []
 

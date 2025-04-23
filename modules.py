@@ -95,7 +95,7 @@ def social_search(user_input: str, room_id: str, user_name:str, limit_posts: int
     print("[INFO] social_search module activated!")
     reddit_ulrs = google_search_reddit(user_input)
     print(f"[INFO] These are the reddit urls: {reddit_ulrs}")
-    summaries = get_reddit_comment_summaries_from_urls(reddit_ulrs[:limit_posts])
+    summaries = get_reddit_comment_summaries_from_urls(reddit_ulrs[:limit_posts], limit_comments)
     print(f"[INFO] This are the summaries: {summaries}")
 
     response = generate(

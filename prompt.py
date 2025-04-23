@@ -225,9 +225,9 @@ SOCIAL_SEARCH_PROMPT = """
         - Are people supportive, skeptical, angry, joking? 
         - Do the comments show disagreement or controversy?
         - Are there shifts in tone (e.g. early support → later backlash)?
-    2. For each Reddit post, quote 2-3 representative comments (use direct quotes or short paraphrases).
+    2. Quote 2-3 representative comments (use direct quotes or short paraphrases).
         - Choose comments that reflect distinct viewpoints or recurring ideas.
-    3. Write in a clear and engaging tone, using emojis where appropriate to improve readability.
+    3. Write in a clear, warm, and concise tone, using emojis to improve readability. Keep the answer concise!
     4. End each post section with the **Reddit post link** so users can explore more.
     5. DO NOT include a generic summary section — instead, focus on structured insights organized by trend/theme.
 
