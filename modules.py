@@ -74,7 +74,7 @@ def local_search(input: str, room_id: str, user_name: str):
     return unified_search_pipeline(
         input, room_id, user_name,
         search_fn=local_google_search,
-        summarizer_fn=generate_summary,
+        # summarizer_fn=generate_summary,
         message_prefix="✅ Got some results from Google — taking a closer look at your claim now! 🔍"
 
     )
@@ -84,7 +84,7 @@ def general_search(input: str, room_id: str, user_name: str, all_search: bool=Fa
     response = unified_search_pipeline(
         input, room_id, user_name,
         search_fn=google_search,
-        summarizer_fn=generate_summary,
+        # summarizer_fn=generate_summary,
         message_prefix="✅ Got some results from Google — taking a closer look at your claim now! 🔍"
     )
     if not all_search:
@@ -200,29 +200,29 @@ def all_search(user_input: str, room_id: str, user_name: str):
         rag_usage=False
     )
 
-    followup_questions = get_relevant_questions(response["response"])
+    # followup_questions = get_relevant_questions(response["response"])
 
-    attachments = [
-        {
-            "text": f"❓ *{question}*",
-            "actions": [
-                {
-                    "type": "button",
-                    "text": "Answer this",
-                    "msg": question,
-                    "msg_in_chat_window": True
-                }
-            ]
-        }
-        for i, question in enumerate(followup_questions)
-    ]
+    # attachments = [
+    #     {
+    #         "text": f"❓ *{question}*",
+    #         "actions": [
+    #             {
+    #                 "type": "button",
+    #                 "text": "Answer this",
+    #                 "msg": question,
+    #                 "msg_in_chat_window": True
+    #             }
+    #         ]
+    #     }
+    #     for i, question in enumerate(followup_questions)
+    # ]
 
     send_direct_message(response["response"], room_id)
 
-    message1 = """ Based on the information I found, here are some follow-up 
-    questions you might want to consider: """
+    # message1 = """ Based on the information I found, here are some follow-up 
+    # questions you might want to consider: """
     
-    send_direct_message(message1, room_id, attachments=attachments)
+    # send_direct_message(message1, room_id, attachments=attachments)
 
     extra_attachments = [
         {

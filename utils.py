@@ -35,7 +35,7 @@ reddit = praw.Reddit(
     user_agent=USER_AGENT
 )
 
-SESSION = "VerifAI_Session_46"
+SESSION = "VerifAI_Session_47"
 
 def google_search(query: str, num_results: int = 10) -> list:
     """
@@ -380,23 +380,23 @@ def add_params_to_module(module_str, *extra_params):
     return new_call
 
 
-def generate_summary(user_input: str, summaries: list, user_name: str) -> str:
+# def generate_summary(user_input: str, summaries: list, user_name: str) -> str:
   
-    query = f"""User Input: {user_input} Summaries:
-    {summaries}
-    """
+#     query = f"""User Input: {user_input} Summaries:
+#     {summaries}
+#     """
 
-    response = generate(
-        model="4o-mini",
-        system=SUMMARIZE_ALL_SOURCES_PROMPT,
-        query=query,
-        temperature=0.4,
-        lastk=3,
-        session_id=f"{SESSION}_{user_name}",
-        rag_usage=False
-    )
+#     response = generate(
+#         model="4o-mini",
+#         system=SUMMARIZE_ALL_SOURCES_PROMPT,
+#         query=query,
+#         temperature=0.2,
+#         lastk=3,
+#         session_id=f"{SESSION}_{user_name}",
+#         rag_usage=False
+#     )
 
-    return response["response"]
+#     return response["response"]
 
 def generate_fact_based_response_custom(user_input: str, summaries: list) -> str:
     """
@@ -463,7 +463,7 @@ def unified_search_pipeline(
     room_id: str,
     user_name: str,
     search_fn,
-    summarizer_fn,
+    # summarizer_fn,
     message_prefix: str = ""
 ) -> str:
     print(f"[INFO] unified_search_pipeline using {search_fn.__name__}")
@@ -498,8 +498,11 @@ def unified_search_pipeline(
     #if message_prefix:
         #send_direct_message(message_prefix, room_id)
 
+    summaries = " ".join(all_summaries)
+
     print("[INFO] Response generated successfully!")
-    return summarizer_fn(query, all_summaries, user_name)
+    # return summarizer_fn(query, all_summaries, user_name)
+    return summaries
 
 def get_relevant_questions(content: str):
     GET_RELEVANT_QUESTIONS_PROMPT = """
