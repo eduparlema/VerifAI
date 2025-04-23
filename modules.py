@@ -4,13 +4,6 @@ from dotenv import load_dotenv
 import praw
 from prompt import *
 
-load_dotenv()
-
-RC_API = os.environ.get("RC_API")
-CLIENT_ID = os.environ.get("praw_client_id")
-CLIENT_SECRET = os.environ.get("praw_client_secret")
-USER_AGENT = "script:misinfo-bot:v1.0"
-
 def intent_detection(user_input: str, room_id: str, user_name: str):
     print("[INFO] intent_detection_activated module activated!")
     response = generate(
@@ -170,7 +163,6 @@ def decide_search_sources(user_input: str) -> list:
     except Exception as e:
         print(f"[WARN] Failed to parse LLM response: {e}")
         return ["general", "local"]  # Fallback
-
 
 def all_search(user_input: str, room_id: str, user_name: str):
     print("[INFO] all_search module activated!")

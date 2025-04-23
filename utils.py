@@ -10,10 +10,18 @@ from prompt import *
 from typing import Optional, List, Dict
 import praw
 
+load_dotenv()
 
-RC_API = os.environ.get("RC_API")
 RC_token = os.environ.get("RC_token")
 RC_userId = os.environ.get("RC_userId")
+RC_API = os.environ.get("RC_API")
+CLIENT_ID = os.environ.get("praw_client_id")
+CLIENT_SECRET = os.environ.get("praw_client_secret")
+USER_AGENT = "script:misinfo-bot:v1.0"
+GOOGLE_API_KEY=os.environ.get("googleSearchApiKey")
+SEARCH_ENGINE_ID=os.environ.get("searchEngineId")
+FACT_CHECK_API=os.environ.get("googleFactCheckApiKey")
+FACT_CHECK_URL=os.environ.get("factCheckApiUrl")
 
 ROCKETCHAT_AUTH = {
     "X-Auth-Token": RC_token,
@@ -26,17 +34,7 @@ reddit = praw.Reddit(
     user_agent=USER_AGENT
 )
 
-load_dotenv()
-
-GOOGLE_API_KEY=os.environ.get("googleSearchApiKey")
-SEARCH_ENGINE_ID=os.environ.get("searchEngineId")
-FACT_CHECK_API=os.environ.get("googleFactCheckApiKey")
-FACT_CHECK_URL=os.environ.get("factCheckApiUrl")
-
-print(GOOGLE_API_KEY)
-print(SEARCH_ENGINE_ID)
-
-SESSION = "VerifAI_Session_28"
+SESSION = "VerifAI_Session_29"
 
 def google_search(query: str, num_results: int = 10) -> list:
     """
