@@ -57,6 +57,9 @@ def main_agent(user_input: str):
     "__NO_FACT_CHECK_API__" will be provided to you which means that you should
     continue down the ideal pipeline provided above. That is, use all_search module.
 
+    IMPORTANT: If you have received a URL as part of user input, you MUST strictly
+    include the url as part of the input when you activate this module. 
+
     IMPORTANT: If you are activating this module after receiving __FACT_CHECKABLE__,
     strictly use the same input to activate this module as you used to activate
     the intent_detection module. Do NOT change it at all.
