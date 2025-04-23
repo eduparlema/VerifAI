@@ -44,11 +44,11 @@ def main():
         response = eval(module)
         print(f"\n\nresponse from module {module}: \n\n{response}")
         if response == "__NEED_WEB_SEARCH__":
-            send_direct_message("🔎 Searching for more information... please wait", room_id)
+            send_direct_message("🌐 Gathering more info from the web... one moment please!", room_id)
         elif response == "__FACT_CHECKABLE__":
-            send_direct_message("🔎 Searching if your claim has been fact-checked... please wait", room_id)
+            send_direct_message("🔎 Looking up your query in Google’s Fact Check Tools... hang on a moment!", room_id)
         elif response == "__NO_FACT_CHECK_API__":
-            send_direct_message("😕 Your claim hasn't been fact-checked yet... 🔎 Performing a general search to find relevant information — please hang tight! ⏳", room_id)
+            send_direct_message("😕 Couldn't find a fact-check for this via Google... 🔍 Starting a broader search to gather relevant info — please hold on! ⏳", room_id)
         
     return jsonify({"success": True})
  
