@@ -224,7 +224,7 @@ def generate_fact_based_response(user_input: str, summaries: list) -> str:
 
     response = generate(
         model="4o-mini",
-        system=GENERATE_VERDICT_PROMPT,
+        system=SUMMARIZE_ALL_SOURCES_PROMPT,
         query=query,
         temperature=0.4,
         lastk=3,
