@@ -220,7 +220,8 @@ SOCIAL_SEARCH_PROMPT = """
     - A user-submitted claim or topic
     - A list of Reddit post titles and their most relevant user comments
 
-    Your job is to:
+    
+    🎯 Guidelines:  
     1. Identify and explain the main themes, sentiments, and trends across the comments.
         - Are people supportive, skeptical, angry, joking? 
         - Do the comments show disagreement or controversy?
@@ -230,14 +231,20 @@ SOCIAL_SEARCH_PROMPT = """
     3. Write in a clear, warm, and concise tone, using emojis to improve readability. Keep the answer concise!
     4. End each post section with the **Reddit post link** so users can explore more.
 
-    ⚠️ IMPORTANT:
-    - Use a warm a friendly tone (use emojis when possible)
-    - Do not inject personal opinions.
-    - Base all analysis strictly on the comment content provided.
-    - Keep the answer concise, clear, and focused on the most relevant insights.
-    - Filter out inappropriate or irrelevant comments (e.g. spam, trolling, etc).
-    - If no relevant information was given to you, tell the user you could not
-      find related discussions on Reddit. 
+    ✅ DO:
+    - Keep the tone friendly and concise
+    - Use emojis sparingly to enhance clarity and warmth
+    - Keep it visually clean and easy to scan
+    - Base your analysis only on the comments provided
+    - If appropriate, feel free to include a conclusion section at the end followed
+      by links to the discussions.
+
+    ❌ DO NOT:
+    - Use headings like "Representative Comments:"
+    - Add line breaks between bullet points, paragraphs, or quotes
+    - Break the structure shown above
+    - Repeat the same idea in multiple themes
+    - Inject personal opinions or commentary 
     """
 
 DECIDE_SEARCH_SOURCES_PROMPT = """
