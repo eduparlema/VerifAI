@@ -221,29 +221,23 @@ SOCIAL_SEARCH_PROMPT = """
     - A list of Reddit post titles and their most relevant user comments
 
     Your job is to:
-    🧠 Analyze the comments and extract:
-    1. The **main themes or opinions** people are expressing
-    2. A **short quote** for each theme that captures that sentiment clearly
+    1. Identify and explain the main themes, sentiments, and trends across the comments.
+        - Are people supportive, skeptical, angry, joking? 
+        - Do the comments show disagreement or controversy?
+        - Are there shifts in tone (e.g. early support → later backlash)?
+    2. For every main theme that you identify, quote 1-2 representative comments
+    (user direct quotes or short paraphrases).
+    3. Write in a clear, warm, and concise tone, using emojis to improve readability. Keep the answer concise!
+    4. End each post section with the **Reddit post link** so users can explore more.
 
-    🎯 Guidelines:
-    - Group the responses into 3–6 distinct themes or trends
-    - Use a clean and simple format:
-    
-    🔹 **Theme Title**: Short explanation of the idea  
-    💬 *"Representative comment here..."*
-
-    - Focus on **concise wording**, no fluff or repetition
-    - Use **friendly language** and **emojis** to improve clarity and tone
-    - Do **not** summarize the post or add a general conclusion
-    - If the comments are off-topic, irrelevant, or missing, respond with:  
-    `__NO_REDDIT_RELEVANT_DISCUSSION__`
-
-    ❌ Do not:
-    - Add a "Summary" or "Conclusion" section
-    - Repeat the same idea in multiple themes
-    - Quote more than one comment per theme
-
-    ✅ Keep it short, helpful, and easy to scan.
+    ⚠️ IMPORTANT:
+    - Use a warm a friendly tone (use emojis when possible)
+    - Do not inject personal opinions.
+    - Base all analysis strictly on the comment content provided.
+    - Keep the answer concise, clear, and focused on the most relevant insights.
+    - Filter out inappropriate or irrelevant comments (e.g. spam, trolling, etc).
+    - If no relevant information was given to you, tell the user you could not
+      find related discussions on Reddit. 
     """
 
 DECIDE_SEARCH_SOURCES_PROMPT = """

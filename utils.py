@@ -35,7 +35,7 @@ reddit = praw.Reddit(
     user_agent=USER_AGENT
 )
 
-SESSION = "VerifAI_Session_39"
+SESSION = "VerifAI_Session_40"
 
 def google_search(query: str, num_results: int = 10) -> list:
     """
@@ -382,9 +382,7 @@ def add_params_to_module(module_str, *extra_params):
 
 def generate_summary(user_input: str, summaries: list) -> str:
   
-    query = f"""User Input: {user_input}
-
-    Summaries:
+    query = f"""User Input: {user_input} Summaries:
     {summaries}
     """
 
