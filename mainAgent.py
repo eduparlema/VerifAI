@@ -38,11 +38,9 @@ def main_agent(user_input: str):
     pipeline provided above. That is, use the fact_check_tools module. Otherwise,
     just respond with the answer provided by this module.
 
-    IMPORTANT: Whenever you call this module, do NOT change the input of the user
+    IMPORTANT: Whenever you call this module, strictly do NOT change the input of the user
     at all. Just call this module with the exact message you received from the
-    user. That is, include any URLs, preambles that the user uses. The module will
-    be in charge of extracting the keywords, you are supposed to activate the module
-    when necessary and STRICTLY passing the exact user input as the module input.
+    user. That is, include any URLs, preambles that the user wrote.
 
     E.g.: If the user inputs: "This article <url> suggests that Y". Then you
     should return intent_detection("This article <url> suggests that Y")
