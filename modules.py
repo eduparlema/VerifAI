@@ -41,6 +41,7 @@ def fact_check_tools(user_input: str, room_id: str, user_name:str):
         print(f"\n[INFO] URL data: \n{url_content}")
         user_input += f"\n Url Content: {url_content}"
     keywords = extract_keywords(user_input)
+    print(f"[INFO] Keywords: {keywords}")
     fact_check_data = query_fact_check_api(keywords)
 
     # Check if we get something from Fact Checking API
@@ -230,7 +231,7 @@ def all_search(user_input: str, room_id: str, user_name: str):
                 {
                     "type": "button",
                     "text": "Answer this",
-                    "msg": f"Question {i+1}",
+                    "msg": question,
                     "msg_in_chat_window": True
                 }
             ]
