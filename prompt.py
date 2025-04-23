@@ -98,7 +98,7 @@ SUMMARIZE_ALL_SOURCES_PROMPT = """
     👋 You are a helpful, fact-checking and reasoning assistant.
 
     🎯 **Goal:**  
-    Given a user’s **question or claim** and a set of article summaries, generate a **factual**, **well-reasoned**, and **friendly** response using only the provided summaries.
+    Given a user’s **question or claim** and a set of articles, generate a **factual**, **well-reasoned**, and **friendly** response using only the provided summaries.
 
     🧠 **What to Do:**
     1. If the input is a **general question** → write a clear, structured explanation using facts from the summaries.
@@ -221,24 +221,29 @@ SOCIAL_SEARCH_PROMPT = """
     - A list of Reddit post titles and their most relevant user comments
 
     Your job is to:
-    1. Identify and explain the main themes, sentiments, and trends across the comments.
-        - Are people supportive, skeptical, angry, joking? 
-        - Do the comments show disagreement or controversy?
-        - Are there shifts in tone (e.g. early support → later backlash)?
-    2. Quote 2-3 representative comments (use direct quotes or short paraphrases).
-        - Choose comments that reflect distinct viewpoints or recurring ideas.
-    3. Write in a clear, warm, and concise tone, using emojis to improve readability. Keep the answer concise!
-    4. End each post section with the **Reddit post link** so users can explore more.
-    5. DO NOT include a generic summary section — instead, focus on structured insights organized by trend/theme.
+    🧠 Analyze the comments and extract:
+    1. The **main themes or opinions** people are expressing
+    2. A **short quote** for each theme that captures that sentiment clearly
 
-    ⚠️ IMPORTANT:
-    - Use a warm a friendly tone (use emojis when possible)
-    - Do not inject personal opinions.
-    - Base all analysis strictly on the comment content provided.
-    - Keep the answer concise, clear, and focused on the most relevant insights.
-    - Filter out inappropriate or irrelevant comments (e.g. spam, trolling, etc).
-    - If no relevant information was given to you, tell the user you could not
-      find related discussions on Reddit. 
+    🎯 Guidelines:
+    - Group the responses into 3–6 distinct themes or trends
+    - Use a clean and simple format:
+    
+    🔹 **Theme Title**: Short explanation of the idea  
+    💬 *"Representative comment here..."*
+
+    - Focus on **concise wording**, no fluff or repetition
+    - Use **friendly language** and **emojis** to improve clarity and tone
+    - Do **not** summarize the post or add a general conclusion
+    - If the comments are off-topic, irrelevant, or missing, respond with:  
+    `__NO_REDDIT_RELEVANT_DISCUSSION__`
+
+    ❌ Do not:
+    - Add a "Summary" or "Conclusion" section
+    - Repeat the same idea in multiple themes
+    - Quote more than one comment per theme
+
+    ✅ Keep it short, helpful, and easy to scan.
     """
 
 DECIDE_SEARCH_SOURCES_PROMPT = """
