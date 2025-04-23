@@ -74,7 +74,7 @@ def local_search(input: str, room_id: str, user_name: str):
     return unified_search_pipeline(
         input, room_id, user_name,
         search_fn=local_google_search,
-        summarizer_fn=generate_fact_based_response_custom,
+        summarizer_fn=generate_summary,
         message_prefix="✅ Got some results from Google — taking a closer look at your claim now! 🔍"
 
     )
@@ -84,7 +84,7 @@ def general_search(input: str, room_id: str, user_name: str, all_search: bool=Fa
     response = unified_search_pipeline(
         input, room_id, user_name,
         search_fn=google_search,
-        summarizer_fn=generate_fact_based_response,
+        summarizer_fn=generate_summary,
         message_prefix="✅ Got some results from Google — taking a closer look at your claim now! 🔍"
     )
     if not all_search:

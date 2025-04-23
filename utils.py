@@ -380,6 +380,26 @@ def add_params_to_module(module_str, *extra_params):
     return new_call
 
 
+def generate_summary(user_input: str, summaries: list) -> str:
+  
+    query = f"""User Input: {user_input}
+
+    Summaries:
+    {summaries}
+    """
+
+    response = generate(
+        model="4o-mini",
+        system=SUMMARIZE_ALL_SOURCES_PROMPT,
+        query=query,
+        temperature=0.4,
+        lastk=3,
+        session_id=SESSION,
+        rag_usage=False
+    )
+
+    return response["response"]
+
 
 def generate_fact_based_response_custom(user_input: str, summaries: list) -> str:
     """
