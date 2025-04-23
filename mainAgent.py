@@ -56,6 +56,10 @@ def main_agent(user_input: str):
     provides a verdict citing all sources. If no suitable content is found,
     "__NO_FACT_CHECK_API__" will be provided to you which means that you should
     continue down the ideal pipeline provided above. That is, use all_search module.
+
+    IMPORTANT: If you are activating this module after receiving __FACT_CHECKABLE__,
+    strictly use the same input to activate this module as you used to activate
+    the intent_detection module. Do NOT change it at all.
     ---
 
     ##3. Tool to perform a comprehensive search  
