@@ -12,7 +12,7 @@ def intent_detection(user_input: str, room_id: str, user_name: str):
         query=user_input,
         temperature=0.5,
         lastk=1,
-        session_id=SESSION,
+        session_id=f"{SESSION}_{user_name}",
         rag_usage=False
     )
     if response["response"] != "__FACT_CHECKABLE__":
@@ -34,7 +34,7 @@ def fact_check_tools(user_input: str, room_id: str, user_name:str):
     # Check if we get something from Fact Checking API
     if fact_check_data and fact_check_data.get('claims'):
         context = prepare_fact_check_context(fact_check_data["claims"])
-        verdict = generate_verdict(user_input, context)
+        verdict = generate_verdict(user_input, context, user_name)
         if verdict == "__NO_FACT_CHECK_API__":
             return "__NO_FACT_CHECK_API__"
         send_direct_message(verdict, room_id)
@@ -104,7 +104,7 @@ def social_search(user_input: str, room_id: str, user_name:str, limit_posts: int
         query=f"Here is the content \n {summaries}",
         temperature=0.1,
         lastk=3,
-        session_id=SESSION,
+        session_id=f"{SESSION}_{user_name}",
         rag_usage=False
     )
     if not all_search:
@@ -196,7 +196,7 @@ def all_search(user_input: str, room_id: str, user_name: str):
         query=final_response,
         temperature=0.4,
         lastk=3,
-        session_id=SESSION,
+        session_id=f"{SESSION}_{user_name}",
         rag_usage=False
     )
 
@@ -254,7 +254,7 @@ def all_search(user_input: str, room_id: str, user_name: str):
     send_direct_message(message, room_id, extra_attachments)           
     return response["response"]
 
-def handle_followup(user_input: str, room_id: str, username: str):
+def handle_followup(user_input: str, room_id: str, user_name: str):
     print("[INFO] handle_followup module activated (via last_k)!")
 
     FOLLOWUP_FROM_CONTEXT_PROMPT = """
@@ -281,7 +281,7 @@ def handle_followup(user_input: str, room_id: str, username: str):
         query=user_input,
         temperature=0.3,
         lastk=6,
-        session_id=SESSION, # This must share same session with main agent
+        session_id=f"{SESSION}_{user_name}", # This must share same session with main agent
         rag_usage=False
     )
 

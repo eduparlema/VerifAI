@@ -318,7 +318,7 @@ def prepare_fact_check_context(claims):
             evidence.append(content_block)
     return "\n\n--\n\n".join(evidence)
 
-def generate_verdict(user_claim: str, evidence: str):
+def generate_verdict(user_claim: str, evidence: str, user_name: str):
 
     response = generate(
     model="4o-mini",
@@ -329,7 +329,7 @@ def generate_verdict(user_claim: str, evidence: str):
             """,
     temperature=0.4,
     lastk=3,
-    session_id=SESSION,
+    session_id=f"{SESSION}_{user_name}",
     rag_usage=False
     )
     return response["response"]
@@ -380,7 +380,7 @@ def add_params_to_module(module_str, *extra_params):
     return new_call
 
 
-def generate_summary(user_input: str, summaries: list) -> str:
+def generate_summary(user_input: str, summaries: list, user_name: str) -> str:
   
     query = f"""User Input: {user_input} Summaries:
     {summaries}
@@ -392,7 +392,7 @@ def generate_summary(user_input: str, summaries: list) -> str:
         query=query,
         temperature=0.4,
         lastk=3,
-        session_id=SESSION,
+        session_id=f"{SESSION}_{user_name}",
         rag_usage=False
     )
 
@@ -499,7 +499,7 @@ def unified_search_pipeline(
         #send_direct_message(message_prefix, room_id)
 
     print("[INFO] Response generated successfully!")
-    return summarizer_fn(query, all_summaries)
+    return summarizer_fn(query, all_summaries, user_name)
 
 def get_relevant_questions(content: str):
     GET_RELEVANT_QUESTIONS_PROMPT = """

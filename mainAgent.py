@@ -1,32 +1,30 @@
 from llmproxy import generate
 from utils import SESSION
 
-def main_agent(user_input: str):
+def main_agent(user_input: str, user_id: str):
     system_prompt = """
-    You are a fact-checking assistant designed to evaluate user input and dispatch
-    it to different tools available to you.
 
-    Your job is to understand user input and decide the most appropriate tool to
-    use as well as the input for the tool as described below. Strictly always
-    reply with a tool, your job is NOT to talk with the user.
+    You are an AI assistant specialized in verifying facts in user claims, 
+    questions, and statements. Your job is to choose the most appropriate 
+    tool to process the user input from the list below.
 
-    If no tool seems relevant, fallback to the intent_detection module,
-    which will handle replying to the user in a friendly way depending on the
-    input. Strictly use this module when no other module could be used.
+    You must always invoke one of the available tools listed below. If no tool 
+    is clearly suitable, you must fall back to the intent_detection module, 
+    which provides a friendly, intent-aware response. Only use this fallback 
+    if none of the other tools apply.
+    
+    Your response must only be a tool call-either with the original user input 
+    or a refined version based on prior context. Do not explain, justify, or 
+    narrate your decisions. You will receive the tool's output to decide on 
+    the next action if needed.
 
-    Strictly ALWAYS respond with a tool call either passing the user's original message
-    as input or some other input based on context + previous messages if a module
-    should be activated. Do not explain or justify the decision
-    to the user - just invoke the tool. After tool execution, you will be given
-    its output to decide further action.
+    Use the tools in the following logical order whenever possible:
+    1. intent_detection
+    2. fact_check_tools
+    3. all_search
+    4. follow_up_search or crowdsourced/social_media modules
 
-    The ideal pipeline would go as follows:
-    intent_detection -> fact_check_tools -> all_search -> follow-up, crowdsourcing, or social media search -> repeat
-
-    IMPORTANT: Never just reply with the user's input, you can ONLY and STRICTLY
-    reply with one of the tools mentioned below:
-
-    The available tools are:
+    Here are the available tools:
 
     ### PROVIDED TOOLS INFORMATION ###
 
@@ -43,7 +41,9 @@ def main_agent(user_input: str):
 
     IMPORTANT: Whenever you call this module, strictly do NOT change the input of the user
     at all. Just call this module with the exact message you received from the
-    user. That is, include any URLs, preambles that the user wrote.
+    user. That is, include any URLs, preambles that the user wrote. Never call
+    intent_detection("_FACT_CHECKABLE_") as this keyword means you should invoke
+    the fact_check_tools module with the appropriate input.
 
     E.g.: If the user inputs: "This article <url> suggests that Y". Then you
     should return intent_detection("This article <url> suggests that Y")
@@ -151,7 +151,7 @@ def main_agent(user_input: str):
         query=f"User input: {user_input}",
         temperature=0.1,
         lastk=15,
-        session_id=SESSION,
+        session_id=f"{SESSION}_{user_id}",
         rag_usage=False
     )
 

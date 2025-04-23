@@ -37,7 +37,7 @@ def main():
 
     while response in special_responses or response == message:
         print(f"Reponse from agent: {response}")
-        module = main_agent(response)
+        module = main_agent(response, user)
         print(f"[INFO] Agent calling: {module}")
         module = add_params_to_module(module, room_id, user)
         print(f"[INFO] Edited module: {module}")
