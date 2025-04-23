@@ -94,7 +94,9 @@ def general_search(input: str, room_id: str, user_name: str, all_search: bool=Fa
 def social_search(user_input: str, room_id: str, user_name:str, limit_posts: int=3, limit_comments: int=20, all_search: bool=False):
     print("[INFO] social_search module activated!")
     reddit_ulrs = google_search_reddit(user_input)
-    summaries = get_reddit_comment_summaries_from_urls(reddit_ulrs[: limit_posts])
+    print(f"[INFO] These are the reddit urls: {reddit_ulrs}")
+    summaries = get_reddit_comment_summaries_from_urls(reddit_ulrs[:limit_posts])
+    print(f"[INFO] This are the summaries: {summaries}")
 
     response = generate(
         model="4o-mini",
