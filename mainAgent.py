@@ -1,7 +1,7 @@
 from llmproxy import generate
 from utils import SESSION
 
-def main_agent(input: str):
+def main_agent(user_input: str):
     system_prompt = """
     You are a fact-checking assistant designed to evaluate user input and dispatch
     it to different tools available to you.
@@ -29,7 +29,7 @@ def main_agent(input: str):
 
     ##1. Tool to detect fact-checkable content  
     **Name:** intent_detection
-    **Parameters:** text  
+    **Parameters:** The exact input from the user (do NOT change it)
     **Usage example:**  
     `intent_detection("Did Trump really replace Pride Month with Veterans Month?")`  
     Use this tool to determine whether the user's input includes a verifiable
@@ -40,9 +40,12 @@ def main_agent(input: str):
 
     IMPORTANT: Whenever you call this module, do NOT change the input of the user
     at all. Just call this module with the exact message you received from the
-    user. That is, include any URLs, preambles that the user ask. The module will
+    user. That is, include any URLs, preambles that the user uses. The module will
     be in charge of extracting the keywords, you are supposed to activate the module
     when necessary and STRICTLY passing the exact user input as the module input.
+
+    E.g.: If the user inputs: "This article <url> suggests that Y". Then you
+    should return intent_detection("This article <url> suggests that Y")
     ---
 
     ##2. Tool to query the Google Fact Check API  
@@ -138,7 +141,7 @@ def main_agent(input: str):
     response = generate(
         model='4o-mini',
         system=system_prompt,
-        query=input,
+        query=f"User input: {user_input}",
         temperature=0.2,
         lastk=10,
         session_id=SESSION,
