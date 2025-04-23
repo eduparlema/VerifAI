@@ -55,7 +55,8 @@ def main_agent(user_input: str):
     Tools API. If relevant results are found, it summarizes the sources and
     provides a verdict citing all sources. If no suitable content is found,
     "__NO_FACT_CHECK_API__" will be provided to you which means that you should
-    continue down the ideal pipeline provided above. That is, use all_search module.
+    continue down the ideal pipeline provided above. That is, strictly use
+    all_search module.
 
     IMPORTANT: If you have received a URL as part of user input, you MUST strictly
     include the url as part of the input when you activate this module. 

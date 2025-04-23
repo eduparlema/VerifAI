@@ -35,7 +35,7 @@ reddit = praw.Reddit(
     user_agent=USER_AGENT
 )
 
-SESSION = "VerifAI_Session_35"
+SESSION = "VerifAI_Session_36"
 
 def google_search(query: str, num_results: int = 10) -> list:
     """
@@ -90,7 +90,7 @@ def local_google_search(user_query: str, num_results: int = 10) -> list:
         query=user_query,
         temperature=0.2,
         lastk=3,
-        session_id="search_param_suggester",
+        session_id="search_param_suggester_0",
         rag_usage=False
     )
 
@@ -136,12 +136,7 @@ def format_source(user_input, url, title, article_text):
     """
     Formats the claim and article text into a structured input for the LLM.
     """
-    return {
-        "Topic": user_input,
-        "URL": url,
-        "Title": title,
-        "Content": article_text
-    }
+    return f"Source: Topic: {user_input}\nURL: {url}\nTitle: {title}\nContent: {article_text}"
 
 def fetch_main_article(url: str, timeout: int = 10) -> str:
     """
@@ -248,7 +243,7 @@ def extract_keywords(user_input: str):
         query=user_input,
         temperature=0.1,
         lastk=3,
-        session_id="keyword_session_1",
+        session_id="keyword_session_2",
         rag_usage=False
     )
 
@@ -509,7 +504,7 @@ def get_relevant_questions(content: str):
         query=f"Here is the content {content}",
         temperature=0.3,
         lastk=1,
-        session_id="get_relevan_questions_0",
+        session_id="get_relevan_questions_1",
         rag_usage=False,
     )
     questions = eval(response["response"].strip())  # Safe only if you trust the output

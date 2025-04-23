@@ -136,7 +136,7 @@ def should_crowdsource(claim, search_summary):
         query=f"User input: {claim}, Fact-checkin results: {search_summary}",
         temperature=0.1,
         lastk=1,
-        session_id="crowdsoursing_0",
+        session_id="crowdsoursing_1",
         rag_usage=False
     )
     return True if response["response"] == "YES" else False
@@ -153,7 +153,7 @@ def decide_search_sources(user_input: str) -> list:
         query= "Here is the user input: \n" + user_input,
         temperature=0,
         lastk=3,
-        session_id="search_planner_v1",
+        session_id="search_planner_v2",
         rag_usage=False
     )
     
@@ -198,7 +198,7 @@ def all_search(user_input: str, room_id: str, user_name: str):
         query=final_response,
         temperature=0.4,
         lastk=3,
-        session_id="final_summary_synthesis",
+        session_id=SESSION,
         rag_usage=False
     )
 
