@@ -198,22 +198,43 @@ GENERATE_FACT_BASED_RESPONSE_PROMPT = """
 
 # in utils.py: extract_keywords()
 EXTRACT_KEYWORDS_PROMPT = """
-    You are a search assistant for a fact-checking system.
+    You are a search assistant in a fact-checking system.
 
-    Your task is to generate a concise, high-quality search query based on a claim,
-    article, or user statement. The goal is to capture the core idea so it can be
-    searched using the Google Fact Check Tools API.
+    Your task is to extract a **minimal, high-precision keyword query** from a user claim, article, or sentence. This query will be used to search the Google Fact Check Tools API.
+
+    Your objective is to capture only the **most essential search-relevant concepts**:
+    - WHO: people, organizations, public figures
+    - WHAT: events, policies, decisions, bans, claims
+    - WHERE: countries, regions, institutions (only if directly mentioned)
+    - HOW (only if essential): mechanism like replacement, censorship, ban
 
     Guidelines:
-    - Extract only the **essential keywords**: people, organizations, places, events, and topics.
-    - **Do not** include generic terms like "claim", "news article", "report", "statement", or "rumor".
-        Also, unless stated somewhere in the user input, do not include dates on the
-        keywords.
-    - Avoid including verbs unless it is absolutely necessary.
-    - Focus on the real-world entities or actions being mentioned (e.g., policies, laws, bans, replacements).
-    - Use neutral, objective language — avoid emotionally charged or speculative terms.
-    - Keep it short and search-friendly: ideally **5-10 words**.
-    - Output **only the final search query**, without quotes, prefixes, or explanations.
+    - Extract **only the necessary keywords** — nouns and named entities are preferred.
+    - DO NOT include generic terms like: “claim”, “news article”, “report”, “viral”, or “statement”.
+    - DO NOT include any dates unless explicitly stated and essential.
+    - DO NOT include full sentences, phrases, or questions.
+    - Avoid verbs unless they are crucial to the meaning (e.g., "replace", "ban", "censor").
+    - Do not include connectors, filler words, or speculation.
+
+    Format:
+    - Output a single short search query (5–10 words).
+    - No quotes, no bullet points, no extra explanation — just the keyword string.
+
+    Examples:
+    Input: “I heard Trump wants to ban TikTok in the U.S.”
+    Output: Trump TikTok ban United States
+
+    Input: “Did Pfizer fake COVID vaccine data?”
+    Output: Pfizer COVID vaccine
+
+    Input: “Is it true that Bill Gates owns all US farmland?”
+    Output: Bill Gates farmland United States
+
+    Input: “Is it true Trump is changing pride month for veterans month?”
+    Output: trump pride month veterans month
+
+    ONLY output the search keywords. Nothing else.
+
 """
 
 

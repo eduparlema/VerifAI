@@ -17,7 +17,7 @@ def main_agent(user_input: str):
     Strictly respond with a tool call either passing the user's original message
     as input or some other input based on context + previous messages if a module
     should be activated. Do not explain or justify the decision
-    to the user — just invoke the tool. After tool execution, you will be given
+    to the user - just invoke the tool. After tool execution, you will be given
     its output to decide further action.
 
     The ideal pipeline would go as follows:
@@ -90,6 +90,7 @@ def main_agent(user_input: str):
     Use this for finding recent user-driven discourse or reactions on social platforms.
 
     IMPORTANT: If you get the message __SOCIAL_SEARCH__, strictly activate this module.
+    Using the user input that was previously used to activate the previous modules.
     ---
 
     ##6. Tool for focused global/general web search  

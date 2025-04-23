@@ -35,7 +35,7 @@ reddit = praw.Reddit(
     user_agent=USER_AGENT
 )
 
-SESSION = "VerifAI_Session_33"
+SESSION = "VerifAI_Session_34"
 
 def google_search(query: str, num_results: int = 10) -> list:
     """
@@ -248,7 +248,7 @@ def extract_keywords(user_input: str):
         query=user_input,
         temperature=0.1,
         lastk=3,
-        session_id="keyword_session_0",
+        session_id="keyword_session_1",
         rag_usage=False
     )
 
