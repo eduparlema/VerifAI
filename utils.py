@@ -224,7 +224,7 @@ def generate_fact_based_response(user_input: str, summaries: list) -> str:
 
     response = generate(
         model="4o-mini",
-        system=GENERATE_FACT_BASED_RESPONSE_PROMPT,
+        system=SUMMARIZE_ALL_SOURCES_PROMPT,
         query=query,
         temperature=0.4,
         lastk=3,
@@ -386,55 +386,6 @@ def generate_fact_based_response_custom(user_input: str, summaries: list) -> str
     information from article summaries, using citations with URLs.
     """
 
-    system_prompt = """
-        You are a fact-checking assistant helping users verify claims or understand current events. 
-        Assume that *you* conducted the research by reading multiple relevant news articles.
-
-        🎯 Goal:
-        Respond to the user's input — whether it's a claim or a general question — by using **only** the article summaries provided.
-
-        💬 Context Note (optional):
-        Sometimes, the query may be tied to a specific region or language. If provided, you'll see a brief explanation like:
-        > "Since this topic is particularly relevant to [region/language], we prioritized sources from that region to provide a more localized and accurate view."
-
-        If this message is present, **include it at the beginning of your response** to let the user know you're taking local context into account.
-
-        🧠 Instructions:
-        1. If the input is a **claim**, decide whether it is:
-        - Likely true
-        - Likely not true
-        - Partially true or misleading
-        - Unverifiable with the current sources
-
-        Start with a clear verdict:  
-        "The claim that [...] is likely not true."
-
-        2. If the input is a **general question**, explain the topic using the facts from the summaries.
-
-        3. Use a natural, helpful tone. For example:
-        - "I looked at several sources including [Title](URL), and here's what I found..."
-        - "Based on these reports, it seems that..."
-
-        4. Include **citations** in this format:  
-        *(Source: [Title](URL))*
-
-        ✅ DO:
-        - Use only the facts from the summaries.
-        - Highlight key quotes or statistics when relevant.
-        - Be clear, concise, and neutral.
-
-        🚫 DO NOT:
-        - Introduce outside knowledge or opinions.
-        - Speculate beyond the summaries.
-
-        📦 Output Format:
-        - If provided, begin with the custom context (e.g., local focus)
-        - State a verdict if applicable
-        - Explain your reasoning
-        - Include inline citations
-        - Offer to help with follow-up questions
-    """
-
     formatted_summaries = "\n\n".join([
         f"- Title: {item['title']}\n  URL: {item['url']}\n Summary: {item['summary']}"
         for item in summaries
@@ -448,7 +399,7 @@ def generate_fact_based_response_custom(user_input: str, summaries: list) -> str
 
     response = generate(
         model="4o-mini",
-        system=system_prompt,
+        system=SUMMARIZE_ALL_SOURCES_PROMPT,
         query=query,
         temperature=0.4,
         lastk=3,

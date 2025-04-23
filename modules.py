@@ -197,8 +197,8 @@ def all_search(user_input: str, room_id: str, user_name: str):
         results["General"] = general_search(user_input, room_id, user_name)
     if "local" in strategy:
         results["Local"] = local_search(user_input, room_id, user_name)
-    if "social" in strategy:
-        results["Social"] = social_search(user_input, room_id, user_name, all_search=True)
+    # if "social" in strategy:
+    #     results["Social"] = social_search(user_input, room_id, user_name, all_search=True)
 
     # Filter empty responses
     non_empty = {k: v for k, v in results.items() if v and len(v.strip()) > 0}
