@@ -40,7 +40,9 @@ def main_agent(input: str):
 
     IMPORTANT: Whenever you call this module, do NOT change the input of the user
     at all. Just call this module with the exact message you received from the
-    user.
+    user. That is, include any URLs, preambles that the user ask. The module will
+    be in charge of extracting the keywords, you are supposed to activate the module
+    when necessary and STRICTLY passing the exact user input as the module input.
     ---
 
     ##2. Tool to query the Google Fact Check API  
