@@ -240,9 +240,9 @@ def extract_keywords(user_input: str):
         model="4o-mini",
         system=EXTRACT_KEYWORDS_PROMPT,
         query=user_input,
-        temperature=0.2,
+        temperature=0.1,
         lastk=3,
-        session_id="keyword_session",
+        session_id="keyword_session_0",
         rag_usage=False
     )
 
