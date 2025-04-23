@@ -107,6 +107,7 @@ def social_search(user_input: str, room_id: str, user_name:str, limit_posts: int
         session_id=f"{SESSION}_{user_name}",
         rag_usage=False
     )
+    print(f"Agent response: {response}")
     if not all_search:
         send_direct_message(response["response"], room_id)
     print(f"[INFO] Social response: {response["response"]}")
@@ -237,20 +238,20 @@ def all_search(user_input: str, room_id: str, user_name: str):
             }
     ]
     message = "🙋‍♀️ Want to ask the community? \n See what people are saying on Reddit! 👥💬"
-    if should_crowdsource(user_input, final_response):
-        extra_attachments.append(
-            {
-                "actions": [
-                    {
-                        "type": "button",
-                        "text": "Crowdsourcing",
-                        "msg": "Crowdsourcing",
-                        "msg_in_chat_window": True
-                    }
-                ]
-            }
-        )
-        message += "  or get input from others in the chat! 🗣️"
+    # if should_crowdsource(user_input, final_response):
+    #     extra_attachments.append(
+    #         {
+    #             "actions": [
+    #                 {
+    #                     "type": "button",
+    #                     "text": "Crowdsourcing",
+    #                     "msg": "Crowdsourcing",
+    #                     "msg_in_chat_window": True
+    #                 }
+    #             ]
+    #         }
+    #     )
+    #     message += "  or get input from others in the chat! 🗣️"
     send_direct_message(message, room_id, extra_attachments)           
     return response["response"]
 
