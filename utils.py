@@ -211,7 +211,7 @@ def generate_fact_based_response(user_input: str, summaries: list) -> str:
     Generate a fact-based answer to a user's question or claim by synthesizing
     information from article summaries, using citations with URLs.
     """
-
+    
     formatted_summaries = "\n\n".join([
         f"- Title: {item['title']}\n  URL: {item['url']}\n Summary: {item['summary']}"
         for item in summaries
@@ -397,7 +397,6 @@ def generate_summary(user_input: str, summaries: list) -> str:
     )
 
     return response["response"]
-
 
 def generate_fact_based_response_custom(user_input: str, summaries: list) -> str:
     """
