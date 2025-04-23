@@ -219,8 +219,12 @@ def all_search(user_input: str, room_id: str, user_name: str):
         for i, question in enumerate(followup_questions)
     ]
 
+    send_direct_message(response["response"], room_id)
+
+    message1 = """ Based on the information I found, here are some follow-up 
+    questions you might want to consider: """
     
-    send_direct_message(response["response"], room_id, attachments=attachments)
+    send_direct_message(message1, room_id, attachments=attachments)
 
     extra_attachments = [
         {
