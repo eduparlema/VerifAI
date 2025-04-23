@@ -89,6 +89,7 @@ def main_agent(user_input: str):
     `social_search("reaction to Bolivian elections on Twitter")`  
     Use this for finding recent user-driven discourse or reactions on social platforms.
 
+    IMPORTANT: If you get the message __SOCIAL_SEARCH__, strictly activate this module.
     ---
 
     ##6. Tool for focused global/general web search  

@@ -11,7 +11,7 @@ app = Flask(__name__)
 RC_token = os.environ.get("RC_token")
 RC_userId = os.environ.get("RC_userId")
 
-special_responses = ["__FACT_CHECKABLE__", "__NO_FACT_CHECK_API__", "__NEED_WEB_SEARCH__", "__FOLLOW_UP__"]
+special_responses = ["__FACT_CHECKABLE__", "__NO_FACT_CHECK_API__", "__NEED_WEB_SEARCH__", "__FOLLOW_UP__", "__SOCIAL_SEARCH__"]
 
 @app.route('/', methods=['POST'])
 def hello_world():
@@ -30,6 +30,8 @@ def main():
         message = "__NO_FACT_CHECK_API__"
     if message.startswith("Question"):
         message = "__FOLLOW_UP__"
+    if message == "Ask Reddit":
+        message = "__SOCIAL_SEARCH__"
 
     response = message
 

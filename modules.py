@@ -101,7 +101,7 @@ def general_search(input: str, room_id: str, user_name: str):
         message_prefix="✅ Got some results from Google — taking a closer look at your claim now! 🔍"
     )
 
-def social_search(input: str, room_id: str, user_name:str, limit_posts: int=3, limit_comments: int=20):
+def social_search(input: str, room_id: str, user_name:str, limit_posts: int=3, limit_comments: int=20, all_search: bool=False):
     print("[INFO] social_search module activated!")
     summaries = []
     posts = reddit.subreddit("all").search(input, sort='relevance', limit=limit_posts)
@@ -127,7 +127,8 @@ def social_search(input: str, room_id: str, user_name:str, limit_posts: int=3, l
         session_id=SESSION,
         rag_usage=False
     )
-    # send_direct_message(response["response"], room_id)
+    if not all_search:
+        send_direct_message(response["response"], room_id)
     print(f"[INFO] Social response: {response["response"]}")
     return response["response"]
 
@@ -197,7 +198,7 @@ def all_search(user_input: str, room_id: str, user_name: str):
     if "local" in strategy:
         results["Local"] = local_search(user_input, room_id, user_name)
     if "social" in strategy:
-        results["Social"] = social_search(user_input, room_id, user_name)
+        results["Social"] = social_search(user_input, room_id, user_name, all_search=True)
 
     # Filter empty responses
     non_empty = {k: v for k, v in results.items() if v and len(v.strip()) > 0}
@@ -242,8 +243,21 @@ def all_search(user_input: str, room_id: str, user_name: str):
     
     send_direct_message(response["response"], room_id, attachments=attachments)
 
+    extra_attachments = [
+        {
+                "actions": [
+                    {
+                        "type": "button",
+                        "text": "Ask Reddit",
+                        "msg": "Ask Reddit",
+                        "msg_in_chat_window": True
+                    }
+                ]
+            }
+    ]
+    message = "🙋‍♀️ Want to ask the community? \n See what people are saying on Reddit! 👥💬"
     if should_crowdsource(user_input, final_response):
-        attachments = [
+        extra_attachments.append(
             {
                 "actions": [
                     {
@@ -254,8 +268,9 @@ def all_search(user_input: str, room_id: str, user_name: str):
                     }
                 ]
             }
-        ]
-        send_direct_message("🙋‍♀️ Want to ask the community? \n Get input from others in the chat! 🗣️", room_id, attachments)
+        )
+        message += "  or get input from others in the chat! 🗣️"
+    send_direct_message(message, room_id, extra_attachments)           
     return response["response"]
 
 def handle_followup(user_input: str, room_id: str, username: str):
