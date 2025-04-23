@@ -102,7 +102,7 @@ def social_search(user_input: str, room_id: str, user_name:str, limit_posts: int
         model="4o-mini",
         system=SOCIAL_SEARCH_PROMPT,
         query=f"Here is the content \n {summaries}",
-        temperature=0.2,
+        temperature=0.4,
         lastk=3,
         session_id=SESSION,
         rag_usage=False
