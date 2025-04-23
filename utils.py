@@ -179,7 +179,7 @@ def summarize_source(user_input: str, source: dict) -> str:
     try:
         response = generate(
             model='4o-mini',
-            system=SUMMARIZE_SOURCE_PROMPT,
+            system=GENERATE_VERDICT_PROMPT,
             query=query,
             temperature=0.2,
             lastk=3,
@@ -224,7 +224,7 @@ def generate_fact_based_response(user_input: str, summaries: list) -> str:
 
     response = generate(
         model="4o-mini",
-        system=SUMMARIZE_ALL_SOURCES_PROMPT,
+        system=GENERATE_VERDICT_PROMPT,
         query=query,
         temperature=0.4,
         lastk=3,
