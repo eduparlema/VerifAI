@@ -10,7 +10,7 @@ def intent_detection(user_input: str, room_id: str, user_name: str):
         model="4o-mini",
         system=INTENT_DETECTION_PROMPT,
         query=user_input,
-        temperature=0.5,
+        temperature=0.2,
         lastk=1,
         session_id=f"{SESSION}_{user_name}",
         rag_usage=False
@@ -153,7 +153,7 @@ def decide_search_sources(user_input: str) -> list:
         query= "Here is the user input: \n" + user_input,
         temperature=0,
         lastk=3,
-        session_id="search_planner_v2",
+        session_id="search_planner_v3",
         rag_usage=False
     )
     

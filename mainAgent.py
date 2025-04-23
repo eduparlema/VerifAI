@@ -34,10 +34,12 @@ def main_agent(user_input: str, user_id: str):
     **Usage example:**  
     `intent_detection("Did Trump really replace Pride Month with Veterans Month?")`  
     Use this tool to determine whether the user's input includes a verifiable
-    factual claim. If no fact checkable claims are found, `__FACT_CHECKABLE__`
-    will be provided to you which means that you should continue down the ideal
-    pipeline provided above. That is, use the fact_check_tools module. Otherwise,
-    just respond with the answer provided by this module.
+    factual claim/statement or a question that can be answered through factual 
+    evidence. 
+    
+    If no fact checkable claims are found, this module returns `__FACT_CHECKABLE__`. 
+    This special keyword will be provided to you meaning that you should continue 
+    down the logical pipeline provided above. That is, use the fact_check_tools module.
 
     IMPORTANT: Whenever you call this module, strictly do NOT change the input of the user
     at all. Just call this module with the exact message you received from the

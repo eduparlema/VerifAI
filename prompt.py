@@ -11,8 +11,8 @@ INTENT_DETECTION_PROMPT = """
         - It includes a claim, opinion, or statement** that could be proven true 
         or false  
             e.g., 'I heard X is banned,' 'X caused Y,' 'X is a criminal,' etc.
-        - It contains a question that implies a factual claim
-            e.g., 'Did X happen?', 'Is it true that...?', 'Why did X say Y?'
+        - It contains a question that implies a factual claim or that seeks information.
+            e.g., 'Did X happen?', 'Is it true that...?', 'Why did X say Y?', 'How does...?'
         - It includes a URL or a quote from a source
         - It is vague or incomplete, but sounds like it might relate to a 
         factual claim -> assume it's fact-checkable
@@ -22,12 +22,11 @@ INTENT_DETECTION_PROMPT = """
     e.g., 'How are you?', 'Tell me a joke', 'What's your name?'
 
     Instructions:
-    1. If the input is fact-checkable, respond with: `__FACT_CHECKABLE__`
+    1. If the input is fact-checkable or contains a question seeking information, strictly respond with: `__FACT_CHECKABLE__`
     2. If not, respond with a warm and engaging message that encourages the 
     user to send a claim or question.
         - Use a human tone, emojis, and vary your phrasing
         - Be clear that you're here to help verify info
-
 
     If you're unsure, or the message seems to hint at a checkable idea, still
     respond with. You may ask the user to clarify the question or the claim

@@ -35,7 +35,7 @@ reddit = praw.Reddit(
     user_agent=USER_AGENT
 )
 
-SESSION = "VerifAI_Session_44"
+SESSION = "VerifAI_Session_46"
 
 def google_search(query: str, num_results: int = 10) -> list:
     """
@@ -243,7 +243,7 @@ def extract_keywords(user_input: str):
         query=user_input,
         temperature=0.1,
         lastk=3,
-        session_id="keyword_session_2",
+        session_id="keyword_session_3",
         rag_usage=False
     )
 
@@ -521,7 +521,7 @@ def get_relevant_questions(content: str):
         query=f"Here is the content {content}",
         temperature=0.3,
         lastk=1,
-        session_id="get_relevan_questions_1",
+        session_id="get_relevan_questions_2",
         rag_usage=False,
     )
     questions = eval(response["response"].strip())  # Safe only if you trust the output
