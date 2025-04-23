@@ -280,7 +280,7 @@ def handle_followup(user_input: str, room_id: str, username: str):
         system=FOLLOWUP_FROM_CONTEXT_PROMPT,
         query=user_input,
         temperature=0.3,
-        lastk=5,
+        lastk=6,
         session_id=SESSION, # This must share same session with main agent
         rag_usage=False
     )

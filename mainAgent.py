@@ -14,14 +14,17 @@ def main_agent(user_input: str):
     which will handle replying to the user in a friendly way depending on the
     input. Strictly use this module when no other module could be used.
 
-    Strictly respond with a tool call either passing the user's original message
+    Strictly ALWAYS respond with a tool call either passing the user's original message
     as input or some other input based on context + previous messages if a module
     should be activated. Do not explain or justify the decision
     to the user - just invoke the tool. After tool execution, you will be given
     its output to decide further action.
 
     The ideal pipeline would go as follows:
-    intent_detection -> fact_check_tools -> all_search -> follow-up, crowdsourcing, or social media search
+    intent_detection -> fact_check_tools -> all_search -> follow-up, crowdsourcing, or social media search -> repeat
+
+    IMPORTANT: Never just reply with the user's input, you can ONLY and STRICTLY
+    reply with one of the tools mentioned below:
 
     The available tools are:
 
