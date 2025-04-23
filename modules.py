@@ -11,12 +11,6 @@ CLIENT_ID = os.environ.get("praw_client_id")
 CLIENT_SECRET = os.environ.get("praw_client_secret")
 USER_AGENT = "script:misinfo-bot:v1.0"
 
-reddit = praw.Reddit(
-    client_id=CLIENT_ID,
-    client_secret=CLIENT_SECRET,
-    user_agent=USER_AGENT
-)
-
 def intent_detection(user_input: str, room_id: str, user_name: str):
     print("[INFO] intent_detection_activated module activated!")
     response = generate(
@@ -92,36 +86,27 @@ def local_search(input: str, room_id: str, user_name: str):
 
     )
 
-def general_search(input: str, room_id: str, user_name: str):
+def general_search(input: str, room_id: str, user_name: str, all_search: bool=False):
     print("[INFO] general_search module activated!")
-    return unified_search_pipeline(
+    response = unified_search_pipeline(
         input, room_id, user_name,
         search_fn=google_search,
         summarizer_fn=generate_fact_based_response,
         message_prefix="✅ Got some results from Google — taking a closer look at your claim now! 🔍"
     )
+    if not all_search:
+        send_direct_message(response["response"], room_id)
+    return response
 
-def social_search(input: str, room_id: str, user_name:str, limit_posts: int=3, limit_comments: int=20, all_search: bool=False):
+def social_search(user_input: str, room_id: str, user_name:str, limit_posts: int=3, limit_comments: int=20, all_search: bool=False):
     print("[INFO] social_search module activated!")
-    summaries = []
-    posts = reddit.subreddit("all").search(input, sort='relevance', limit=limit_posts)
-    comments = []
-    for post in posts:
-        post.comments.replace_more(limit=0)
-        comments = [comment.body for comment in post.comments[:limit_comments]]
-        summaries.append({
-            "title": post.title,
-            "url": post.shortlink,
-            "comments": comments
-        })
-        print([post.shortlink])
+    reddit_ulrs = google_search_reddit(user_input)
+    summaries = get_reddit_comment_summaries_from_urls(reddit_ulrs[: limit_posts])
 
-    system_prompt = SOCIAL_SEARCH_PROMPT
-    
     response = generate(
         model="4o-mini",
-        system=system_prompt,
-        query=f"Here is the content \n {comments}",
+        system=SOCIAL_SEARCH_PROMPT,
+        query=f"Here is the content \n {summaries}",
         temperature=0.2,
         lastk=3,
         session_id=SESSION,
@@ -194,7 +179,7 @@ def all_search(user_input: str, room_id: str, user_name: str):
     results = {}
 
     if "general" in strategy:
-        results["General"] = general_search(user_input, room_id, user_name)
+        results["General"] = general_search(user_input, room_id, user_name, all_search=True)
     if "local" in strategy:
         results["Local"] = local_search(user_input, room_id, user_name)
     # if "social" in strategy:

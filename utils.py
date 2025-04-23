@@ -19,6 +19,12 @@ ROCKETCHAT_AUTH = {
     "X-User-Id": RC_userId,
 }
 
+reddit = praw.Reddit(
+    client_id=CLIENT_ID,
+    client_secret=CLIENT_SECRET,
+    user_agent=USER_AGENT
+)
+
 load_dotenv()
 
 GOOGLE_API_KEY=os.environ.get("googleSearchApiKey")
@@ -516,3 +522,68 @@ def extract_url(text: str) -> str:
     if not match:
         match = re.search(r'http?://[^\s]+', text)
     return match.group(0) if match else None
+
+def extract_post_id(url: str) -> str:
+    """Extracts Reddit post ID from full reddit.com URL"""
+    pattern = r"reddit\.com/r/[^/]+/comments/([a-z0-9]+)/"
+    match = re.search(pattern, url)
+    if match:
+        return match.group(1)
+    else:
+        raise ValueError(f"Could not extract post ID from URL: {url}")
+
+def get_reddit_comment_summaries_from_urls(urls: list[str], limit_comments: int = 20):
+    """Takes a list of Reddit post URLs and returns comment summaries."""
+    summaries = []
+
+    for url in urls:
+        try:
+            post_id = extract_post_id(url)
+            submission = reddit.submission(id=post_id)
+            submission.comments.replace_more(limit=0)
+
+            comments = [comment.body for comment in submission.comments[:limit_comments]]
+            summaries.append({
+                "title": submission.title,
+                "url": submission.shortlink,
+                "comments": comments
+            })
+        except Exception as e:
+            print(f"[ERROR] Failed to process {url}: {e}")
+
+    return summaries
+
+def google_search_reddit(query: str, num_results: int = 10) -> list:
+    """
+    Performs a Google Custom Search API query and returns the top 'num_results' links.
+    """
+    cleaned_query = query.replace('"', '') 
+                    
+    search_url = "https://www.googleapis.com/customsearch/v1"
+    params = {
+        "key": GOOGLE_API_KEY,
+        "cx": SEARCH_ENGINE_ID_REDDIT,
+        "q": cleaned_query,
+        "num": num_results
+    }
+
+    try:
+        response = requests.get(search_url, params=params, timeout=10)
+
+        response.raise_for_status()
+        data = response.json()
+
+        results = data.get("items", [])
+
+        google_results_urls = []
+        
+        for item in results:
+            url = item.get("link")
+            google_results_urls.append(url)
+            
+        return google_results_urls
+
+    except Exception as e:
+        print(f"❌ Unexpected error: {e}")
+
+    return []
