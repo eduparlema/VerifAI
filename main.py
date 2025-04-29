@@ -49,5 +49,3 @@ if __name__ == "__main__":
     current_query="voter fraud in the 2020 U.S. presidential election"
 
     main(user_input, current_query)
-
-    

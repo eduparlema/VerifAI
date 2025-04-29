@@ -421,8 +421,41 @@ def get_diversity_score(combined_text: str, user_input: str) -> float:
 # _____________________ #
 # Next action functions #
 # _____________________ #
-def paraphrase_query():
-    pass
+def paraphrase_query(current_query: str) -> str:
+    """
+    Takes the current_query that is being used for search and provides a paraphrased
+    version. It should keep the same meaning, use different wording and possibly
+    broaden or tighten the focus a little.
+    """
+
+    PARAPHRASE_PROMPT = """
+        You are an expert at reformulating search queries to improve information
+        retrieval from Google search results.
+
+        Given a current query, your task is to paraphrase it:
+        - Keep the original meaning.
+        - Change the wording enough to potentially match different documents.
+        - You can reword slightly more broadly or narrowly if that would likely help.
+        - Make sure it still sounds natural and clear.
+
+        Rules:
+        - Only return the new paraphrased query as a sentence.
+        - Do NOT add explanations, notes, or formatting — just the new query.
+        """
+    
+    response = generate(
+        model="4o-mini",
+        system=PARAPHRASE_PROMPT,
+        query=f"Current query: {current_query}",
+        temperature=0.3,
+        lastk=8,
+        session_id=SESSION,
+        rag_usage=False
+    )
+
+    return response["response"].strip()
+    
+
 
 def localize_query():
     pass
