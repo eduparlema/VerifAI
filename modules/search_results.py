@@ -327,7 +327,8 @@ def evaluate_relevance(results: list, user_input: str):
     """
     scores = []
     for result in results:
-        result_info = f"Title: {result["title"]}\n Date: {result["date"]}\n Content: {result["content"]}"
+        title, date, content = result["title"], result["date"], result["content"]
+        result_info = f"Title: {title}\n Date: {date}\n Content: {content}"
         score = get_relevance_score(result_info, user_input)
         scores.append(score)
     return sum(scores) / max(1, len(scores))
