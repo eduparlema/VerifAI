@@ -5,3 +5,4 @@ old_main.py
 llmproxy_local.py
 .env
 reddit.py
+__pycache__
