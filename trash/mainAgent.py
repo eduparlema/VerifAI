@@ -1,5 +1,5 @@
 from llmproxy import generate
-from utils import SESSION
+from test.utils import SESSION
 
 def main_agent(user_input: str, user_id: str):
     system_prompt = """

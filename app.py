@@ -2,16 +2,14 @@ import requests
 from flask import Flask, request, jsonify, Response
 from llmproxy import generate
 import os
-from mainAgent import main_agent
-from modules import *
-from utils import *
+from test.mainAgent import main_agent
+from test.modules import *
+from test.utils import *
 
 app = Flask(__name__)
 
 RC_token = os.environ.get("RC_token")
 RC_userId = os.environ.get("RC_userId")
-
-special_responses = ["__FACT_CHECKABLE__", "__NO_FACT_CHECK_API__", "__NEED_WEB_SEARCH__", "__FOLLOW_UP__", "__SOCIAL_SEARCH__"]
 
 @app.route('/', methods=['POST'])
 def hello_world():
@@ -26,31 +24,8 @@ def main():
     message = data.get("text", "")
     room_id = data.get("channel_id")
     print(data)
-    if message == "Search the web":
-        message = "__NO_FACT_CHECK_API__"
-    if message.startswith("Question"):
-        message = "__FOLLOW_UP__"
-    if message == "Ask Reddit":
-        message = "__SOCIAL_SEARCH__"
 
-    response = message
-
-    while response in special_responses or response == message:
-        print(f"Reponse from agent: {response}")
-        module = main_agent(response, user)
-        print(f"[INFO] Agent calling: {module}")
-        module = add_params_to_module(module, room_id, user)
-        print(f"[INFO] Edited module: {module}")
-        response = eval(module)
-        print(f"\n\nresponse from module {module}: \n\n{response}")
-        if response == "__NEED_WEB_SEARCH__":
-            send_direct_message("🌐 Gathering more info from the web... one moment please!", room_id)
-        elif response == "__FACT_CHECKABLE__":
-            send_direct_message("🔎 Looking up your query in Google’s Fact Check Tools... hang on a moment!", room_id)
-        elif response == "__NO_FACT_CHECK_API__":
-            send_direct_message("😕 Couldn't find a fact-check for this via Google... 🔍 Starting a broader search to gather relevant info — please hold on! ⏳", room_id)
-        
-    return jsonify({"success": True})
+    return jsonify({"text": message})
  
 @app.errorhandler(404)
 def page_not_found(e):
@@ -58,3 +33,28 @@ def page_not_found(e):
 
 if __name__ == "__main__":
     app.run()
+
+
+"""Bot Topics:
+ 🗽 United States
+Immigration Policies and Debates
+(e.g., U.S.-Mexico border policies, DACA, asylum rules)
+
+Election Integrity and Voting Laws
+(e.g., mail-in voting security, voter ID laws, allegations of election fraud)
+
+🌎 International
+Climate Change Agreements and Policies
+(e.g., Paris Agreement commitments, disputes over climate financing among countries)
+
+International Conflicts and Humanitarian Crises
+(e.g., Russia-Ukraine war facts vs. propaganda, Gaza conflict narratives)
+
+🇧🇷 Country-Specific (Examples)
+Political Corruption in Latin America
+(e.g., Brazil’s "Operation Car Wash," recent election controversies in countries like Bolivia, Peru)
+
+Authoritarianism and Democratic Backsliding
+(e.g., election fairness debates in Hungary, Turkey, or Venezuela)
+
+"""

@@ -4,6 +4,74 @@ from dotenv import load_dotenv
 import praw
 from prompt import *
 
+def search_results(user_input: str, follow_up = False) -> str:
+
+ 
+
+    
+
+
+
+    # Retrieve fact check org results
+    # Retrieve general google search results
+    # Retrieve local search results if applicable
+    if local_
+    
+    # Let the LLM write a response based on all the resources provideds
+    
+    pass
+
+
+
+
+
+
+
+
+
+
+
+"""
+You are a political fact-checking assistant specialized in identifying canonical claims from user input.
+
+Your job is to carefully read a user message and rewrite the core factual statement
+(the claim) in a clean, neutral, and fact-checkable form suitable for a Google search.
+
+Here are the rules:
+- ✅ Keep the claim concise (preferably under 20 words).
+- ✅ Remove any emojis, slang, extra speculation ("I heard", "apparently", etc.).
+- ✅ Focus only on the factual content that could realistically be verified or debunked.
+- ✅ Use clear, neutral language without exaggeration.
+- ✅ Preserve names, dates, numbers, and important qualifiers (e.g., locations, timeframes).
+- ❌ Do not add new information.
+- ❌ Do not editorialize or judge whether the claim is true or false.
+
+Your output must be a **single line** with the **canonical claim**.
+
+---
+Examples:
+Input:  
+"I heard Biden wants to ban all gas stoves!! 😱 Is that true?"
+
+Output:  
+**"Biden plans to ban gas stoves."**
+---
+Input:  
+"Can you check if immigrants are voting illegally in U.S. elections?"
+
+Output:  
+**"Immigrants are voting illegally in U.S. elections."**
+---
+Input:  
+"Hi, how are you?"
+
+Output:  
+**(No claim detected.)**
+---
+
+If the message does **not** contain a fact-checkable political claim, reply exactly:
+"""
+
 def intent_detection(user_input: str, room_id: str, user_name: str):
     print("[INFO] intent_detection_activated module activated!")
     response = generate(

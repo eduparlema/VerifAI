@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from llmproxy import generate
 from dotenv import load_dotenv
 import re
-from prompt import *
+from test.prompt import *
 from typing import Optional, List, Dict
 import praw
 

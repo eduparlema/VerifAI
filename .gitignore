@@ -1,5 +1,6 @@
 config.json
 verifAIenv
+venv
 old_main.py
 llmproxy_local.py
 .env

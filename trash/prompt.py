@@ -68,7 +68,7 @@ LOCAL_GOOGLE_SEARCH_PROMPT = """
     
     Stick to the following structure:
 
-    📦 Output format (as a JSON dictionary):
+    📦 Output format (as a JSON dictionary). For example:
     {
     "query": "<query in Turkish>",
     "language": "<tr>",
