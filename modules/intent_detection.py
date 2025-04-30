@@ -1,6 +1,5 @@
-from llmproxy import generate
+from llmproxy import generate, SESSION
 import os
-SESSION = os.environ.get("SESSION")
 
 INTENT_DETECTION_PROMPT = """
 🤖 You are a helpful, friendly, and human-like assistant who helps an agent that

@@ -4,7 +4,7 @@ import re
 import requests
 from readability import Document
 from bs4 import BeautifulSoup
-from llmproxy import generate
+from llmproxy import generate, SESSION
 from dotenv import load_dotenv
 from urllib.parse import urlparse
 from typing import Dict
@@ -16,8 +16,6 @@ GOOGLE_API_KEY = os.environ.get("googleSearchApiKey")
 SEARCH_ENGINE_ID = os.environ.get("searchEngineId")
 FACT_CHECK_API=os.environ.get("googleFactCheckApiKey")
 FACT_CHECK_URL=os.environ.get("factCheckApiUrl")
-# SESSION = os.environ.get("SESSION")
-SESSION = "chatbot_1"
 
 RELEVANCE_THRESHOLD = 0.7
 DIVERSITY_THRESHOLD = 0.7
@@ -555,7 +553,7 @@ def get_diversity_score(combined_text: str, user_input: str, username: str) -> f
         session_id=f"diversity_scoring_session_{username}",
         rag_usage=False
     )
-    
+    print("[get_diversity_score]")
     try:
         return float(response["response"].strip())
     except ValueError:
