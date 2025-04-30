@@ -9,6 +9,11 @@ app = Flask(__name__)
 
 RC_token = os.environ.get("RC_token")
 RC_userId = os.environ.get("RC_userId")
+RC_API = os.environ.get("RC_API")
+ROCKETCHAT_AUTH = {
+    "X-Auth-Token": RC_token,
+    "X-User-Id": RC_userId,
+}
 
 @app.route('/', methods=['POST'])
 def hello_world():
@@ -25,7 +30,8 @@ def main():
     print(data)
 
     response = generate_response(message, user)
-
+    print(f"\n\n Response: {response}")
+    send_direct_message(response, room_id)
     return jsonify({"text": response})
  
 @app.errorhandler(404)
@@ -59,3 +65,19 @@ Authoritarianism and Democratic Backsliding
 (e.g., election fairness debates in Hungary, Turkey, or Venezuela)
 
 """
+
+def send_direct_message(message: str, room_id: str, attachments = None) -> None:
+    payload = {
+        "roomId": room_id,
+        "text": message
+    }
+    if attachments:
+        payload["attachments"] = attachments
+
+    response = requests.post(RC_API, headers=ROCKETCHAT_AUTH, json=payload)
+
+    # Optional: handle errors
+    if response.status_code != 200:
+        print(f"Failed to send message: {response.status_code} - {response.text}")
+
+    return
