@@ -509,8 +509,11 @@ def get_relevance_score(result: str, user_input: str, username: str) -> float:
         Scoring Guidelines:
         - Score between 0 and 1.
         - 0 = Completely irrelevant or outdated.
-        - 0.5 = Partially related but incomplete, outdated, or off-topic in parts.
+        - 0.5 = Partially related but incomplete, or outdated when the date is
+            important within the user's query.
         - 1 = Highly relevant, directly answers the user's question, and is timely.
+        - This should be a continuum, do not only score either with 0, 0.5, or 1.
+          Feel free to give values in between like 0.7, 0.8, 0.3, etc.
 
         Output:
         Strictly only return a number between 0 and 1. No explanation, no text,
