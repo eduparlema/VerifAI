@@ -17,7 +17,7 @@ SEARCH_ENGINE_ID = os.environ.get("searchEngineId")
 FACT_CHECK_API=os.environ.get("googleFactCheckApiKey")
 FACT_CHECK_URL=os.environ.get("factCheckApiUrl")
 
-RELEVANCE_THRESHOLD = 0.7
+RELEVANCE_THRESHOLD = 0.5
 NUM_RELEVAN_RESULTS_THRESHOLD = 5
 DIVERSITY_THRESHOLD = 0.7
 
