@@ -366,11 +366,14 @@ def choose_search_params(collected_results: list, current_query:str, user_input:
     )
 
     try:
-        parsed = ast.literal_eval(response["response"].strip())
-        if isinstance(parsed, dict):
-            return parsed
+        if isinstance(response, dict) and "response" in response:
+            parsed = ast.literal_eval(response["response"].strip())
+            if isinstance(parsed, dict):
+                return parsed
+            else:
+                raise ValueError("LLM response is not a dictionary.")
         else:
-            raise ValueError("LLM response is not a dictionary.")
+            return f"ERROR with LLM response {response}"
     except (ValueError, SyntaxError) as e:
         print(f"[ERROR] Failed to parse search parameters: {e}")
         return None  # or raise, depending on your error strategy
