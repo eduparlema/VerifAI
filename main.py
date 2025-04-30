@@ -16,5 +16,5 @@ if __name__ == "__main__":
     user_input = "Is Erdogan a dictator?"
 
     current_query=""
-
+    print("\nRespone from Composer:\n>>>>>")
     print(main(user_input, "Erin123"))

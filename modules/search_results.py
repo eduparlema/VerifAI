@@ -508,7 +508,10 @@ def get_relevance_score(result: str, user_input: str, username: str) -> float:
         rag_usage=False
     )
     try:
-        return float(response["response"].strip())
+        if isinstance(response, dict) and "response" in response:
+            return float(response["response"].strip())
+        else:
+            print(f"[get_relecant_score ERROR] Invalid LLM response form {response}")
     except ValueError:
         return 0.0
     
@@ -555,7 +558,10 @@ def get_diversity_score(combined_text: str, user_input: str, username: str) -> f
     )
     print("[get_diversity_score]")
     try:
-        return float(response["response"].strip())
+        if isinstance(response, dict) and "response" in response:
+            return float(response["response"].strip())
+        else:
+            print(f"[get_relecant_score ERROR] Invalid LLM response form {response}")
     except ValueError:
         # Fall back to low diversity if parsing fails
         return 0.0
