@@ -1,7 +1,7 @@
 from modules.search_results import *
 from modules.composer import *
 
-def main(user_input, username):
+def generate_response(user_input, username):
     results = search(user_input, username)
 
     final_sources = results["final_sources"]
@@ -17,4 +17,4 @@ if __name__ == "__main__":
 
     current_query=""
     print("\nRespone from Composer:\n>>>>>")
-    print(main(user_input, "Erin123"))
+    print(generate_response(user_input, "Erin123"))

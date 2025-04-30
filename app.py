@@ -2,9 +2,8 @@ import requests
 from flask import Flask, request, jsonify, Response
 from llmproxy import generate
 import os
-from test.mainAgent import main_agent
-from test.modules import *
-from test.utils import *
+from modules import *
+from main import generate_response
 
 app = Flask(__name__)
 
@@ -25,7 +24,9 @@ def main():
     room_id = data.get("channel_id")
     print(data)
 
-    return jsonify({"text": message})
+    response = generate_response(message, user)
+
+    return jsonify({"text": response})
  
 @app.errorhandler(404)
 def page_not_found(e):

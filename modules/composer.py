@@ -70,5 +70,7 @@ def composer(user_query: str, search_content: str, username: str):
         rag_usage=False,
     )
 
-    return response["response"]
-    
+    if isinstance(response, dict) and "response" in response:
+        return response["response"]
+    else:
+        return f"ERROR in LLM reponse: {response}"
