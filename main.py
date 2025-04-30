@@ -12,8 +12,8 @@ def generate_response(user_input, username):
     return composer(user_input, "\n".join(composer_input), username)
 
 if __name__ == "__main__":
-    # user_input = "Was there an election fraud in Bolivia in 2019?"    
-    user_input = "Is Erdogan a dictator?"
+    user_input = "Has the Paris agreement actually reduced global emissions?"    
+    # user_input = "Is Erdogan a dictator?"
 
     current_query=""
     print("\nRespone from Composer:\n>>>>>")

@@ -9,7 +9,7 @@ load_dotenv()
 end_point = os.environ.get("endPoint")
 api_key = os.environ.get("apiKey")
 
-SESSION = "chatbot_3"
+SESSION = "chatbot_4"
 
 def retrieve(
     query: str,

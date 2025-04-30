@@ -18,6 +18,7 @@ FACT_CHECK_API=os.environ.get("googleFactCheckApiKey")
 FACT_CHECK_URL=os.environ.get("factCheckApiUrl")
 
 RELEVANCE_THRESHOLD = 0.7
+NUM_RELEVAN_RESULTS_THRESHOLD = 5
 DIVERSITY_THRESHOLD = 0.7
 
 def search(user_input: str, username: str) -> str:
@@ -58,24 +59,24 @@ def search(user_input: str, username: str) -> str:
 
         # 2. Perform search
         results = perform_search(user_input, username, chosen_params)
-
         # 3. Evaluate results
-        relevance = evaluate_relevance(results, user_input, username)
+        relevant_results = evaluate_relevance(results, user_input, username)
         diversity = evaluate_diversity(collected_results + results, user_input, username)
+        print(f"Diversity score so far: {diversity}")
 
         # 4. Record the step
         search_journey.append({
             "query": current_query,
-            "relevance": relevance,
             "diversity_so_far": diversity,
+            "num of relevant sources": len(collected_results),
             "num_results": len(results),
-            #"results": results
         })
 
-        collected_results.extend(results)
+        collected_results.extend(relevant_results)
+        print(f"TOTAL RELEVANT: {len(collected_results)}")
 
         # 5. Reason about what to do next
-        if relevance > RELEVANCE_THRESHOLD and diversity > DIVERSITY_THRESHOLD:
+        if len(collected_results) > NUM_RELEVAN_RESULTS_THRESHOLD and diversity > DIVERSITY_THRESHOLD:
             break
 
     # 6. Finalize
@@ -84,7 +85,7 @@ def search(user_input: str, username: str) -> str:
         "search_journey": search_journey,
     }
 
-    print(search_journey)
+    print(f"Search journey: {search_journey}")
     print(collected_results)
 
     return final_output
@@ -103,6 +104,11 @@ def perform_search(original_input: str, username: str, chose_params: Dict = None
     - date (if available)
     - content (scraped text from the page)
     """
+    IGNORE = [
+        "-filetype:pdf", "-filetype:ppt", "-filetype:doc", "-site:twitter.com", 
+        "-site:facebook.com", "-site:instagram.com", "-site:pinterest.com ",
+        "-site:tiktok.com", "-site:reddit.com", "-site:linkedin.com"
+    ]
 
     search_url = "https://www.googleapis.com/customsearch/v1"
     params = {
@@ -113,6 +119,10 @@ def perform_search(original_input: str, username: str, chose_params: Dict = None
     }
     
     params.update(chose_params)
+
+    old_q = params["q"]
+    ignore_sites = " ".join(IGNORE)
+    params["q"] = f"{old_q} {ignore_sites}"
 
     try:
         response = requests.get(search_url, params=params, timeout=10)
@@ -466,17 +476,23 @@ def decide_next_action(collected_results:list, user_input:str, username:str) -> 
 # __________________ #
 # Evaluate functions #
 # __________________ #
-def evaluate_relevance(results: list, user_input: str, username: str):
+def evaluate_relevance(results: list, user_input: str, username: str) -> list:
     """
     Checks how closely the search results match the user's original query.
+    Returns a list of relevant articles.
     """
-    scores = []
+    # scores = []
+    relevant_results = []
     for result in results:
         title, date, content = result["title"], result["date"], result["content"]
         result_info = f"Title: {title}\n Date: {date}\n Content: {content}"
         score = get_relevance_score(result_info, user_input, username)
-        scores.append(score)
-    return sum(scores) / max(1, len(scores))
+        print(f"{title} got score {score}")
+        if score > RELEVANCE_THRESHOLD:
+            relevant_results.append(result)
+        # scores.append(score)
+    # return sum(scores) / max(1, len(scores))
+    return relevant_results
 
 
 def get_relevance_score(result: str, user_input: str, username: str) -> float:
