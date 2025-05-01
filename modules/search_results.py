@@ -40,8 +40,35 @@ def smart_search(user_input: str, user_name):
         "search_journey": list of steps taken (each step = action, query, results),
     }
     """
-    current_query = user_input
+    max_steps = 3
+    collected_results = []
+    search_journey = []
+    steps_taken = 0
+    feedback = {}
+    while steps_taken < max_steps:
+        steps_taken += 1
+        print(f"[smart_search] step {steps_taken}")
+
+        # Choose params to perform google search
+        chosen_params = choose_search_params(feedback, user_input, user_name)
+        print(f"Chosen parameters: {chosen_params}")
+        
+        # Perform search
+        results = perform_search(user_input, user_name, chosen_params)
+        
+
+        # Evaluate results
+        feedback = evaluate_search_results(user_input, chosen_params, results, user_name)
+        print(f"Feedback received: {feedback}")
+        # Save results
+        collected_results.extend(results)
+        search_journey.append(chosen_params)
     
+    final_output = {
+        "final_sources": collected_results,
+        "search_journey": search_journey,
+    }
+    return final_output
 
 def search(user_input: str, user_name: str):
     """
@@ -280,23 +307,23 @@ def summarize_content(user_input: str, article_text: str, user_name: str) -> str
 # choose_search_params #
 # ____________________ #
 
-def choose_search_params(collected_results: list, current_query:str, user_input:str, user_name:str):
+def choose_search_params(feedback: dict, user_input: str, user_name: str):
     CHOOSE_PARAMS_PROMPT = """
     You are a smart and precise search parameter selection agent. You support a
     fact-checking AI system by crafting optimal Google Custom Search queries to
     retrieve the most relevant, trustworthy, and diverse results.
 
-    You will be given the user's query and after the first time, previous results
-    you received so that you can update the params accordingly.
-
-    Your task is to analyze the user's input and choose the best search parameters to improve:
+    You will be given the user's query a dectionary containing feedback, it will
+    contains the previous params you used and a short message indicating what
+    needs to be improved to get better results. Your task is to use the 
+    feedback to update the search parameters to improve: 
     - Relevance
     - Recency (if time-sensitive)
     - Regional context
     - Language fit
     - Result diversity
 
-    If no previous result is provided, just focus on the user's query when 
+    If no feedback is given to you, just focus on the user's query when 
     choosing the parameters.
 
     To do this, you may:
@@ -340,79 +367,83 @@ def choose_search_params(collected_results: list, current_query:str, user_input:
     in the past conversations.
 
     ---
+    ## Examples:
 
-    ### ✅ Examples:
-
-    **Example Input:**  
-    "Was the Turkish government's response to the 2023 earthquake effective?"
-
-    **Example Outputs:**  
-    ```python
-    Example 1:
+    ### 📝 Feedback Example 1:
+    Feedback:
     {
-    "q": "Public opinion turkey government earthquake response 2023",
-    "cr": "countryTR",
-    "lr": "lang_tr",
-    "filter": 1,
+    "previous_params": {
+        "q": "Turkey earthquake government response",
+        "cr": "countryTR",
+        "lr": "lang_en",
+        "filter": 1
+    },
+    "message": "Too many generic articles. Try focusing on international views or criticisms from NGOs."
     }
-    Example 2:
+
+    Updated Output:
     {
-    "q": "Turkey earthquake 2023 preparedness early warning measures",
-    "cr": "countryTR",
-    "lr": "lang_en",
-    "dateRestrict": "y1",
-    "filter": 1,
-    }
-    Example 3:
-    {
-    "q": "Opposition criticism turkey government earthquake handling",
+    "q": "NGO evaluation of Turkey's earthquake response 2023",
     "cr": "countryUS",
     "lr": "lang_en",
-    "filter": 1,
+    "filter": 1
     }
-    Example 4:
+
+    ---
+
+    ### 📝 Feedback Example 2:
+    Feedback:
     {
-    "q": "International reaction turkey earthquake emergency response",
-    "cr": "countryUS",
+    "previous_params": {
+        "q": "Biden immigration policies",
+        "cr": "countryUS",
+        "lr": "lang_en",
+        "filter": 1
+    },
+    "message": "Too focused on recent changes. Try historical comparisons or non-US perspectives."
+    }
+
+    Updated Output:
+    {
+    "q": "Comparison of Biden vs Trump immigration policy",
     "lr": "lang_en",
-    "filter": 1,
+    "filter": 1
     }
-    Example 5:
+
+    ---
+
+    ### 📝 Feedback Example 2:
+    Feedback:
     {
-    "q": "government aid affected regions turkey earthquake 2023",
-    "cr": "countryTR",
-    "lr": "lang_tr",
-    "dateRestrict": "m6",
-    "filter": 1,
+    "previous_params": {
+        "q": "Health system collapse in Bolivia",
+        "lr": "lang_en",
+        "cr": "countryUS",
+        "filter": 1
+    },
+    "message": "Results are mostly international summaries. Try switching to local sources by using Spanish and restricting to Bolivia."
+    }
+    {
+    "q": "colapso del sistema de salud en Bolivia 2023",
+    "lr": "lang_es",
+    "cr": "countryBO",
+    "filter": 1
     }
     """
+    previous_query = ""
+    if "previous_params" in feedback:
+        previous_query = feedback["previous_params"]
+        previous_query = ", ".join(f"{key}='{value}'" for key, value in previous_query.items())
 
-    # Summarize collected results clearly
-    summarized = ""
-    for idx, res in enumerate(collected_results, start=1):
-        summarized += f"""Source {idx}
-            Article Title: {res.get('title', 'Unknown Title')}
-            Content: {res.get('content', 'No summary available')}
-            """
-        
-    
-    # User prompt: Specific task input
-    user_prompt = f"""
-        User's original input:
-        {user_input}
-        Currenty query:
-        {current_query}
+    feedback_message = ""
+    if "message" in feedback:
+        feedback_message = feedback["message"]
 
-        Past search results:
-        {summarized}
-        """
-
-    # Call LLM
     response = generate(
         model="4o-mini",
         system=CHOOSE_PARAMS_PROMPT,
-        query=user_prompt.strip(),
-        temperature=0,
+        query=f"Previous query: {previous_query}\nFeedback message: {feedback_message}",
+        temperature=0.3,
         lastk=5,
         session_id=f"{SESSION}_{user_name}",
         rag_usage=False
@@ -430,7 +461,75 @@ def choose_search_params(collected_results: list, current_query:str, user_input:
     except (ValueError, SyntaxError) as e:
         print(f"[ERROR] Failed to parse search parameters: {e}")
         return None  # or raise, depending on your error strategy
+    
+def evaluate_search_results(user_query: str, chosen_params: dict, results: list, user_name: str):
+    EVALUATE_SEARCH_RESULTS_PROMPT = """
+    🎯 **Role**
+    You are a search feedback assistant that evaluates Google search results
+    produced by another AI agent. Your job is to assess whether the current
+    search results are:
+    - Relevant
+    - Diverse
+    - Informative enough to answer the user's original query
 
+    ---
+
+    🧠 **Your Task**
+    Given:
+    - The user's original query
+    - The search parameters that were used
+    - The list of search results (titles, snippets, URLs)
+
+    Analyze the results and decide if the search needs to be improved.
+
+    If so, provide:
+    1. A clear and short feedback message (what needs to be improved)
+    2. A JSON object containing the `previous_params` used and your `message`
+
+    Your feedback should guide the next search to:
+    - Be more focused (if too vague)
+    - Be broader (if too narrow or repetitive)
+    - Include new viewpoints (e.g. international, opposition, expert)
+    - Update the date range (if results are outdated)
+    - Shift language or country if relevant
+    ---
+    📌 **Output Format**
+    ```json
+    {
+    "previous_params": {...},
+    "message": "Try using a different angle, such as criticism from NGOs or opposition parties."
+    }
+    """
+    results_parsed = []
+    # parse results
+    for result in results:
+        results_parsed.append(", ".join(f"{key}='{value}'" for key, value in result.items()))
+    results_parsed_str = "\n\n".join(results_parsed)
+        
+
+
+    response = generate(
+        model="4o-mini",
+        system=EVALUATE_SEARCH_RESULTS_PROMPT,
+        query=f"Original query: {user_query}\nChosen_params: {chosen_params}\nResults:{results_parsed_str}",
+        temperature=0.3,
+        lastk=5,
+        session_id=f"{SESSION}_{user_name}",
+        rag_usage=False
+    )
+
+    try:
+        if isinstance(response, dict) and "response" in response:
+            parsed = ast.literal_eval(response["response"].strip())
+            if isinstance(parsed, dict):
+                return parsed
+            else:
+                raise ValueError("LLM response is not a dictionary.")
+        else:
+            return f"ERROR with LLM response {response}"
+    except (ValueError, SyntaxError) as e:
+        print(f"[ERROR] Failed to parse search parameters: {e}")
+        return None  # or raise, depending on your error strategy
 
 # ________________________ #
 # Decide Next Action       #

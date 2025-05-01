@@ -28,7 +28,7 @@ def generate_response(user_input, room_id, user_name):
         
         content = []
         for query in queries:
-            content = search(query, user_name)
+            content = smart_search(query, user_name)
             search_content.extend(content["final_sources"])
 
         
@@ -142,4 +142,5 @@ if __name__ == "__main__":
 
     Send this to at least 15 friends before midnight. Bolivia must wake up. Don’t
     break this chain – the truth must be known."""
-    print(generate_response(content, "room123", "Erin123"))
+    # print(generate_response(content, "room123", "Erin123"))
+    results = smart_search(user_input, "Erin123")
