@@ -121,16 +121,16 @@ if __name__ == "__main__":
     user_input = "Has the Paris agreement actually reduced global emissions?"    
     # user_input = "Is Erdogan a dictator?"
 
-    # current_query=""
-    # print("\nRespone from Composer:\n>>>>>")
-    # print(generate_response(user_input, "Erin123"))
-    # content = """"You can say whatever you want, but MAS is the only party that
-    # gave real dignity to our people. Free school breakfast, gas subsidies, help
-    # for the countryside. Don’t fall for media lies paid by the elites in La Paz.
-    # Don’t forget what they took from us before Evo. 🇧🇴
+    current_query=""
+    print("\nRespone from Composer:\n>>>>>")
+    print(generate_response(user_input, "Erin123"))
+    content = """"You can say whatever you want, but MAS is the only party that
+    gave real dignity to our people. Free school breakfast, gas subsidies, help
+    for the countryside. Don’t fall for media lies paid by the elites in La Paz.
+    Don’t forget what they took from us before Evo. 🇧🇴
 
-    # Send this to at least 15 friends before midnight. Bolivia must wake up. Don’t
-    # break this chain – the truth must be known."""
+    Send this to at least 15 friends before midnight. Bolivia must wake up. Don’t
+    break this chain – the truth must be known."""
     content = "Is there evidence for corruption in the MAS political party?"
     composer_response = generate_response(content, "room123", "Erin123")
     print(f"RESPONSE: {composer_response}")
