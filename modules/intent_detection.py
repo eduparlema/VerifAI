@@ -14,16 +14,16 @@ Your task is to classify the user's input into one of the following types:
 🟣 "misinformation_analysis":
 Use this category for **any input involving a forwarded message, claim, or 
 emotionally charged language** that should be analyzed for truthfulness and 
-tone. It includes two subtypes:
+tone. There are two cases:
 
-  🟢 "fact_check":
+    First case,
   - Use this when the message contains a **claim about politics, health, safety, 
     policies, disasters, etc. that can be verified** using reliable external information.
   - Example: "The UN just declared war on Israel? Is that true?"
   - Example: "My aunt sent a message saying there will be a blackout in 3 days. Is this real?"
   - Example: "I saw a post saying vaccines contain microchips. Can you verify?"
 
-  🟠 "bias_detect":
+    Second case,
   - Use this when the input contains **highly emotional, fear-based, or 
     manipulative language** that may spread misinformation — even if it’s not 
     a verifiable claim.
@@ -78,7 +78,7 @@ you asking about recent laws, statistics, or public reactions?"
 ---
 
 Response Format by Type:
-"misinformation_analysis" → Respond strictly with the keyword "fact_check".
+"misinformation_analysis" → Respond strictly with the keyword "misinformation_analysis".
 "follow_up" → Respond strictly with the keyword "follow_up".
 "generic_response" → Provide a full paragraph response.
 
@@ -92,69 +92,7 @@ def intent_detection(user_input, room_id, user_name):
         query=f"User input: {user_input}",
         temperature=0.3,
         lastk=3,
-        session_id=f"{SESSION}-{user_name}",
+        session_id=f"{SESSION}_{user_name}",
         rag_usage=False
     )
     return response["response"]
-
-import random
-
-if __name__ == "__main__":
-    test1 = """In 2014, they said ‘development’ – now they want to remove Hindu
-            temples and legalize terrorism. Ask yourself who benefits when our 
-            traditions are erased. Jai Hind 🙏🏼 Pass this on to 10 real patriots. 
-            If you care about Bharat, don’t stay silent."""
-    test2 = """: El fin del Corona virus con esta prevención alemana. Científicos 
-            alemanes anunciaron, después de una serie de estudios, que el virus 
-            Corona no solo se reproduce en los pulmones como el virus del SARS 
-            en 2002, sino que también se propaga ampliamente en la garganta 
-            durante la primera semana de infección. Los científicos sugirieron 
-            al canciller alemán y al ministro de Salud que le pidan a la gente 
-            que haga una tarea simple varias veces al día, que es hacer gárgaras 
-            con una solución semicaliente de Abmonak. Durante mucho tiempo han 
-            insistido en la necesidad de hacer esto, y ahora, después de los 
-            resultados de los experimentos realizados por biólogos alemanes 
-            sobre la multiplicación del virus Corona en la garganta, han 
-            enfatizado una vez más la necesidad de hacer gárgaras con una 
-            solución tibia de agua y sal. íficos alemanes aseguran al 
-            Ministerio de Salud alemán: si todas las personas se aclaran la 
-            garganta varias veces al día haciendo gárgaras con una solución 
-            semi-caliente de agua salada, el virus se eliminará por completo 
-            en toda Alemania en una semana. Los experimentos han demostrado que 
-            al hacer gárgaras con una solución de agua y sal, constantemente 
-            convertimos nuestra garganta en un ambiente completamente alcalino, 
-            y este ambiente es el peor ambiente para el coronavirus, porque con 
-            el agua salada, el pH de la boca cambia a alcalino.  pH, y si 
-            hacemos gárgaras varias veces al día haciendo gárgaras con solución 
-            salina casi caliente, no le estamos dando oportunidad al coronavirus 
-            de multiplicarse. Por lo tanto, es necesario que todas las personas 
-            hagan gárgaras con una solución salina semi-caliente varias veces 
-            al día varias veces al día, especialmente por la mañana y antes de 
-            salir de casa y después de regresar a casa, para no permitir que el 
-            virus Corona se multiplique.  en el mismo período inicial. Pidamos 
-            a todas las personas que apliquen estos importantes y sencillos 
-            consejos de salud con compromiso A medida que este artículo se 
-            vuelva viral, usted también estará en el círculo de quienes luchan 
-            contra la propagación del coronavirus. Enviar a sus seres queridos"""
-    # Small set of mixed test cases
-    test_cases = [
-        ("misinformation_analysis", test1),
-        # ("follow_up", "What does that ruling mean for small businesses?"),
-        ("generic_response", "Who is the President of Canada?"),
-        ("generic_response", "voting rights"),
-        ("generic_response", "hey there!"),
-        ("misinformation_analysis", test2),
-        ("generic_response", "Tell me a good movie to watch tonight")
-    ]
-
-    # Randomize order
-    random.shuffle(test_cases)
-
-    # Run tests
-    for idx, (expected_category, user_input) in enumerate(test_cases, start=1):
-        print(f"\n=== Test {idx} | Expected: {expected_category.upper()} ===")
-        print(f"Input: {user_input}\n")
-        room_id = "test_room"
-        user_name = "test_user"
-        response = intent_detection(user_input.strip(), room_id, user_name)
-        print(f"Response: {response}")

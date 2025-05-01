@@ -3,6 +3,7 @@ from modules.composer import *
 from modules.intent_detection import *
 from modules.language_analysis import *
 from llmproxy import retrieve, RAG_SESSION, text_upload
+from collections import defaultdict
 
 def generate_response(user_input, room_id, user_name):
     # Detect intention
@@ -22,6 +23,7 @@ def generate_response(user_input, room_id, user_name):
 
     # If misinformation_analysis: Get the queries and proceed to search
     if intent == "misinformation_analysis":
+        print("in misinformation_analysis")
         queries = eval(get_queries(user_input, room_id, user_name))
         
         content = []
@@ -36,6 +38,7 @@ def generate_response(user_input, room_id, user_name):
     
     # If follow_up: Skip getting the queries and just proceed to search (if needed)
     elif intent == "follow_up":
+        print("in follow up")
         # Check RAG
         rag_context = retrieve(
             query = f"Content: {user_input}",
@@ -57,6 +60,9 @@ def generate_response(user_input, room_id, user_name):
 
     # Get composer_input together
     composer_input = {}
+    composer_input["search_content"] = ""
+    composer_input["rag_content"] = ""
+    composer_input["language_analysis"] = ""
 
     if search_content:
         search_content_parsed = []
@@ -70,7 +76,7 @@ def generate_response(user_input, room_id, user_name):
     if lang_analysis:
         composer_input["language_analysis"] = lang_analysis
 
-
+    return composer(user_input, composer_input, user_name)
     # Pass composer_input to generate response
     
 
@@ -129,37 +135,11 @@ if __name__ == "__main__":
     # current_query=""
     # print("\nRespone from Composer:\n>>>>>")
     # print(generate_response(user_input, "Erin123"))
-    content = """Esto ya no es crisis, es abuso institucionalizado!
+    content = """"You can say whatever you want, but MAS is the only party that
+    gave real dignity to our people. Free school breakfast, gas subsidies, help
+    for the countryside. Don’t fall for media lies paid by the elites in La Paz.
+    Don’t forget what they took from us before Evo. 🇧🇴
 
-El Ministerio de Salud sigue mirando hacia otro lado mientras la profesión médica en Bolivia se convierte en una de las más maltratadas y peor pagadas.
-
-Cada año más de 5.000 médicos generales egresan… ¿para qué?
-No hay fuentes de trabajo, no hay planificación, no hay respeto.
-Mientras tanto, siguen abriendo universidades como si fueran tiendas de barrio, generando una saturación brutal y condenando a generaciones enteras al desempleo o al subempleo.
-
-Y lo peor:
-Los contratos que deberían ser para médicos generales están siendo entregados a especialistas que no tienen dónde ejercer su verdadera función.
-¿El resultado?
-Especialistas frustrados, médicos generales desplazados, servicios mal organizados y pacientes mal atendidos.
-
-Nos faltan otorrinos, oncólogos, reumatólogos, endocrinólogos, neumólogos, y más.
-Pero los cupos de residencia siguen atascados en las mismas cuatro especialidades básicas, como si estuviéramos atrapados en un loop sin sentido: pediatría, medicina interna, ginecología y cirugía general.
-
-¿Quién decide esto?
-Hospitales que piensan en lo que les conviene, no en lo que necesita el país.
-¿Dónde están el Ministerio, el Colegio Médico, las sociedades científicas?
-Callados. Cómplices.
-
-Hoy en Bolivia, cuesta más hacerse las uñas acrílicas que una consulta médica.
-Y eso no es casualidad: es el reflejo del desprecio sistemático hacia nuestra labor.
-Ya debería existir un ARANCEL MÉDICO NACIONAL obligatorio, para frenar esta denigración, para exigir respeto, y para dignificar esta profesión que lo da todo y recibe migajas.
-
-¡Basta ya!
-Exigimos una reestructuración total del sistema de salud,
-Una distribución de especialidades basada en las verdaderas necesidades del país,
-Y un freno al uso político y económico de nuestra vocación."""
-
-    qs = get_queries(content, "room1", "erin1")
-    q1 = eval(qs.strip())[0]
-    print(qs)
-    print(q1)
+    Send this to at least 15 friends before midnight. Bolivia must wake up. Don’t
+    break this chain – the truth must be known."""
+    print(generate_response(content, "room123", "Erin123"))

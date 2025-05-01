@@ -45,52 +45,59 @@ def search(user_input: str, user_name: str) -> str:
     search_journey = []
     current_query = user_input
     steps_taken = 0
-    max_steps = 4
+    max_steps = 2
     collected_results = []
     num_relevant_results = 0
 
-    while steps_taken < max_steps:
-        steps_taken += 1
-        print(f"[search] Step {steps_taken}")
+    # while steps_taken < max_steps:
+    #     steps_taken += 1
+    #     print(f"[search] Step {steps_taken}")
 
-        # Choose params to perform google search
-        chosen_params = choose_search_params(collected_results, current_query, user_input, user_name)
-        print(f"chosen parameters: {chosen_params}")
+    #     # Choose params to perform google search
+    # chosen_params = choose_search_params(collected_results, current_query, user_input, user_name)
+    #     print(f"chosen parameters: {chosen_params}")
 
-        # 2. Perform search
-        results = perform_search(user_input, user_name, chosen_params)
-        # 3. Evaluate results
-        num_relevant_results += evaluate_relevance(results, user_input, user_name)
-        diversity = evaluate_diversity(collected_results + results, user_input, user_name)
-        print(f"Diversity score so far: {diversity}")
+    #     # 2. Perform search
+    # results = perform_search(user_input, user_name, chosen_params)
+    #     # 3. Evaluate results
+    #     num_relevant_results += evaluate_relevance(results, user_input, user_name)
+    #     diversity = evaluate_diversity(collected_results + results, user_input, user_name)
+    #     print(f"Diversity score so far: {diversity}")
 
-        # 4. Record the step
-        search_journey.append({
-            "query": current_query,
-            "diversity_so_far": diversity,
-            "num of relevant sources": len(collected_results),
-            "num_results": len(results),
-        })
+    #     # 4. Record the step
+    #     search_journey.append({
+    #         "query": current_query,
+    #         "diversity_so_far": diversity,
+    #         "num of relevant sources": len(collected_results),
+    #         "num_results": len(results),
+    #     })
 
-        collected_results.extend(results)
-        print(f"TOTAL RELEVANT: {len(collected_results)}")
+    #     collected_results.extend(results)
+    #     print(f"TOTAL RELEVANT: {len(collected_results)}")
 
-        # 5. Reason about what to do next
-        if num_relevant_results > NUM_RELEVAN_RESULTS_THRESHOLD and diversity > DIVERSITY_THRESHOLD:
-            break
+    #     # 5. Reason about what to do next
+    #     if num_relevant_results > NUM_RELEVAN_RESULTS_THRESHOLD and diversity > DIVERSITY_THRESHOLD:
+    #         break
 
-        sources_string = "\n\n".join(
-            f"{src.get('title', 'No Title')} ({src.get('date', 'No Date')})\n{src.get('link', 'No URL')}\n{src.get('content', '')}"
-            for src in collected_results
-        )
+    #     sources_string = "\n\n".join(
+    #         f"{src.get('title', 'No Title')} ({src.get('date', 'No Date')})\n{src.get('link', 'No URL')}\n{src.get('content', '')}"
+    #         for src in collected_results
+    #     )
 
-        text_upload(
-                text=sources_string,
-                session_id=user_name,
-                strategy='fixed'
-            )
+        # text_upload(
+        #         text=sources_string,
+        #         session_id=user_name,
+        #         strategy='fixed'
+        #     )
 
-       
+    # Choose params to perform google search
+    chosen_params = choose_search_params(collected_results, current_query, user_input, user_name)
+    print(f"chosen parameters: {chosen_params}")
+
+    # 2. Perform search
+    results = perform_search(user_input, user_name, chosen_params)
+
+    collected_results.extend(results)
 
     # 6. Finalize
     final_output = {
@@ -500,9 +507,9 @@ def evaluate_relevance(results: list, user_input: str, user_name: str):
         title, date, content = result["title"], result["date"], result["content"]
         result_info = f"Title: {title}\n Date: {date}\n Content: {content}"
         score = get_relevance_score(result_info, user_input, user_name)
-        print(f"{title} got score {score}")
-        if score > RELEVANCE_THRESHOLD:
-            num_relevant_results += 1
+        # print(f"{title} got score {score}")
+        # if score > RELEVANCE_THRESHOLD:
+        #     num_relevant_results += 1
         # scores.append(score)
     # return sum(scores) / max(1, len(scores))
     return num_relevant_results
