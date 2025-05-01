@@ -47,3 +47,35 @@ def language_analysis(content: str, user_name: str):
         return response["response"]
     else:
         print(f"Error [language_analysis] LLM response: {response}")
+
+
+
+
+
+
+def check_language(content: str, user_name: str):
+    # Should return yes if there is alarming, emotional, or manipulative language
+    # cIf it is just a regular question or statement it should return no
+    LANGUAGE_ANALYSIS_PROMPT = """You are a smart and friendly assistant that helps
+    people understand the tone and language of messages shared on social media or messaging apps.
+    Your task is ONLY to analyze the language, analyzing the actual content and
+    its veracity is the responsibility of another agent.
+    Many of these messages can be emotional, biased, or manipulative — even if
+    they don't seem false at first. 
+    Your job is to detemrine if this is the case and return "YES or "NO"
+    Here are some examples
+
+
+    response = generate(
+        model='4o-mini',
+        system=LANGUAGE_ANALYSIS_PROMPT,
+        query=f"Content: {content}",
+        temperature=0.4,
+        lastk=0,
+        session_id=f"{SESSION}_{user_name}",
+        rag_usage=False
+    )
+    if isinstance(response, dict) and "response" in response:
+        return response["response"]
+    else:
+        print(f"Error [language_analysis] LLM response: {response}")

@@ -54,8 +54,6 @@ def generate_response(user_input, room_id, user_name):
         # Inform the user about your search
         query_information = inform_user(user_input, queries, user_name)
         send_direct_message(query_information, room_id)
-
-
         
         content = []
         for query in queries:
@@ -65,6 +63,8 @@ def generate_response(user_input, room_id, user_name):
             search_content.extend(content["final_sources"])
         print("search content")
         print(search_content)
+
+        
         # Get language analysis
         lang_analysis = language_analysis(user_input, user_name)
 
