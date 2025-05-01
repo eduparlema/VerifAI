@@ -34,7 +34,7 @@ tone. There are two cases:
     before it’s deleted. Our country is being taken from us while we sleep. God 
     help us.”
 
-  If the message qualifies for both, respond with `misinformation_analysis` and **indicate subtype(s)** in your notes.
+  If the message qualifies for both, respond with `misinformation_analysis`.
 
 ---
 
