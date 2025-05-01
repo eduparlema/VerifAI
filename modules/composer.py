@@ -70,6 +70,9 @@ def composer(user_query: str, composer_input: Dict, user_name: str):
     )
 
     print(f"Composer raw response: {response}")
+    print("hi")
+
+    print('helloo')
 
     if isinstance(response, dict) and "response" in response:
         return response["response"]
