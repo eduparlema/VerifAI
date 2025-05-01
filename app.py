@@ -29,7 +29,7 @@ def main():
     room_id = data.get("channel_id")
     print(data)
 
-    response = generate_response(message, user)
+    response = generate_response(message, room_id, user)
     print(f"\n\n Response: {response}")
     send_direct_message(response, room_id)
     return jsonify({"text": response})
