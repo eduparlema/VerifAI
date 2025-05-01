@@ -41,31 +41,6 @@ def page_not_found(e):
 if __name__ == "__main__":
     app.run()
 
-
-"""Bot Topics:
- 🗽 United States
-Immigration Policies and Debates
-(e.g., U.S.-Mexico border policies, DACA, asylum rules)
-
-Election Integrity and Voting Laws
-(e.g., mail-in voting security, voter ID laws, allegations of election fraud)
-
-🌎 International
-Climate Change Agreements and Policies
-(e.g., Paris Agreement commitments, disputes over climate financing among countries)
-
-International Conflicts and Humanitarian Crises
-(e.g., Russia-Ukraine war facts vs. propaganda, Gaza conflict narratives)
-
-🇧🇷 Country-Specific (Examples)
-Political Corruption in Latin America
-(e.g., Brazil’s "Operation Car Wash," recent election controversies in countries like Bolivia, Peru)
-
-Authoritarianism and Democratic Backsliding
-(e.g., election fairness debates in Hungary, Turkey, or Venezuela)
-
-"""
-
 def send_direct_message(message: str, room_id: str, attachments = None) -> None:
     payload = {
         "roomId": room_id,

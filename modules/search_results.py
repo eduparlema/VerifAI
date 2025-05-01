@@ -164,7 +164,7 @@ def search(user_input: str, user_name: str):
 #   Perform Search               #
 # ============================== #
 
-def perform_search(original_input: str, user_name: str, chose_params: Dict = None, num_results: int =3) -> list:
+def perform_search(original_input: str, user_name: str, chose_params: Dict = None, num_results: int=6) -> list:
     """
     Perform a Google Custom Search and return a list of search results.
     
@@ -204,8 +204,12 @@ def perform_search(original_input: str, user_name: str, chose_params: Dict = Non
         return []
 
     results = []
+    NUM_DESIRED_RESOURCES = 3 # Number of resources we want to get
+    num, id = 0, 0
 
-    for item in items:
+    while num < NUM_DESIRED_RESOURCES and num < num_results:
+
+        item = items[id]
         url = item.get("link")
         title = item.get("title")
         print(f'I found a url: {url}')
@@ -214,20 +218,24 @@ def perform_search(original_input: str, user_name: str, chose_params: Dict = Non
         scraped_text = scrape_webpage(url)
         
         if scraped_text == "ERROR":
+            id += 1
             continue  # skip bad scrapes
 
         # Summarize the article text based on the user's input
         summary = summarize_content(original_input, scraped_text, user_name)
-
-
+        
+        if summary == 'No relevant information found in the article.':
+            id += 1
+            continue
+        
         results.append({
             "url": url,
             "title": title,
             "date": date,
             "content": summary
-            #"content": scraped_text
-            # "summary": summary
         })
+        num += 1
+        id += 1
 
     return results
 
@@ -277,6 +285,48 @@ def summarize_content(user_input: str, article_text: str, user_name: str) -> str
     system_prompt = """You are a helpful assistant that summarizes articles in a 
     focused way, based on a user query."""
 
+    SUMMARIZE_SOURCE_PROMPT = """
+    You are a fact-focused news summarizer.
+
+    Goal:
+    Summarize a news article with a specific focus on the parts that are **most 
+    relevant to the user's topic or claim**. Your summary should be informative, 
+    clear, and focused — capturing important facts, context, and supporting details 
+    without unnecessary generalizations.
+
+    Input:
+    You will receive:
+    - A topic or claim from the user.
+    - A news article, including its title, full text, and source URL.
+
+    DO:
+    - Write a **detailed** summary of the article, focusing only on content that
+        relates to the user's topic or claim.
+    - Include important **facts, data points, events, or explanations** that help 
+        the user understand the article’s relevance to the claim.
+    - If there are any **quotes** relevant to the topic or claim, include them
+        with the **speaker’s name** (e.g., "John Smith said, '...'").
+    - Use the article's original phrasing when appropriate to maintain fidelity.
+    - Be accurate, objective, and free of speculation.
+
+    DON'T:
+    - Do NOT summarize unrelated parts of the article.
+    - Do NOT judge or speculate on whether the claim is true or false.
+    - Do NOT make inferences or assumptions beyond what's in the text.
+    - Do NOT include commentary or interpretation.
+
+    If relevant infomatio found, 
+
+    Output Format:
+    <This article is about <topic>. It provides the following information
+    relevant to the user's claim or curiosity: <summary with key facts and 
+    any relevant quotes>.
+
+    If no relevant information is found, return:
+    <No relevant information found in the article.>
+
+    """
+
     user_prompt = f"""
         User Query:
         "{user_input}"
@@ -285,11 +335,6 @@ def summarize_content(user_input: str, article_text: str, user_name: str) -> str
         \"\"\"
         {article_text}
         \"\"\"
-
-        Instructions:
-        - Summarize only the parts of the article that are directly relevant to the user query.
-        - If there is no relevant information, respond with: "No relevant information found."
-        - Keep the summary concise (maximum 3-5 sentences).
         """
 
     response = generate(

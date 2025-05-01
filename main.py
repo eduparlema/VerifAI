@@ -28,8 +28,11 @@ def generate_response(user_input, room_id, user_name):
         content = []
         for query in queries:
             content = search(query, user_name)
+            print('inside the for loop')
+            print(content)
             search_content.extend(content["final_sources"])
-        
+        print("search content")
+        print(search_content)
         # Get language analysis
         lang_analysis = language_analysis(user_input, user_name)
 
@@ -63,11 +66,14 @@ def generate_response(user_input, room_id, user_name):
     composer_input["rag_content"] = ""
     composer_input["language_analysis"] = ""
 
+    print("\nPRINTING SOURCES TO SEND COMPOSER!")
     if search_content:
         search_content_parsed = []
         for source in search_content:
-            search_content_parsed.append("".join(list(source.values())))
+            print(f"Source being sent to composer: \n{source}")
+            search_content_parsed.append(", ".join(f"{key}='{value}'" for key, value in source.items()))
         composer_input["search_content"] = "\n".join(search_content_parsed)
+    print("\n\n")
 
     if rag_content:
         composer_input["rag_content"] = "\n\n".join(rag_content)
@@ -124,13 +130,10 @@ if __name__ == "__main__":
     # current_query=""
     # print("\nRespone from Composer:\n>>>>>")
     # print(generate_response(user_input,"room", "Erin123"))
-    content = """"You can say whatever you want, but MAS is the only party that
-    gave real dignity to our people. Free school breakfast, gas subsidies, help
-    for the countryside. Don’t fall for media lies paid by the elites in La Paz.
-    Don’t forget what they took from us before Evo. 🇧🇴
+    content = """"In 2014, they said ‘development’ – now they want to remove Hindu
+    temples and legalize terrorism. Ask yourself who benefits when our traditions are erased. Jai Hind 🙏🏼
 
-    Send this to at least 15 friends before midnight. Bolivia must wake up. Don’t
-    break this chain – the truth must be known."""
+Pass this on to 10 real patriots. If you care about Bharat, don’t stay silent."""
     # content = "Is there evidence for corruption in the MAS political party?"
     composer_response = generate_response(content, "room123", "Erin123")
     print(f"RESPONSE: {composer_response}")
