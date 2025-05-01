@@ -207,7 +207,7 @@ def perform_search(original_input: str, user_name: str, chose_params: Dict = Non
     NUM_DESIRED_RESOURCES = 3 # Number of resources we want to get
     num, id = 0, 0
 
-    while num < NUM_DESIRED_RESOURCES and num < num_results:
+    while num < NUM_DESIRED_RESOURCES and id < num_results:
 
         item = items[id]
         url = item.get("link")
