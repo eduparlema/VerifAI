@@ -921,61 +921,56 @@ def get_queries(content: str, room_id: str, user_name: str, ):
     """
 
     GET_QUERIES_PROMPT = """You are an intelligent assistant that reads
-    long or short messages shared on social media, especially in WhatsApp group chats.
-    These messages often contain misinformation, opinions, or emotionally charged 
-    political claims.
+        long or short messages shared on social media, especially in WhatsApp group chats.
+        These messages often contain misinformation, opinions, or emotionally charged 
+        political claims.
 
-    Your task is to carefully analyze such messages and extract **explicit or
-    implied questions** that a fact-checking or search agent would need to
-    answer in order to confidently respond to the message.
+        Your task is to analyze such messages and extract a Python list of 3
+        explicit or implied **factual questions** that a fact-checking agent should answer
+        in order to verify the message.
 
-    These questions should:
-    - Focus on specific claims, events, or accusations mentioned in the message
-    - Help guide a research or fact-checking agent in collecting the most relevant evidence
-    - Be phrased in a neutral, factual tone
-    - Avoid rhetorical or sarcastic phrasing
-    - Be answerable (at least in principle) using news, government, or expert sources
-    ---
-    ### Examples
+        Guidelines:
+        - Focus on specific claims, events, or accusations in the message
+        - Phrase the questions neutrally and factually
+        - Avoid rhetorical or sarcastic phrasing
+        - Make sure the questions are answerable using news, government, or expert sources
+        - Return only a valid Python list (not Markdown, not numbered)
 
-    **Message:**
-    > “France gave too many rights to migrants and look what happened: riots,
-    no-go zones, and terror attacks. They don’t show it on TV, but it’s happening. Don’t let this happen in your country.”
+        ---
 
-    **Extracted Questions:**
-    1. Have recent riots in France been linked to migrant communities?
-    2. Are there areas in France officially or unofficially referred to as “no-go zones”?
-    3. Is there evidence that increased migrant rights correlate with a rise in terror attacks in France?
+        ### Examples
 
-    ---
+        Message:
+        “France gave too many rights to migrants and look what happened: riots,
+        no-go zones, and terror attacks. They don’t show it on TV, but it’s happening.”
 
-    **Message:**
-    "La paciente murió porque no había oxígeno ni camas en terapia intensiva.
-    El gobernador y la directora de salud son responsables."
+        Output:
+        [
+        "Have recent riots in France been linked to migrant communities?",
+        "Are there areas in France officially or unofficially referred to as 'no-go zones'?",
+        "Is there evidence that increased migrant rights correlate with a rise in terror attacks in France?"
+        ]
 
-    **Extracted Questions:**
-    1. Was there a shortage of oxygen or ICU beds at Hospital San Juan de Dios in Tarija during [insert relevant date]?
-    2. Have health personnel been laid off or reassigned at the hospital in recent months?
-    3. Who currently directs Hospital San Juan de Dios and what are their qualifications?
+        ---
 
-    ---
+        Message:
+        "The media mocks God and family, but Bolsonaro defends what’s right.
+        Abortion, gender ideology, corruption — that’s what the left wants."
 
-    **Message:**
-    > “The media mocks God and family, but Bolsonaro defends what’s right.
-    Abortion, gender ideology, corruption — that’s what the left wants. Open
-    your eyes, Brazil! 🇧🇷 Send this to 20 brothers and sisters in Christ.”
+        Output:
+        [
+        "Has Jair Bolsonaro publicly opposed abortion and gender education programs?",
+        "Have Brazilian left-wing parties supported policies related to abortion or gender education?",
+        "What are the public positions of major Brazilian parties on family and religious values?"
+        ]
 
-    **Extracted Questions:**
-    1. Has Jair Bolsonaro publicly opposed abortion and gender education programs?
-    2. Have Brazilian left-wing parties supported policies related to abortion or gender education?
-    3. What are the public positions of major Brazilian parties on family and religious values?
+        ---
 
-    ---
+        Do not wrap your answer in triple backticks. 
+        Do not include any explanation or preamble. 
+        Return only a **clean, valid Python list of 3 string questions**.
+        """
 
-    Only return a clean Python list of clear, factual, answerable questions.
-    Do not include any commentary or explanations. Please, limit your response
-    to the 3 most relevant questions you can come up with. 
-    """
 
     response = generate(
         model='4o-mini',
