@@ -1,6 +1,7 @@
 from llmproxy import generate, SESSION
 
 
+
 def language_analysis(content: str, user_name: str):
     """
     This module is in charge of analyzing the language of social media content.

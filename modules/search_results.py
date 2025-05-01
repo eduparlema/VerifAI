@@ -20,7 +20,30 @@ RELEVANCE_THRESHOLD = 0.5
 NUM_RELEVAN_RESULTS_THRESHOLD = 5
 DIVERSITY_THRESHOLD = 0.7
 
-def search(user_input: str, user_name: str) -> str:
+def smart_search(user_input: str, user_name):
+    """
+    Agentic Search Function:
+    - Treats the search process as an evolving plan.
+    - After each search, evaluates:
+        - Relevance
+        - Sufficiency
+        - Diversity
+    - Decides dynamically whether to:
+        - Accept the results
+        - Modify the query (paraphrase, localize, translate, reframe)
+        - Gather complementary perspectives
+    - Terminates when confident results are obtained or no meaningful improvements are possible.
+    
+    Output:
+    {
+        "final_sources": list of dicts (title, url, snippet, etc.),
+        "search_journey": list of steps taken (each step = action, query, results),
+    }
+    """
+    current_query = user_input
+    
+
+def search(user_input: str, user_name: str):
     """
     Agentic Search Function:
     - Treats the search process as an evolving plan.
