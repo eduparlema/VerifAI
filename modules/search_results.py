@@ -302,7 +302,10 @@ def summarize_content(user_input: str, article_text: str, user_name: str) -> str
         rag_usage=False
     )
 
-    return response["response"].strip()
+    if isinstance(response, dict) and "response" in response:
+        return response["response"].strip()
+    else:
+        return f"ERROR [summarize_content] LLM_raw_response: {response}"
 
 # ____________________ #
 # choose_search_params #
