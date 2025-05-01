@@ -4,9 +4,8 @@ import re
 import requests
 from readability import Document
 from bs4 import BeautifulSoup
-from llmproxy import generate, SESSION
+from llmproxy import generate, SESSION, text_upload
 from dotenv import load_dotenv
-from urllib.parse import urlparse
 from typing import Dict
 import ast
 
@@ -21,7 +20,7 @@ RELEVANCE_THRESHOLD = 0.5
 NUM_RELEVAN_RESULTS_THRESHOLD = 5
 DIVERSITY_THRESHOLD = 0.7
 
-def search(user_input: str, username: str) -> str:
+def search(user_input: str, user_name: str) -> str:
     """
     Agentic Search Function:
     - Treats the search process as an evolving plan.
@@ -46,22 +45,23 @@ def search(user_input: str, username: str) -> str:
     search_journey = []
     current_query = user_input
     steps_taken = 0
-    max_steps = 5
+    max_steps = 4
     collected_results = []
+    num_relevant_results = 0
 
     while steps_taken < max_steps:
         steps_taken += 1
         print(f"[search] Step {steps_taken}")
 
         # Choose params to perform google search
-        chosen_params = choose_search_params(collected_results, current_query, user_input, username)
+        chosen_params = choose_search_params(collected_results, current_query, user_input, user_name)
         print(f"chosen parameters: {chosen_params}")
 
         # 2. Perform search
-        results = perform_search(user_input, username, chosen_params)
+        results = perform_search(user_input, user_name, chosen_params)
         # 3. Evaluate results
-        relevant_results = evaluate_relevance(results, user_input, username)
-        diversity = evaluate_diversity(collected_results + results, user_input, username)
+        num_relevant_results += evaluate_relevance(results, user_input, user_name)
+        diversity = evaluate_diversity(collected_results + results, user_input, user_name)
         print(f"Diversity score so far: {diversity}")
 
         # 4. Record the step
@@ -72,12 +72,25 @@ def search(user_input: str, username: str) -> str:
             "num_results": len(results),
         })
 
-        collected_results.extend(relevant_results)
+        collected_results.extend(results)
         print(f"TOTAL RELEVANT: {len(collected_results)}")
 
         # 5. Reason about what to do next
-        if len(collected_results) > NUM_RELEVAN_RESULTS_THRESHOLD and diversity > DIVERSITY_THRESHOLD:
+        if num_relevant_results > NUM_RELEVAN_RESULTS_THRESHOLD and diversity > DIVERSITY_THRESHOLD:
             break
+
+        sources_string = "\n\n".join(
+            f"{src.get('title', 'No Title')} ({src.get('date', 'No Date')})\n{src.get('link', 'No URL')}\n{src.get('content', '')}"
+            for src in collected_results
+        )
+
+        text_upload(
+                text=sources_string,
+                session_id=user_name,
+                strategy='fixed'
+            )
+
+       
 
     # 6. Finalize
     final_output = {
@@ -94,7 +107,7 @@ def search(user_input: str, username: str) -> str:
 #   Perform Search               #
 # ============================== #
 
-def perform_search(original_input: str, username: str, chose_params: Dict = None, num_results: int =3) -> list:
+def perform_search(original_input: str, user_name: str, chose_params: Dict = None, num_results: int =3) -> list:
     """
     Perform a Google Custom Search and return a list of search results.
     
@@ -147,7 +160,7 @@ def perform_search(original_input: str, username: str, chose_params: Dict = None
             continue  # skip bad scrapes
 
         # # Summarize the article text based on the user's input
-        # summary = summarize_content(original_input, scraped_text, username)
+        # summary = summarize_content(original_input, scraped_text, user_name)
 
 
         results.append({
@@ -199,7 +212,7 @@ def scrape_webpage(url: str, timeout: int = 10) -> str:
         # print(f"⚠️ Parsing error ({url}): {e}")
         return "ERROR"
     
-def summarize_content(user_input: str, article_text: str, username: str) -> str: 
+def summarize_content(user_input: str, article_text: str, user_name: str) -> str: 
     """
     Summarize the article focusing only on information related to the user's query.
     """
@@ -227,7 +240,7 @@ def summarize_content(user_input: str, article_text: str, username: str) -> str:
         query=user_prompt,
         temperature=0.1,
         lastk=5,
-        session_id=f"{SESSION}_{username}",
+        session_id=f"{SESSION}_{user_name}",
         rag_usage=False
     )
 
@@ -237,7 +250,7 @@ def summarize_content(user_input: str, article_text: str, username: str) -> str:
 # choose_search_params #
 # ____________________ #
 
-def choose_search_params(collected_results: list, current_query:str, user_input:str, username:str):
+def choose_search_params(collected_results: list, current_query:str, user_input:str, user_name:str):
     CHOOSE_PARAMS_PROMPT = """
     You are a smart and precise search parameter selection agent. You support a
     fact-checking AI system by crafting optimal Google Custom Search queries to
@@ -371,7 +384,7 @@ def choose_search_params(collected_results: list, current_query:str, user_input:
         query=user_prompt.strip(),
         temperature=0,
         lastk=5,
-        session_id=f"{SESSION}_{username}",
+        session_id=f"{SESSION}_{user_name}",
         rag_usage=False
     )
 
@@ -393,7 +406,7 @@ def choose_search_params(collected_results: list, current_query:str, user_input:
 # Decide Next Action       #
 # ________________________ #
 
-def decide_next_action(collected_results:list, user_input:str, username:str) -> str:
+def decide_next_action(collected_results:list, user_input:str, user_name:str) -> str:
     """
     Decide the next search action based on current search results and the user's input.
     Returns a dictionary like:
@@ -457,7 +470,7 @@ def decide_next_action(collected_results:list, user_input:str, username:str) -> 
         query=user_prompt.strip(),
         temperature=0,
         lastk=5,
-        session_id=f"{SESSION}_{username}",
+        session_id=f"{SESSION}_{user_name}",
         rag_usage=False
     )
 
@@ -476,26 +489,26 @@ def decide_next_action(collected_results:list, user_input:str, username:str) -> 
 # __________________ #
 # Evaluate functions #
 # __________________ #
-def evaluate_relevance(results: list, user_input: str, username: str) -> list:
+def evaluate_relevance(results: list, user_input: str, user_name: str):
     """
     Checks how closely the search results match the user's original query.
     Returns a list of relevant articles.
     """
     # scores = []
-    relevant_results = []
+    num_relevant_results = 0
     for result in results:
         title, date, content = result["title"], result["date"], result["content"]
         result_info = f"Title: {title}\n Date: {date}\n Content: {content}"
-        score = get_relevance_score(result_info, user_input, username)
+        score = get_relevance_score(result_info, user_input, user_name)
         print(f"{title} got score {score}")
         if score > RELEVANCE_THRESHOLD:
-            relevant_results.append(result)
+            num_relevant_results += 1
         # scores.append(score)
     # return sum(scores) / max(1, len(scores))
-    return relevant_results
+    return num_relevant_results
 
 
-def get_relevance_score(result: str, user_input: str, username: str) -> float:
+def get_relevance_score(result: str, user_input: str, user_name: str) -> float:
     SCORE_PROMPT = SCORE_PROMPT = """
         You are an expert search quality evaluator.
 
@@ -526,7 +539,7 @@ def get_relevance_score(result: str, user_input: str, username: str) -> float:
         query=f"Result: {result}. User input: {user_input}",
         temperature=0.3,
         lastk=1,
-        session_id=f"scoring_session_{username}",
+        session_id=f"scoring_session_{user_name}",
         rag_usage=False
     )
     try:
@@ -537,7 +550,7 @@ def get_relevance_score(result: str, user_input: str, username: str) -> float:
     except ValueError:
         return 0.0
     
-def evaluate_diversity(results: str, user_input: str, username: str) -> str:
+def evaluate_diversity(results: str, user_input: str, user_name: str) -> str:
     """
     Checks how diverse the opinions and perspectives are accross the results
     """
@@ -545,10 +558,10 @@ def evaluate_diversity(results: str, user_input: str, username: str) -> str:
     for result in results:
         combined_text += f"Title: {result['title']}\nDate: {result['date']}\nContent: {result['content']}\n\n"
 
-    diversity_score = get_diversity_score(combined_text, user_input, username)
+    diversity_score = get_diversity_score(combined_text, user_input, user_name)
     return diversity_score
 
-def get_diversity_score(combined_text: str, user_input: str, username: str) -> float:
+def get_diversity_score(combined_text: str, user_input: str, user_name: str) -> float:
     DIVERSITY_PROMPT = """
     You are an expert opinion diversity evaluator.
 
@@ -575,7 +588,7 @@ def get_diversity_score(combined_text: str, user_input: str, username: str) -> f
         query=f"User Question: {user_input}\n\nSearch Results:\n{combined_text}",
         temperature=0.3,
         lastk=1,
-        session_id=f"diversity_scoring_session_{username}",
+        session_id=f"diversity_scoring_session_{user_name}",
         rag_usage=False
     )
     print("[get_diversity_score]")
@@ -591,7 +604,7 @@ def get_diversity_score(combined_text: str, user_input: str, username: str) -> f
 # _____________________ #
 # Next action functions #
 # _____________________ #
-def paraphrase_query(current_query: str, username: str) -> str:
+def paraphrase_query(current_query: str, user_name: str) -> str:
     """
     Takes the current_query that is being used for search and provides a paraphrased
     version. It should keep the same meaning, use different wording and possibly
@@ -619,9 +632,89 @@ def paraphrase_query(current_query: str, username: str) -> str:
         query=f"Current query: {current_query}",
         temperature=0.3,
         lastk=8,
-        session_id=f"{SESSION}_{username}",
+        session_id=f"{SESSION}_{user_name}",
         rag_usage=False
     )
 
     return response["response"].strip()
 
+def get_queries(content: str, room_id: str, user_name: str, ):
+    """
+    This function takes as input a social media content (e.g., WhatsApp chain 
+    messages, snippets from Facebook posts, etc) and identifies things an agent
+    should know in order to analyze the content confidently.
+    """
+
+    GET_QUERIES_PROMPT = """You are an intelligent assistant that reads
+    long or short messages shared on social media, especially in WhatsApp group chats.
+    These messages often contain misinformation, opinions, or emotionally charged 
+    political claims.
+
+    Your task is to carefully analyze such messages and extract **explicit or
+    implied questions** that a fact-checking or search agent would need to
+    answer in order to confidently respond to the message.
+
+    These questions should:
+    - Focus on specific claims, events, or accusations mentioned in the message
+    - Help guide a research or fact-checking agent in collecting the most relevant evidence
+    - Be phrased in a neutral, factual tone
+    - Avoid rhetorical or sarcastic phrasing
+    - Be answerable (at least in principle) using news, government, or expert sources
+    ---
+    ### Examples
+
+    **Message:**
+    > “France gave too many rights to migrants and look what happened: riots,
+    no-go zones, and terror attacks. They don’t show it on TV, but it’s happening. Don’t let this happen in your country.”
+
+    **Extracted Questions:**
+    1. Have recent riots in France been linked to migrant communities?
+    2. Are there areas in France officially or unofficially referred to as “no-go zones”?
+    3. Is there evidence that increased migrant rights correlate with a rise in terror attacks in France?
+
+    ---
+
+    **Message:**
+    "La paciente murió porque no había oxígeno ni camas en terapia intensiva.
+    El gobernador y la directora de salud son responsables."
+
+    **Extracted Questions:**
+    1. Was there a shortage of oxygen or ICU beds at Hospital San Juan de Dios in Tarija during [insert relevant date]?
+    2. Have health personnel been laid off or reassigned at the hospital in recent months?
+    3. Who currently directs Hospital San Juan de Dios and what are their qualifications?
+
+    ---
+
+    **Message:**
+    > “The media mocks God and family, but Bolsonaro defends what’s right.
+    Abortion, gender ideology, corruption — that’s what the left wants. Open
+    your eyes, Brazil! 🇧🇷 Send this to 20 brothers and sisters in Christ.”
+
+    **Extracted Questions:**
+    1. Has Jair Bolsonaro publicly opposed abortion and gender education programs?
+    2. Have Brazilian left-wing parties supported policies related to abortion or gender education?
+    3. What are the public positions of major Brazilian parties on family and religious values?
+
+    ---
+
+    Only return a clean Python list of clear, factual, answerable questions.
+    Do not include any commentary or explanations. Please, limit your response
+    to the 3 most relevant questions you can come up with. 
+    """
+
+    response = generate(
+        model='4o-mini',
+        system=GET_QUERIES_PROMPT,
+        query=f"Content: {content}",
+        temperature=0.3,
+        lastk=0,
+        session_id="get_queries_0",
+        rag_usage=False,
+    )
+
+    print(f"Raw response: {response}")
+    if isinstance(response, dict) and "response" in response:
+        return response["response"]
+    else:
+        print(f"Error in response from the LLM: {response}")
+        return f"ERROR [get_queries] LLM response:{response}"

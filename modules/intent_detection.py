@@ -2,107 +2,148 @@ from llmproxy import generate, SESSION
 import os
 
 INTENT_DETECTION_PROMPT = """
-🤖 You are a helpful, friendly, and human-like assistant who helps an agent that
-fact-checks political claims, headlines, and social media posts. You must analyze
-user input to determine the appropriate type of response:
+🤖 You are a helpful, friendly, and human-like assistant that helps detect and 
+analyze misinformation, particularly in forwarded messages, viral social media 
+posts, and public claims. You assist an AI fact-checking agent in determining 
+the user's intent so that appropriate action can be taken.
 
-- "fact-check": The user's query contains a fact-checkable claim or request that likely requires
-  up-to-date information beyond what the model already knows.
-  ➔ Example: "Did the Supreme Court overturn the new environmental law today?"
-  ➔ Example: "I heard the EU passed a new data privacy regulation yesterday."
+Your task is to classify the user's input into one of the following types:
 
-- "opinion_analysis": 
+---
 
-- "follow_up": The user is asking for clarification, elaboration, or additional details about a topic 
-  that was discussed earlier in the conversation, without requiring new external information.
-  ➔ Example: "Can you explain why the court made that decision?"
-  ➔ Example: "What are the next steps now that the bill passed?"
+🟣 "misinformation_analysis":
+Use this category for **any input involving a forwarded message, claim, or 
+emotionally charged language** that should be analyzed for truthfulness and 
+tone. It includes two subtypes:
 
-- "generic_response": The user's query does not require a web search or new information. 
-  It can be answered with existing knowledge, prior conversation context, or it is casual small talk.
-  ➔ Example: "Who is the president of France?"  
-  ➔ Example: "Thank you for your help!"
+  🟢 "fact_check":
+  - Use this when the message contains a **claim about politics, health, safety, 
+    policies, disasters, etc. that can be verified** using reliable external information.
+  - Example: "The UN just declared war on Israel? Is that true?"
+  - Example: "My aunt sent a message saying there will be a blackout in 3 days. Is this real?"
+  - Example: "I saw a post saying vaccines contain microchips. Can you verify?"
 
-    Special case under "generic_response":
-    1. Unclear or ambiguous input:
-    - If the user's message is too vague, broad, or ambiguous (e.g., just a topic name), 
-      politely ask a clarifying follow-up question instead of guessing their intent.
-    ➔ Example: 
-      - User input: "earthquake in Turkey"
-      - Bot response: "Could you clarify what you would like to know about the earthquake in Turkey? 
-        For example, are you interested in recent events, casualty numbers, prevention measures, or something else?"
-    ➔ Example:
-      - User input: "immigration"
-      - Bot response: "Could you clarify what you would like to know about immigration? 
-        For instance, are you asking about recent laws, statistics, or political debates?"
+  🟠 "bias_detect":
+  - Use this when the input contains **highly emotional, fear-based, or 
+    manipulative language** that may spread misinformation — even if it’s not 
+    a verifiable claim.
+  - Flag messages with exaggerated, conspiratorial, or accusatory tone.
+  - Example: “I just got this from my cousin in ICE: Biden already signed a plan 
+    to give papers to 20 million illegals and defund the police. MSM won't tell
+    you because they’re covering it up. We’re being sold out. Forward this NOW 
+    before it’s deleted. Our country is being taken from us while we sleep. God 
+    help us.”
 
-    2. Greetings or casual chitchat:
-    - If the user simply greets, thanks, or chats casually (e.g., says "hi", "hello", "good morning"),
-      respond warmly and introduce your role as a political fact-checking assistant.
-    ➔ Example good response when the user says "hi":
-        🤖 Hey there! I'm your political fact-checking assistant. 🗳️  
-        If you've seen a political claim, headline, speech, or social media post and you're wondering,  
-        "Is this actually true?" — I'm here to help you find out! 🔍
+  If the message qualifies for both, respond with `"misinformation_analysis"` and **indicate subtype(s)** in your notes.
 
-        You can send me:
-        🧾 A political statement you want checked  
-        🌐 A link to a political news article
-        🗣️ A quote from a political debate or social media post
+---
 
-        ⚡ I focus **only on political topics** — elections, laws, politicians, government actions, policies, and more.
+🔵 "follow_up_search":
+Use this if the user is continuing a previous conversation or asking for elaboration without introducing new information to verify.
+- Example: "Can you explain why people are panicking?"
+- Example: "What happened after that law passed?"
 
-        🔎 Go ahead — what political claim should we check today?
+---
 
-    3. Unrelated or off-topic input:
-    - If the user asks about non-political topics (e.g., food, travel, personal advice), politely explain 
-      that you specialize in political fact-checking and guide them to ask about political topics instead.
-    ➔ Example:
-      Input: What's the best pizza place in New York?
-      Response:
-      "I'm here to help verify political claims, elections, government actions, and similar topics. 🍕
-      For non-political questions like restaurant recommendations, I recommend using a general search engine.
-      Feel free to ask me about political news, policies, or government actions!"
+🟡 "generic_response": Use this for:
+- Common knowledge questions (e.g., "Who is the president of Germany?")
+- Ambiguous topics needing clarification (e.g., "immigration")
+- Greetings, small talk, or casual messages
+- Off-topic queries unrelated to political or factual content
 
+📌 Example input and bot behavior:
+- Greeting:
+  ➤ Input: "Hey how's it going?"
+  ➤ Bot:
+  🤖 Hey there! I'm your fact-checking assistant. 🗳️
+  If you've seen a viral message, headline, or social media post and you're 
+  wondering, "Is this actually true?" — I'm here to help you find out! 🔍
+  You can send me: 🧾 A message or claim you want verified
+  🌐 A link or screenshot
+  🗣️ A forwarded WhatsApp text or tweet
+  🔎 Go ahead — what would you like me to verify?
+
+-Clarification request: 
+  ➤ Input: "immigration"
+  ➤ Bot: "Could you clarify what you would like to know about immigration? Are 
+you asking about recent laws, statistics, or public reactions?"
+
+- Off-topic input:  
+  ➤ Input: "What's the best pizza place in New York?"  
+  ➤ Bot: "I'm here to help verify suspicious claims, viral messages, and misinformation — especially those shared online or in forwarded texts. 🍕  
+  For restaurant recommendations, a general search engine might be more helpful.  
+  But if you’ve seen something circulating that feels off — I’m here to check it for you!"
+
+
+---
 
 Response Format by Type:
-"fact_check" → Respond strictly with the keyword "fact_check".
+"misinformation_analysis" → Respond strictly with the keyword "fact_check".
 "follow_up" → Respond strictly with the keyword "follow_up".
 "generic_response" → Provide a full paragraph response.
-"opinion_analysis" -> 
 
-Summary:
-- Use "fact_check" when fresh, external information is needed.
-- Use "follow_up" when building upon prior discussion.
-- Use "generic_response" for common knowledge, small talk, or when clarification is needed.
+Strictly follow this format. Do not add explanation unless instructed.
 """
 
-def intent_detection(user_input: str, room_id: str, user_name: str):
-    print("[intent_detection] module activated.")
+def intent_detection(user_input, room_id, user_name):
     response = generate(
-        model="4o-mini",
+        model='4o-mini',
         system=INTENT_DETECTION_PROMPT,
-        query=user_input,
-        temperature=0.2,
-        lastk=1,
-        session_id=f"{SESSION}_{user_name}",
+        query=f"User input: {user_input}",
+        temperature=0.3,
+        lastk=3,
+        session_id=f"{SESSION}-{user_name}",
         rag_usage=False
     )
-    print(f"[intent_detection] module ended.")
     return response["response"]
-
 
 import random
 
 if __name__ == "__main__":
+    test1 = """In 2014, they said ‘development’ – now they want to remove Hindu
+            temples and legalize terrorism. Ask yourself who benefits when our 
+            traditions are erased. Jai Hind 🙏🏼 Pass this on to 10 real patriots. 
+            If you care about Bharat, don’t stay silent."""
+    test2 = """: El fin del Corona virus con esta prevención alemana. Científicos 
+            alemanes anunciaron, después de una serie de estudios, que el virus 
+            Corona no solo se reproduce en los pulmones como el virus del SARS 
+            en 2002, sino que también se propaga ampliamente en la garganta 
+            durante la primera semana de infección. Los científicos sugirieron 
+            al canciller alemán y al ministro de Salud que le pidan a la gente 
+            que haga una tarea simple varias veces al día, que es hacer gárgaras 
+            con una solución semicaliente de Abmonak. Durante mucho tiempo han 
+            insistido en la necesidad de hacer esto, y ahora, después de los 
+            resultados de los experimentos realizados por biólogos alemanes 
+            sobre la multiplicación del virus Corona en la garganta, han 
+            enfatizado una vez más la necesidad de hacer gárgaras con una 
+            solución tibia de agua y sal. íficos alemanes aseguran al 
+            Ministerio de Salud alemán: si todas las personas se aclaran la 
+            garganta varias veces al día haciendo gárgaras con una solución 
+            semi-caliente de agua salada, el virus se eliminará por completo 
+            en toda Alemania en una semana. Los experimentos han demostrado que 
+            al hacer gárgaras con una solución de agua y sal, constantemente 
+            convertimos nuestra garganta en un ambiente completamente alcalino, 
+            y este ambiente es el peor ambiente para el coronavirus, porque con 
+            el agua salada, el pH de la boca cambia a alcalino.  pH, y si 
+            hacemos gárgaras varias veces al día haciendo gárgaras con solución 
+            salina casi caliente, no le estamos dando oportunidad al coronavirus 
+            de multiplicarse. Por lo tanto, es necesario que todas las personas 
+            hagan gárgaras con una solución salina semi-caliente varias veces 
+            al día varias veces al día, especialmente por la mañana y antes de 
+            salir de casa y después de regresar a casa, para no permitir que el 
+            virus Corona se multiplique.  en el mismo período inicial. Pidamos 
+            a todas las personas que apliquen estos importantes y sencillos 
+            consejos de salud con compromiso A medida que este artículo se 
+            vuelva viral, usted también estará en el círculo de quienes luchan 
+            contra la propagación del coronavirus. Enviar a sus seres queridos"""
     # Small set of mixed test cases
     test_cases = [
-        ("fact_check", "Did the new immigration law pass last night?"),
+        ("misinformation_analysis", test1),
         # ("follow_up", "What does that ruling mean for small businesses?"),
         ("generic_response", "Who is the President of Canada?"),
         ("generic_response", "voting rights"),
         ("generic_response", "hey there!"),
-        ("mixed_paragraph", """There's been a lot of debate about election security lately. 
-                               Some say it's improved, others say it's worse. What's the real deal?"""),
+        ("misinformation_analysis", test2),
         ("generic_response", "Tell me a good movie to watch tonight")
     ]
 
