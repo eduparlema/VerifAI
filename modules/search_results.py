@@ -216,15 +216,16 @@ def perform_search(original_input: str, user_name: str, chose_params: Dict = Non
         if scraped_text == "ERROR":
             continue  # skip bad scrapes
 
-        # # Summarize the article text based on the user's input
-        # summary = summarize_content(original_input, scraped_text, user_name)
+        # Summarize the article text based on the user's input
+        summary = summarize_content(original_input, scraped_text, user_name)
 
 
         results.append({
             "url": url,
             "title": title,
             "date": date,
-            "content": scraped_text
+            "content": summary
+            #"content": scraped_text
             # "summary": summary
         })
 
