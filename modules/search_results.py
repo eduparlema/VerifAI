@@ -943,50 +943,52 @@ def get_queries(content: str, room_id: str, user_name: str, ):
         print(f"Error in response from the LLM: {response}")
         return f"ERROR [get_queries] LLM response:{response}"
     
-
 def inform_user(user_input: str, question: str, username: str):
     """
     Inform the user about suggested questions that could help analyze the message content,
     and let them know that a search for answers is now underway.
     """
     INFORM_USER_PROMPT = """
-    You are a helpful assistant that reviews social media posts or messages 
-    that may contain factual claims, opinions, or emotionally charged language.
+    You are a helpful, friendly assistant who helps users understand and fact-check
+    messages they come across on social media, WhatsApp, or other online spaces.
 
-    You will be given a message and a set of questions that could help guide 
-    a fact-checking or search process. These questions are not the only possible ones, 
-    but they are relevant and useful for investigating the message further.
+    Sometimes these messages contain strong opinions, alarming claims, or confusing
+    information. To make sense of them, it's useful to break things down into specific 
+    questions — the kind a fact-checker or journalist might ask before searching for answers.
 
-    Your job is to clearly communicate these suggested questions to the user,
-    and inform them that you are now starting to search for answers.
-
-    ✅ Be clear, neutral, and factual.
-    ✅ Emphasize that the questions guide the search process.
-    ✅ End by stating that you are now searching for answers.
+    Your job is to:
+    ✅ Clearly present a few thoughtful questions related to the message.
+    ✅ Explain briefly why asking these questions is helpful.
+    ✅ Keep your tone friendly, clear, and human — feel free to use a few emojis.
+    ✅ Let the user know that you’re now searching for answers.
 
     Example:
 
     User Message:
     "France gave too many rights to migrants and look what happened: riots,
     no-go zones, and terror attacks. They don’t show it on TV, but it’s happening."
-    Questions: 
+
+    Suggested Questions:
     1. Have recent riots in France been linked to migrant communities?
     2. Are there areas in France commonly referred to as 'no-go zones'?
     3. Is there evidence connecting increased migrant rights with a rise in terror attacks?
 
     Response:
-    "To help analyze this message, here are some questions we could explore:
-    1. Have recent riots in France been linked to migrant communities?
-    2. Are there areas in France commonly referred to as 'no-go zones'?
-    3. Is there evidence connecting increased migrant rights with a rise in terror attacks?
+    "Thanks for sharing this. 🧐 To get a clearer picture, here are a few questions we might explore:
+    
+    1️⃣ Have recent riots in France actually been connected to migrant communities?  
+    2️⃣ Are 'no-go zones' officially recognized, or is that more of a media phrase?  
+    3️⃣ Is there solid evidence showing that expanded migrant rights are linked to an increase in terror attacks?
 
-    I’ll now look for answers to these questions using trustworthy sources."
+    Asking these kinds of questions helps break down complex or emotional messages and look at them with a more critical lens. It’s not just about proving something true or false — it's about understanding what’s being claimed, what’s missing, and what evidence really says. 🔍
+
+    I'm now searching for answers using trustworthy sources. I’ll be right back with what I find! 💬"
     """
 
     response = generate(
         model='4o-mini',
         system=INFORM_USER_PROMPT,
-        query=f"User Message: {user_input}\n Questions: {question}",
+        query=f"User Message: {user_input}\nQuestions: {question}",
         temperature=0.3,
         lastk=0,
         session_id=f"{SESSION}-{username}",
@@ -994,4 +996,3 @@ def inform_user(user_input: str, question: str, username: str):
     )
 
     return response["response"]
-
