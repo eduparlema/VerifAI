@@ -20,56 +20,6 @@ RELEVANCE_THRESHOLD = 0.5
 NUM_RELEVAN_RESULTS_THRESHOLD = 5
 DIVERSITY_THRESHOLD = 0.7
 
-def smart_search(user_input: str, user_name):
-    """
-    Agentic Search Function:
-    - Treats the search process as an evolving plan.
-    - After each search, evaluates:
-        - Relevance
-        - Sufficiency
-        - Diversity
-    - Decides dynamically whether to:
-        - Accept the results
-        - Modify the query (paraphrase, localize, translate, reframe)
-        - Gather complementary perspectives
-    - Terminates when confident results are obtained or no meaningful improvements are possible.
-    
-    Output:
-    {
-        "final_sources": list of dicts (title, url, snippet, etc.),
-        "search_journey": list of steps taken (each step = action, query, results),
-    }
-    """
-    max_steps = 2
-    collected_results = []
-    search_journey = []
-    steps_taken = 0
-    feedback = dict()
-    while steps_taken < max_steps:
-        steps_taken += 1
-        print(f"[smart_search] step {steps_taken}")
-
-        # Choose params to perform google search
-        chosen_params = choose_search_params_smart(feedback, user_input, user_name)
-        print(f"Chosen parameters: {chosen_params}")
-        
-        # Perform search
-        results = perform_search(user_input, user_name, chosen_params)
-        
-
-        # Evaluate results
-        feedback = evaluate_search_results(user_input, chosen_params, results, user_name)
-        print(f"Feedback received: {feedback}")
-        # Save results
-        collected_results.extend(results)
-        search_journey.append(chosen_params)
-    
-    final_output = {
-        "final_sources": collected_results,
-        "search_journey": search_journey,
-    }
-    return final_output
-
 def search(user_input: str, user_name: str):
     """
     Agentic Search Function:
@@ -98,47 +48,6 @@ def search(user_input: str, user_name: str):
     max_steps = 2
     collected_results = []
     num_relevant_results = 0
-
-    # while steps_taken < max_steps:
-    #     steps_taken += 1
-    #     print(f"[search] Step {steps_taken}")
-
-    #     # Choose params to perform google search
-    # chosen_params = choose_search_params(collected_results, current_query, user_input, user_name)
-    #     print(f"chosen parameters: {chosen_params}")
-
-    #     # 2. Perform search
-    # results = perform_search(user_input, user_name, chosen_params)
-    #     # 3. Evaluate results
-    #     num_relevant_results += evaluate_relevance(results, user_input, user_name)
-    #     diversity = evaluate_diversity(collected_results + results, user_input, user_name)
-    #     print(f"Diversity score so far: {diversity}")
-
-    #     # 4. Record the step
-    #     search_journey.append({
-    #         "query": current_query,
-    #         "diversity_so_far": diversity,
-    #         "num of relevant sources": len(collected_results),
-    #         "num_results": len(results),
-    #     })
-
-    #     collected_results.extend(results)
-    #     print(f"TOTAL RELEVANT: {len(collected_results)}")
-
-    #     # 5. Reason about what to do next
-    #     if num_relevant_results > NUM_RELEVAN_RESULTS_THRESHOLD and diversity > DIVERSITY_THRESHOLD:
-    #         break
-
-    #     sources_string = "\n\n".join(
-    #         f"{src.get('title', 'No Title')} ({src.get('date', 'No Date')})\n{src.get('link', 'No URL')}\n{src.get('content', '')}"
-    #         for src in collected_results
-    #     )
-
-        # text_upload(
-        #         text=sources_string,
-        #         session_id=user_name,
-        #         strategy='fixed'
-        #     )
 
     # Choose params to perform google search
     chosen_params = choose_search_params(collected_results, current_query, user_input, user_name)
@@ -1033,3 +942,56 @@ def get_queries(content: str, room_id: str, user_name: str, ):
     else:
         print(f"Error in response from the LLM: {response}")
         return f"ERROR [get_queries] LLM response:{response}"
+    
+
+def inform_user(user_input: str, question: str, username: str):
+    """
+    Inform the user about suggested questions that could help analyze the message content,
+    and let them know that a search for answers is now underway.
+    """
+    INFORM_USER_PROMPT = """
+    You are a helpful assistant that reviews social media posts or messages 
+    that may contain factual claims, opinions, or emotionally charged language.
+
+    You will be given a message and a set of questions that could help guide 
+    a fact-checking or search process. These questions are not the only possible ones, 
+    but they are relevant and useful for investigating the message further.
+
+    Your job is to clearly communicate these suggested questions to the user,
+    and inform them that you are now starting to search for answers.
+
+    ✅ Be clear, neutral, and factual.
+    ✅ Emphasize that the questions guide the search process.
+    ✅ End by stating that you are now searching for answers.
+
+    Example:
+
+    User Message:
+    "France gave too many rights to migrants and look what happened: riots,
+    no-go zones, and terror attacks. They don’t show it on TV, but it’s happening."
+    Questions: 
+    1. Have recent riots in France been linked to migrant communities?
+    2. Are there areas in France commonly referred to as 'no-go zones'?
+    3. Is there evidence connecting increased migrant rights with a rise in terror attacks?
+
+    Response:
+    "To help analyze this message, here are some questions we could explore:
+    1. Have recent riots in France been linked to migrant communities?
+    2. Are there areas in France commonly referred to as 'no-go zones'?
+    3. Is there evidence connecting increased migrant rights with a rise in terror attacks?
+
+    I’ll now look for answers to these questions using trustworthy sources."
+    """
+
+    response = generate(
+        model='4o-mini',
+        system=INFORM_USER_PROMPT,
+        query=f"User Message: {user_input}\n Questions: {question}",
+        temperature=0.3,
+        lastk=0,
+        session_id=f"{SESSION}-{username}",
+        rag_usage=False,
+    )
+
+    return response["response"]
+

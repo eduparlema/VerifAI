@@ -5,6 +5,30 @@ from modules.language_analysis import *
 from llmproxy import retrieve, RAG_SESSION, text_upload
 from collections import defaultdict
 
+RC_token = os.environ.get("RC_token")
+RC_userId = os.environ.get("RC_userId")
+RC_API = os.environ.get("RC_API")
+ROCKETCHAT_AUTH = {
+    "X-Auth-Token": RC_token,
+    "X-User-Id": RC_userId,
+}
+
+def send_direct_message(message: str, room_id: str, attachments = None) -> None:
+    payload = {
+        "roomId": room_id,
+        "text": message
+    }
+    if attachments:
+        payload["attachments"] = attachments
+
+    response = requests.post(RC_API, headers=ROCKETCHAT_AUTH, json=payload)
+
+    # Optional: handle errors
+    if response.status_code != 200:
+        print(f"Failed to send message: {response.status_code} - {response.text}")
+
+    return
+
 def generate_response(user_input, room_id, user_name):
     # Detect intention
     intent = intent_detection(user_input, room_id, user_name).strip('"')
@@ -23,7 +47,15 @@ def generate_response(user_input, room_id, user_name):
     # If misinformation_analysis: Get the queries and proceed to search
     if intent == "misinformation_analysis":
         print("in misinformation_analysis")
+
+        # Analyze the user input
         queries = eval(get_queries(user_input, room_id, user_name))
+
+        # Inform the user about your search
+        query_information = inform_user(user_input, queries, user_name)
+        send_direct_message(query_information, room_id)
+
+
         
         content = []
         for query in queries:
@@ -122,6 +154,7 @@ def rag_decide(user_question: str, rag_context: str):
     else:
         print(f"ERRO [rag_decide] LLM reponse: {response}")
         return f"ERROR LLM Response: {response}"
+
 
 if __name__ == "__main__":
     # user_input = "Has the Paris agreement actually reduced global emissions?"    
