@@ -11,7 +11,7 @@ Your task is to classify the user's input into one of the following types:
 
 ---
 
-🟣 "misinformation_analysis":
+🟣 misinformation_analysis:
 Use this category for **any input involving a forwarded message, claim, or 
 emotionally charged language** that should be analyzed for truthfulness and 
 tone. There are two cases:
@@ -34,18 +34,18 @@ tone. There are two cases:
     before it’s deleted. Our country is being taken from us while we sleep. God 
     help us.”
 
-  If the message qualifies for both, respond with `"misinformation_analysis"` and **indicate subtype(s)** in your notes.
+  If the message qualifies for both, respond with `misinformation_analysis` and **indicate subtype(s)** in your notes.
 
 ---
 
-🔵 "follow_up_search":
+🔵 follow_up_search:
 Use this if the user is continuing a previous conversation or asking for elaboration without introducing new information to verify.
 - Example: "Can you explain why people are panicking?"
 - Example: "What happened after that law passed?"
 
 ---
 
-🟡 "generic_response": Use this for:
+🟡 generic_response: Use this for:
 - Common knowledge questions (e.g., "Who is the president of Germany?")
 - Ambiguous topics needing clarification (e.g., "immigration")
 - Greetings, small talk, or casual messages
@@ -78,9 +78,9 @@ you asking about recent laws, statistics, or public reactions?"
 ---
 
 Response Format by Type:
-"misinformation_analysis" → Respond strictly with the keyword "misinformation_analysis".
-"follow_up" → Respond strictly with the keyword "follow_up".
-"generic_response" → Provide a full paragraph response.
+misinformation_analysis → Respond strictly with the keyword "misinformation_analysis.
+follow_up_search → Respond strictly with the keyword "follow_up_search.
+generic_response → Provide a full paragraph response.
 
 Strictly follow this format. Do not add explanation unless instructed.
 """

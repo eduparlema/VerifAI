@@ -7,11 +7,11 @@ from collections import defaultdict
 
 def generate_response(user_input, room_id, user_name):
     # Detect intention
-    intent = intent_detection(user_input, room_id, user_name)
+    intent = intent_detection(user_input, room_id, user_name).strip('"')
     print("intent", intent)
 
     # If generic_reponse: directly return
-    if intent != "follow_up" and intent != "misinformation_analysis":
+    if intent != "follow_up_search" and intent != "misinformation_analysis":
         print("in generic response")
         return intent
 
@@ -20,7 +20,6 @@ def generate_response(user_input, room_id, user_name):
     lang_analysis = ""
     rag_content = []
 
-
     # If misinformation_analysis: Get the queries and proceed to search
     if intent == "misinformation_analysis":
         print("in misinformation_analysis")
@@ -28,17 +27,17 @@ def generate_response(user_input, room_id, user_name):
         
         content = []
         for query in queries:
-            content = smart_search(query, user_name)
+            content = search(query, user_name)
             search_content.extend(content["final_sources"])
-
         
         # Get language analysis
         lang_analysis = language_analysis(user_input, user_name)
 
     
-    # If follow_up: Skip getting the queries and just proceed to search (if needed)
-    elif intent == "follow_up":
+    # If follow_up_search: Skip getting the queries and just proceed to search (if needed)
+    elif intent == "follow_up_search":
         print("in follow up")
+        
         # Check RAG
         rag_context = retrieve(
             query = f"Content: {user_input}",
@@ -77,17 +76,7 @@ def generate_response(user_input, room_id, user_name):
         composer_input["language_analysis"] = lang_analysis
 
     return composer(user_input, composer_input, user_name)
-    # Pass composer_input to generate response
-    
-
-    # results = search(user_input, username)
-
-    # final_sources = results["final_sources"]
-    # composer_input = []
-    # for source in final_sources:
-    #     composer_input.append("".join(list(source.values())))
-
-    # return composer(user_input, "\n".join(composer_input), username)
+   
 
 def rag_decide(user_question: str, rag_context: str):
     RAG_DECIDE_PROMPT = """
@@ -135,12 +124,14 @@ if __name__ == "__main__":
     # current_query=""
     # print("\nRespone from Composer:\n>>>>>")
     # print(generate_response(user_input, "Erin123"))
-    content = """"You can say whatever you want, but MAS is the only party that
-    gave real dignity to our people. Free school breakfast, gas subsidies, help
-    for the countryside. Don’t fall for media lies paid by the elites in La Paz.
-    Don’t forget what they took from us before Evo. 🇧🇴
+    # content = """"You can say whatever you want, but MAS is the only party that
+    # gave real dignity to our people. Free school breakfast, gas subsidies, help
+    # for the countryside. Don’t fall for media lies paid by the elites in La Paz.
+    # Don’t forget what they took from us before Evo. 🇧🇴
 
-    Send this to at least 15 friends before midnight. Bolivia must wake up. Don’t
-    break this chain – the truth must be known."""
-    # print(generate_response(content, "room123", "Erin123"))
-    results = smart_search(user_input, "Erin123")
+    # Send this to at least 15 friends before midnight. Bolivia must wake up. Don’t
+    # break this chain – the truth must be known."""
+    content = "Is there evidence for corruption in the MAS political party?"
+    composer_response = generate_response(content, "room123", "Erin123")
+    print(f"RESPONSE: {composer_response}")
+    # results = smart_search(user_input, "Erin123")
