@@ -31,8 +31,9 @@ def composer(user_query: str, composer_input: Dict, user_name: str):
     2. 🧠 **Explores multiple viewpoints if available**
     - E.g., government vs. opposition, left vs. right, domestic vs. international
 
-    3. 📎 **Cites sources clearly** using:
-    *(Source: [Title](URL))*
+    3. 📎 **Cites sources clearly**:
+    Use *(Source: [Title](URL))* at the end of a response.
+    Directly quote the information provided to you if relevant!
 
     4. 🤝 **Uses a warm, respectful tone** — assume the user is curious, not malicious.
 
@@ -48,7 +49,6 @@ def composer(user_query: str, composer_input: Dict, user_name: str):
     - Section the answer clearly if needed (e.g. “🧵 What this message says”, “🔍 What the facts say”)
 
     Now respond with a warm, credible, and well-structured message that helps the user make sense of the original message and its claims.
-
     """
     print("\n\nGot to the composer!\n\n")
     # Get all the types of content
