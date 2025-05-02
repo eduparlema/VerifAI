@@ -107,6 +107,7 @@ def perform_search(original_input: str, user_name: str, chose_params: Dict = Non
         response = requests.get(search_url, params=params, timeout=10)
         response.raise_for_status()
         items = response.json().get("items", [])
+        print(f"Items got: {items}")
 
     except Exception as e:
         # print(f"❌ Search error: {e}")
