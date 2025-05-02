@@ -75,8 +75,7 @@ def generate_response(user_input, room_id, user_name):
         print("search content")
         print(search_content)
 
-        finished_search = "I've finished pulling up the resources! 📚 Let" \
-        "me syntheisze them for you. 🧠"
+        finished_search = "I've finished pulling up the resources! 📚 Let me synthesize them for you. 🧠"
 
         send_direct_message(finished_search, room_id)
 

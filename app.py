@@ -82,7 +82,7 @@ def main():
     
 
     if language_analysis:
-        language_analysis_update = """ 😮💬 This message seems pretty emotionally charged.
+        language_analysis_update = """\n\n😮💬 This message seems pretty emotionally charged.
             Would you like me to:
 
             🔍 Analyze the language to understand how it's written?
@@ -98,6 +98,10 @@ def main():
                             "msg": f"Analyze the language of {message}",
                             "msg_in_chat_window": True
                         },
+                    ]
+                },
+                {
+                    "action": [
                         {
                             "type": "button",
                             "text": "Ask Reddit",
