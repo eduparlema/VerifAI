@@ -191,9 +191,7 @@ def scrape_webpage(url: str, timeout: int = 10) -> str:
 def summarize_content(user_input: str, article_text: str, user_name: str) -> str: 
     """
     Summarize the article focusing only on information related to the user's query.
-    """
-    system_prompt = """You are a helpful assistant that summarizes articles in a 
-    focused way, based on a user query."""
+    """ 
 
     SUMMARIZE_SOURCE_PROMPT = """
     You are a fact-focused news summarizer.
@@ -249,7 +247,7 @@ def summarize_content(user_input: str, article_text: str, user_name: str) -> str
 
     response = generate(
         model="4o-mini",
-        system=system_prompt,
+        system=SUMMARIZE_SOURCE_PROMPT,
         query=user_prompt,
         temperature=0.1,
         lastk=5,

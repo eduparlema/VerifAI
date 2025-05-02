@@ -17,16 +17,16 @@ print(f"Mongo URI: {MONGO_URI}")
 # db = client["chatbot_db"]
 # messages = db["messages"]  # Collection to store messages
 number_emojis = {
-    1: "1️⃣",
-    2: "2️⃣",
-    3: "3️⃣",
-    4: "4️⃣",
-    5: "5️⃣",
-    6: "6️⃣",
-    7: "7️⃣",
-    8: "8️⃣",
-    9: "9️⃣",
-    10: "🔟"
+    1: "1️⃣ ",
+    2: " 2️⃣ ",
+    3: " 3️⃣ ",
+    4: " 4️⃣ ",
+    5: " 5️⃣ ",
+    6: " 6️⃣ ",
+    7: " 7️⃣ ",
+    8: " 8️⃣ ",
+    9: " 9️⃣ ",
+    10:" 🔟 "
 }
 
 
@@ -79,9 +79,9 @@ def main():
     # print(f"\n\n Response: {response}")
 
     if language_analysis:
+        langua_analysis_update = "\nIt looks like this message uses some emotionally charged language 😮💬. Would you like me to analyze it and explain how it's written? 🔍😊"
         attachement = [
-                {   "text": "It looks like this message uses some emotionally charged language 😮💬. Would you like me to analyze it and explain how it's written? 🔍😊",
-                    "actions": [
+                {   "actions": [
                         {
                             "type": "button",
                             "text": "Press here to analyze the language",
@@ -91,7 +91,7 @@ def main():
                     ]
                 }
             ]
-        send_direct_message(response, room_id, attachement)
+        send_direct_message(response + language_analysis, room_id, attachement)
     else: 
         send_direct_message(response, room_id)
 
@@ -119,11 +119,10 @@ def main():
 
         # Send as a single attachment
         attachment = {
-            "text": question_text,
             "actions": buttons
         }
 
-        send_direct_message("Want to keep going? Here's more you can explore 👇", room_id, attachments=[attachment])
+        send_direct_message("Want to keep going? Here's more you can explore 👇\n" + question_text, room_id, attachments=[attachment])
 
 
     # followup_questions = get_relevant_questions(message, response, intent)
