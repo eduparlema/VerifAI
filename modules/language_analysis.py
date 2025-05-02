@@ -100,9 +100,7 @@ def analyze_language(
     content: str,
     user_name: str,
     session_id: str,
-    language_flag: str
-):
-    
+):  
     LANGUAGE_ANALYSIS_PROMPT = """You are a smart and friendly assistant that helps
         people understand the tone and language of messages shared on social media 
         or messaging apps.

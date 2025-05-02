@@ -33,7 +33,7 @@ Use this if the user is continuing a previous conversation or asking for elabora
 generic_response: Use this for:
 - Common knowledge questions (e.g., "Who is the president of Germany?")
 - Ambiguous topics needing clarification (e.g., "immigration")
-- Greetings, small talk, or casual messages (Use the variations of the example below:)
+- Greetings, small talk, or casual messages (Use strcitly the same message as the one below)
 - Off-topic queries unrelated to political or factual content
 
 📌 Example input and bot behavior:
