@@ -3,7 +3,6 @@ from typing import Dict
 
 
 def composer(user_query: str, composer_input: Dict, user_name: str):
-    #TODO: Change prompt for langage analysis
     COMPOSER_PROMPT = f"""
     🎯 **Role**  
     You are a thoughtful, trustworthy assistant skilled in understanding viral or emotional political content.
@@ -58,17 +57,14 @@ def composer(user_query: str, composer_input: Dict, user_name: str):
     response = generate(
         model='4o-mini',
         system=COMPOSER_PROMPT,
-        query=f"User input: {user_query}\nSearch content: {search_content}\n Rag_content: {rag_content}",
-        temperature=0.1,
+        query=f"User input: {user_query}\nSearch content: {search_content}\nRag_content: {rag_content}",
+        temperature=0.2,
         lastk=5,
         session_id=f"{SESSION}_{user_name}",
         rag_usage=False,
     )
 
     print(f"Composer raw response: {response}")
-    print("hi")
-
-    print('helloo')
 
     if isinstance(response, dict) and "response" in response:
         return response["response"]

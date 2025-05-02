@@ -86,7 +86,7 @@ def perform_search(original_input: str, user_name: str, chose_params: Dict = Non
     IGNORE = [
         "-filetype:pdf", "-filetype:ppt", "-filetype:doc", "-site:twitter.com", 
         "-site:facebook.com", "-site:instagram.com", "-site:pinterest.com ",
-        "-site:tiktok.com", "-site:reddit.com", "-site:linkedin.com"
+        "-site:tiktok.com", "-site:reddit.com", "-site:linkedin.com", "-site:wikipedia.org"
     ]
 
     search_url = "https://www.googleapis.com/customsearch/v1"
