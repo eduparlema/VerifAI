@@ -3,6 +3,7 @@ from typing import Dict
 
 
 def composer(user_query: str, composer_input: Dict, user_name: str):
+    #TODO: Change prompt for langage analysis
     COMPOSER_PROMPT = f"""
     🎯 **Role**  
     You are a thoughtful, trustworthy assistant skilled in understanding viral or emotional political content.
@@ -25,6 +26,7 @@ def composer(user_query: str, composer_input: Dict, user_name: str):
     1. 💬 **Explains the tone and intent** of the message, using the language analysis
     - Is the message emotional, biased, urgent, exaggerated, manipulative?
     - Use **emojis** to make the tone breakdown easy to understand.
+    - You could provide citations 
 
     2. 📚 **Responds to the user’s main question or concern**
     - Use relevant facts from the RAG and search content

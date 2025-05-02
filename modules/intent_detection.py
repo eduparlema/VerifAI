@@ -73,15 +73,11 @@ you asking about recent laws, statistics, or public reactions?"
 
 analyze_language:
 Use this category when the user specifically asks to analyze the tone or emotional language of a message, rather than the factual content. This is often triggered by phrases like:
-"Press here to analyze the language"
-"Analyzing the language..."
+a sentence that starts with "Analyzing the language of ..."
 This mode focuses on whether the message uses emotionally charged, manipulative, or fear-inducing language — not whether the information is true or false.
 📌 Example inputs and bot behavior:
-➤ Input: "Press here to analyze the language"
+➤ Input: "Analyzing the language of..."
 ➤ Bot: analyze_language
-➤ Input: "Analyzing the language..."
-➤ Bot: analyze_language
-
 
 ---
 

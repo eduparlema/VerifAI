@@ -29,22 +29,11 @@ def send_direct_message(message: str, room_id: str, attachments = None) -> None:
 
     return
 
-def generate_response(conversation_history, user_input, room_id, user_name):
+def generate_response(user_input, room_id, user_name):
     # Detect intention
     intent = intent_detection(user_input, room_id, user_name).strip('"')
     print("intent", intent)
 
-    if intent == "analyze_language":
-        history = "\n".join(conversation_history) if conversation_history else ""
-        print(history)
-        return analyze_language(history, user_name, room_id), False
-
-
-    if intent == "language_analysis":
-        print("in language analysis")
-        # Get language analysis
-        lang_analysis = language_analysis(user_input, user_name)
-        return lang_analysis
 
     # If generic_reponse: directly return
     if intent != "follow_up_search" and intent != "misinformation_analysis":
@@ -53,11 +42,14 @@ def generate_response(conversation_history, user_input, room_id, user_name):
 
     # Define variables to keep track of content for the composer
     search_content = []
-    lang_analysis = ""
     rag_content = []
 
     language_flag = "NO"
 
+    if intent == "analyze_language":
+        print("in analyze_language")
+        # Get language analysis
+        return language_analysis(user_input, user_name)
     # If misinformation_analysis: Get the queries and proceed to search
     if intent == "misinformation_analysis":
         print("in misinformation_analysis")
@@ -80,7 +72,7 @@ def generate_response(conversation_history, user_input, room_id, user_name):
 
 
         # Get language analysis
-        lang_analysis = language_analysis(user_input, user_name)
+        # lang_analysis = language_analysis(user_input, user_name)
         language_flag = check_language(user_input, user_name)
 
     
@@ -111,7 +103,6 @@ def generate_response(conversation_history, user_input, room_id, user_name):
     composer_input = {}
     composer_input["search_content"] = ""
     composer_input["rag_content"] = ""
-    composer_input["language_analysis"] = ""
 
     print("\nPRINTING SOURCES TO SEND COMPOSER!")
     if search_content:
@@ -124,9 +115,6 @@ def generate_response(conversation_history, user_input, room_id, user_name):
 
     if rag_content:
         composer_input["rag_content"] = "\n\n".join(rag_content)
-
-    if lang_analysis:
-        composer_input["language_analysis"] = lang_analysis
 
 
     response = composer(user_input, composer_input, user_name)
