@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify, Response
 from llmproxy import generate
 import os
 from modules import *
-from main import generate_response
+from main import generate_response, send_direct_message
 # from pymongo import MongoClient
 
 import os
@@ -82,8 +82,6 @@ def main():
         send_direct_message(response, room_id,  attachement)
     else: 
         send_direct_message(response, room_id)
-
-
     return jsonify({"success": True})
  
 @app.errorhandler(404)
@@ -92,19 +90,3 @@ def page_not_found(e):
 
 if __name__ == "__main__":
     app.run()
-
-def send_direct_message(message: str, room_id: str, attachments = None) -> None:
-    payload = {
-        "roomId": room_id,
-        "text": message
-    }
-    if attachments:
-        payload["attachments"] = attachments
-
-    response = requests.post(RC_API, headers=ROCKETCHAT_AUTH, json=payload)
-
-    # Optional: handle errors
-    if response.status_code != 200:
-        print(f"Failed to send message: {response.status_code} - {response.text}")
-
-    return
