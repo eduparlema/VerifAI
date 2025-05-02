@@ -37,12 +37,12 @@ def generate_response(user_input, room_id, user_name):
     if intent == "analyze_language":
         print("in analyze_language")
         # Get language analysis
-        return language_analysis(user_input, user_name), False
+        return language_analysis(user_input, user_name), False, "analyze_language"
 
     # If generic_reponse: directly return
     if intent != "follow_up_search" and intent != "misinformation_analysis":
         print("in generic response")
-        return intent, False
+        return intent, False, "generic_response"
 
     # Define variables to keep track of content for the composer
     search_content = []
@@ -120,9 +120,9 @@ def generate_response(user_input, room_id, user_name):
     response = composer(user_input, composer_input, user_name)
 
     if language_flag == "YES":
-        return response, True
+        return response, True, intent
     else:
-        return response, False
+        return response, False, intent
    
 
 def rag_decide(user_question: str, rag_context: str):

@@ -59,7 +59,7 @@ def main():
     # if conversation_history.get(user) is None:
     #     conversation_history[user] = []
 
-    response, language_analysis = generate_response(message, room_id, user)
+    response, language_analysis, intent = generate_response(message, room_id, user)
 
     # conversation_history[user].append(message)
 
@@ -79,28 +79,29 @@ def main():
                     ]
                 }
             ]
-        send_direct_message(response, room_id,  attachement)
+        send_direct_message(response, room_id, attachement)
     else: 
         send_direct_message(response, room_id)
 
-    followup_questions = get_relevant_questions(message, response)
+    followup_questions = get_relevant_questions(message, response, intent)
+    if followup_questions:
 
-    attachments = [
-        {
-            "text": f"❓ *{question}*",
-            "actions": [
-                {
-                    "type": "button",
-                    "text": "Answer this",
-                    "msg": question,
-                    "msg_in_chat_window": True
-                }
-            ]
-        }
-        for i, question in enumerate(followup_questions)
-    ]
+        attachments = [
+            {
+                "text": f"❓ *{question}*",
+                "actions": [
+                    {
+                        "type": "button",
+                        "text": "Answer this",
+                        "msg": question,
+                        "msg_in_chat_window": True
+                    }
+                ]
+            }
+            for i, question in enumerate(followup_questions)
+        ]
 
-    send_direct_message(response["response"], room_id, attachments=attachments)
+        send_direct_message("Want to keep going? You might find these questions interesting! 👉", room_id, attachments=attachments)
 
     return jsonify({"success": True})
  
@@ -108,7 +109,7 @@ def main():
 def page_not_found(e):
     return "Not Found", 404
 
-def get_relevant_questions(user_query: str, content: str):
+def get_relevant_questions(user_query: str, content: str, intent: str):
     GET_RELEVANT_QUESTIONS_PROMPT = """
     You are a helpful assistant for an AI Agent that helps user detect
     missinformation. You should generaterelevant follow-up questions based
@@ -121,6 +122,8 @@ def get_relevant_questions(user_query: str, content: str):
     Strictly respond ONLY with a Python list of the questions you come up with,
     like ["question1", "questions2"].
     """
+    if intent == "generic_response" or intent == "analyze_language":
+        return []
     response = generate(
         model="4o-mini",
         system=GET_RELEVANT_QUESTIONS_PROMPT,
