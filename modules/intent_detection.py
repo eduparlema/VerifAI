@@ -26,6 +26,7 @@ that are likely to come from social media (e.g., WhatsApp chain messages)
 
 follow_up_search:
 Use this if the user is continuing a previous conversation or asking for elaboration without introducing new information to verify.
+If the user is asking a question with no previous information, then assume it is a follow-up.
 - Example: "Can you explain why people are panicking?"
 - Example: "What happened after that law passed?"
 

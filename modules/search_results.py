@@ -890,6 +890,9 @@ def get_queries(content: str, room_id: str, user_name: str, ):
         - Avoid rhetorical or sarcastic phrasing
         - Make sure the questions are answerable using news, government, or expert sources
         - Return only a valid Python list (not Markdown, not numbered)
+        - Only include questions that are not reformulations of a question you 
+        already included. Each question should try to get information of different
+        aspects of the user's query.
 
         ---
 
@@ -923,7 +926,9 @@ def get_queries(content: str, room_id: str, user_name: str, ):
 
         Do not wrap your answer in triple backticks. 
         Do not include any explanation or preamble. 
-        Return only a **clean, valid Python list of 3 string questions**.
+        Return only a **clean, valid Python list of up to 3 string questions**.
+        Feel free to return less than 3 if, for example, the input is just one
+        question, or it includes only one fact.
         """
 
 
