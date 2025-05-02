@@ -4,6 +4,16 @@ from llmproxy import generate
 import os
 from modules import *
 from main import generate_response
+from pymongo import MongoClient
+
+import os
+from pymongo import MongoClient
+
+MONGO_URI = os.environ.get("MONGO_URI")
+client = MongoClient(MONGO_URI)
+db = client["chatbot_db"]
+messages = db["messages"]  # Collection to store messages
+
 
 app = Flask(__name__)
 
@@ -15,7 +25,7 @@ ROCKETCHAT_AUTH = {
     "X-User-Id": RC_userId,
 }
 
-conversation_history = {}
+# conversation_history = {}
 
 @app.route('/', methods=['POST'])
 def hello_world():
@@ -32,16 +42,28 @@ def main():
     room_id = data.get("channel_id")
     print(data)
 
-    # Initialize conversation if needed
-    if conversation_history.get(user) is None:
-        conversation_history[user] = []
+    # Upsert: add to list or create new doc
+    messages.update_one(
+        {"username": user},
+        {"$push": {"messages": message}},
+        upsert=True
+    )
 
-    response, language_analysis = generate_response(conversation_history[user], message, room_id, user)
+    user_data = messages.find_one({"username": user}, {"_id": 0})
 
-    conversation_history[user].append(message)
+    messages = user_data.get("messages", [])
+    print(f"User messages: {messages}")
+
+    # # Initialize conversation if needed
+    # if conversation_history.get(user) is None:
+    #     conversation_history[user] = []
+
+    response, language_analysis = generate_response(messages, message, room_id, user)
+
+    # conversation_history[user].append(message)
 
 
-    print(f"\n\n Response: {response}")
+    # print(f"\n\n Response: {response}")
 
     if language_analysis:
         attachement = [
