@@ -99,4 +99,8 @@ def intent_detection(user_input, room_id, user_name):
         session_id=f"{SESSION}_{user_name}",
         rag_usage=False
     )
-    return response["response"]
+    if isinstance(response, dict) and "response" in response:
+      return response["response"]
+    else:
+       print(f"ERROR LLM response: {response}")
+       return f"ERROR in LLM response: {response}"
