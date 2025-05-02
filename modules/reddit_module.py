@@ -152,6 +152,7 @@ def get_reddit_search_keywords(user_input: str):
         system=sys_prompt,
         query=f"User input: {user_input}",
         temperature=0.1,
+        lastk=0,
         session_id="reddit_keywords",
         rag_usage=False
     )
