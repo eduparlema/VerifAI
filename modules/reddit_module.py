@@ -6,6 +6,7 @@ from llmproxy import SESSION, generate
 import praw
 
 GOOGLE_API_KEY = os.environ.get("googleSearchApiKey")
+GOOGLE_API_KEY_EDU = os.environ.get("googleSearchApiKeyEdu")
 SEARCH_ENGINE_ID_REDDIT = os.environ.get("searchEngineIDReddit")
 CLIENT_ID = os.environ.get("praw_client_id")
 CLIENT_SECRET = os.environ.get("praw_client_secret")
@@ -54,7 +55,7 @@ def google_search_reddit(query: str, num_results: int = 10) -> list:
                     
     search_url = "https://www.googleapis.com/customsearch/v1"
     params = {
-        "key": GOOGLE_API_KEY,
+        "key": GOOGLE_API_KEY_EDU,
         "cx": SEARCH_ENGINE_ID_REDDIT,
         "q": cleaned_query,
         "num": num_results
@@ -115,10 +116,57 @@ def get_reddit_comment_summaries_from_urls(urls: list[str], limit_comments: int)
 
     return summaries
 
+def get_reddit_search_keywords(user_input: str):
+    sys_prompt = """
+    🎯 **Role**  
+    You are a Reddit search assistant that helps a misinformation analysis system find useful public opinions and reactions from Reddit.
 
-def social_search(user_input: str, room_id: str, user_name:str, limit_posts: int=3, limit_comments: int=20, all_search: bool=False):
+    ---
+
+    🧠 **Your Task**  
+    The user will give you a message — it may be:
+    - a forwarded WhatsApp post
+    - a piece of viral or emotional misinformation
+    - a political claim or conspiracy theory
+    - or a general question
+
+    Your job is to extract a **concise, well-phrased search query** that can be used to look up relevant Reddit discussions on this topic.
+
+    ---
+
+    ✅ Your search query should:
+    - Focus on the **core claim or topic** in the message
+    - Be phrased in **natural Reddit language** (not overly formal)
+    - Remove filler, hashtags, or non-informative parts
+    - Be **neutral and direct** — not emotionally biased or inflammatory
+    - Be a good fit for finding posts in Reddit titles or comment threads
+
+    ---
+
+    📌 **Output Format**  
+    Return only the search query as a single line of text. No explanation. No punctuation at the end.
+    """
+
+    response = generate(
+        model='4o-mini',
+        system=sys_prompt,
+        query=f"User input: {user_input}",
+        temperature=0.1,
+        session_id="reddit_keywords",
+        rag_usage=False
+    )
+
+    if isinstance(response, dict) and "response" in response:
+        return response["response"]
+    else:
+        print(f"ERROR [social_search] LLM response: {response}")
+        return f"ERROR [social_search] LLM response: {response}"
+
+
+def social_search(user_input: str, room_id: str, user_name:str, limit_posts: int=3, limit_comments: int=20):
+    keywords = get_reddit_search_keywords(user_input)
     print("[INFO] social_search module activated!")
-    reddit_ulrs = google_search_reddit(user_input)
+    reddit_ulrs = google_search_reddit(keywords)
     print(f"[INFO] These are the reddit urls: {reddit_ulrs}")
     summaries = get_reddit_comment_summaries_from_urls(reddit_ulrs[:limit_posts], limit_comments)
     print(f"[INFO] This are the summaries: {summaries}")
