@@ -15,12 +15,15 @@ ROCKETCHAT_AUTH = {
     "X-User-Id": RC_userId,
 }
 
+conversation_history = {}
+
 @app.route('/', methods=['POST'])
 def hello_world():
    return jsonify({"text":'Hello from Koyeb - you reached the main page!'})
 
 @app.route('/query', methods=['POST'])
 def main():
+
     data = request.get_json() 
 
     # Extract relevant information
@@ -29,7 +32,13 @@ def main():
     room_id = data.get("channel_id")
     print(data)
 
-    response, language_analysis = generate_response(message, room_id, user)
+    if conversation_history.get("usernname") is None:
+        conversation_history[user] = [message]
+    else:
+        conversation_history[user].append(message)
+
+
+    response, language_analysis = generate_response(conversation_history[user], message, room_id, user)
 
     print(f"\n\n Response: {response}")
 

@@ -29,13 +29,14 @@ def send_direct_message(message: str, room_id: str, attachments = None) -> None:
 
     return
 
-def generate_response(user_input, room_id, user_name):
+def generate_response(conversation_history, user_input, room_id, user_name):
     # Detect intention
     intent = intent_detection(user_input, room_id, user_name).strip('"')
     print("intent", intent)
 
     if intent == "analyze_language":
-        return analyze_language(user_input, user_name, room_id), False
+        print(conversation_history[-2])
+        return analyze_language(conversation_history[-2], user_name, room_id), False
 
 
     if intent == "language_analysis":
