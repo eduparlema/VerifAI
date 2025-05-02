@@ -34,6 +34,10 @@ def generate_response(user_input, room_id, user_name):
     intent = intent_detection(user_input, room_id, user_name).strip('"')
     print("intent", intent)
 
+    if intent == "analyze_language":
+        print("in analyze_language")
+        # Get language analysis
+        return language_analysis(user_input, user_name)
 
     # If generic_reponse: directly return
     if intent != "follow_up_search" and intent != "misinformation_analysis":
@@ -46,10 +50,6 @@ def generate_response(user_input, room_id, user_name):
 
     language_flag = "NO"
 
-    if intent == "analyze_language":
-        print("in analyze_language")
-        # Get language analysis
-        return language_analysis(user_input, user_name)
     # If misinformation_analysis: Get the queries and proceed to search
     if intent == "misinformation_analysis":
         print("in misinformation_analysis")
