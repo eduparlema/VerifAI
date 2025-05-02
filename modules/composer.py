@@ -58,13 +58,12 @@ def composer(user_query: str, composer_input: Dict, user_name: str):
     print("\n\nGot to the composer!\n\n")
     # Get all the types of content
     search_content = composer_input["search_content"]
-    lang_analysis = composer_input["language_analysis"]
     rag_content = composer_input["rag_content"]
 
     response = generate(
         model='4o-mini',
         system=COMPOSER_PROMPT,
-        query=f"User input: {user_query}\nSearch content: {search_content}\nLanguage analysis: {lang_analysis}\n Rag_content: {rag_content}",
+        query=f"User input: {user_query}\nSearch content: {search_content}\n Rag_content: {rag_content}",
         temperature=0.1,
         lastk=5,
         session_id=f"{SESSION}_{user_name}",

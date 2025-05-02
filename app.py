@@ -68,7 +68,7 @@ def main():
 
     if language_analysis:
         attachement = [
-                {
+                {   "text": "It looks like this message uses some emotionally charged language 😮💬. Would you like me to analyze it and explain how it's written? 🔍😊",
                     "actions": [
                         {
                             "type": "button",
