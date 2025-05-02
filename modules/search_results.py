@@ -12,6 +12,7 @@ import ast
 load_dotenv()
 
 GOOGLE_API_KEY = os.environ.get("googleSearchApiKey")
+GOOGLE_API_KEY_EDU = os.environ.get("googleSearchApiKeyEdu")
 SEARCH_ENGINE_ID = os.environ.get("searchEngineId")
 FACT_CHECK_API=os.environ.get("googleFactCheckApiKey")
 FACT_CHECK_URL=os.environ.get("factCheckApiUrl")
@@ -55,7 +56,6 @@ def search(user_input: str, user_name: str):
 
     # 2. Perform search
     results = perform_search(user_input, user_name, chosen_params)
-
     collected_results.extend(results)
 
     # 6. Finalize
@@ -91,7 +91,7 @@ def perform_search(original_input: str, user_name: str, chose_params: Dict = Non
 
     search_url = "https://www.googleapis.com/customsearch/v1"
     params = {
-        "key": GOOGLE_API_KEY,
+        "key": GOOGLE_API_KEY_EDU,
         "cx": SEARCH_ENGINE_ID,
         "num": num_results,
         "excludeTerms": "filetype:pdf"

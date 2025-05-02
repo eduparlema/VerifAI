@@ -172,11 +172,12 @@ if __name__ == "__main__":
     # current_query=""
     # print("\nRespone from Composer:\n>>>>>")
     # print(generate_response(user_input,"room", "Erin123"))
-    content = """"In 2014, they said ‘development’ – now they want to remove Hindu
-    temples and legalize terrorism. Ask yourself who benefits when our traditions are erased. Jai Hind 🙏🏼
+#     content = """"In 2014, they said ‘development’ – now they want to remove Hindu
+#     temples and legalize terrorism. Ask yourself who benefits when our traditions are erased. Jai Hind 🙏🏼
 
-Pass this on to 10 real patriots. If you care about Bharat, don’t stay silent."""
-    # content = "Is there evidence for corruption in the MAS political party?"
-    composer_response = generate_response(content, "room123", "Erin123")
-    print(f"RESPONSE: {composer_response}")
+# Pass this on to 10 real patriots. If you care about Bharat, don’t stay silent."""
+    content = "Is there evidence for corruption in the MAS political party?"
+#     composer_response = generate_response(content, "room123", "Erin123")
+#     print(f"RESPONSE: {composer_response}")
     # results = smart_search(user_input, "Erin123")
+    res = search(content, "Edu123")
