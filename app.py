@@ -73,7 +73,7 @@ def main():
                         {
                             "type": "button",
                             "text": "Press here to analyze the language",
-                            "msg": f"Analyzing the language of {message}",
+                            "msg": f"Analyze the language of {message}",
                             "msg_in_chat_window": True
                         },
                     ]

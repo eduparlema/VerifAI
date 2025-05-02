@@ -37,7 +37,7 @@ def generate_response(user_input, room_id, user_name):
     if intent == "analyze_language":
         print("in analyze_language")
         # Get language analysis
-        return language_analysis(user_input, user_name)
+        return language_analysis(user_input, user_name), False
 
     # If generic_reponse: directly return
     if intent != "follow_up_search" and intent != "misinformation_analysis":
