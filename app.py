@@ -42,23 +42,23 @@ def main():
     room_id = data.get("channel_id")
     print(data)
 
-    # Upsert: add to list or create new doc
+   # Add user message to DB
     messages.update_one(
         {"username": user},
         {"$push": {"messages": message}},
         upsert=True
     )
 
+    # Retrieve full message history
     user_data = messages.find_one({"username": user}, {"_id": 0})
-
-    messages = user_data.get("messages", [])
-    print(f"User messages: {messages}")
+    user_messages = user_data.get("messages", [])  # ✅ different variable name
+    print(f"✅ Messages for user '{user}':{user_messages}")
 
     # # Initialize conversation if needed
     # if conversation_history.get(user) is None:
     #     conversation_history[user] = []
 
-    response, language_analysis = generate_response(messages, message, room_id, user)
+    response, language_analysis = generate_response(user_messages, message, room_id, user)
 
     # conversation_history[user].append(message)
 
