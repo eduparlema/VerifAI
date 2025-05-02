@@ -163,7 +163,7 @@ def get_reddit_search_keywords(user_input: str):
         return f"ERROR [social_search] LLM response: {response}"
 
 
-def social_search(user_input: str, content: str, room_id: str, user_name:str, limit_posts: int=3, limit_comments: int=20):
+def social_search(user_input: str, room_id: str, user_name:str, limit_posts: int=3, limit_comments: int=20):
     keywords = get_reddit_search_keywords(user_input)
     print(f"Reddit KEYWORDS: {keywords}")
     print("[INFO] social_search module activated!")
