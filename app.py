@@ -12,6 +12,7 @@ from pymongo import MongoClient
 app = Flask(__name__)
 
 MONGO_URI = os.environ.get("MONGO_URI")
+print(f"Mongo URI: {MONGO_URI}")
 client = MongoClient(MONGO_URI)
 db = client["chatbot_db"]
 messages = db["messages"]  # Collection to store messages
