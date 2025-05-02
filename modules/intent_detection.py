@@ -13,7 +13,8 @@ Your task is to classify the user's input into one of the following types:
 
 misinformation_analysis:
 Use this category for **any input involving a forwarded message, or claim ** 
-that should be analyzed for truthfulness. 
+that should be analyzed for truthfulness. This includes messages and content
+that are likely to come from social media (e.g., WhatsApp chain messages)
   - Use this when the message contains a **claim about politics, health, safety, 
     policies, disasters, etc. that can be verified** using reliable external information.
   - Example: "The UN just declared war on Israel? Is that true?"
@@ -70,9 +71,11 @@ you asking about recent laws, statistics, or public reactions?"
 analyze_language:
 Use this category when the user specifically asks to analyze the tone or emotional language of a message, rather than the factual content. This is often triggered by phrases like:
 a sentence that starts with "Analyzing the language of ..."
-This mode focuses on whether the message uses emotionally charged, manipulative, or fear-inducing language — not whether the information is true or false.
+This mode focuses on whether the message uses emotionally charged, manipulative,
+or fear-inducing language — not whether the information is true or false. Strictly
+only return analyze_language when the user specifically asks you to.
 📌 Example inputs and bot behavior:
-➤ Input: "Anale the language of..."
+➤ Input: "Analyze the language of..."
 ➤ Bot: analyze_language
 
 ---
