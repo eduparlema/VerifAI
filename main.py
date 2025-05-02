@@ -48,7 +48,7 @@ def generate_response(conversation_history, user_input, room_id, user_name):
     # If generic_reponse: directly return
     if intent != "follow_up_search" and intent != "misinformation_analysis":
         print("in generic response")
-        return intent
+        return intent, False
 
     # Define variables to keep track of content for the composer
     search_content = []

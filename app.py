@@ -32,13 +32,14 @@ def main():
     room_id = data.get("channel_id")
     print(data)
 
+    # Initialize conversation if needed
     if conversation_history.get(user) is None:
-        conversation_history[user] = [message]
-    else:
-        conversation_history[user].append(message)
-
+        conversation_history[user] = []
 
     response, language_analysis = generate_response(conversation_history[user], message, room_id, user)
+
+    conversation_history[user].append(message)
+
 
     print(f"\n\n Response: {response}")
 
