@@ -36,8 +36,7 @@ def generate_response(conversation_history, user_input, room_id, user_name):
 
     if intent == "analyze_language":
         print(conversation_history)
-        print(conversation_history[-2])
-        return analyze_language(conversation_history[-2], user_name, room_id), False
+        return analyze_language(conversation_history[-1], user_name, room_id), False
 
 
     if intent == "language_analysis":
