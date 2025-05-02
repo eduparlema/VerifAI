@@ -16,6 +16,18 @@ print(f"Mongo URI: {MONGO_URI}")
 # client = MongoClient(MONGO_URI)
 # db = client["chatbot_db"]
 # messages = db["messages"]  # Collection to store messages
+number_emojis = {
+    1: "1️⃣",
+    2: "2️⃣",
+    3: "3️⃣",
+    4: "4️⃣",
+    5: "5️⃣",
+    6: "6️⃣",
+    7: "7️⃣",
+    8: "8️⃣",
+    9: "9️⃣",
+    10: "🔟"
+}
 
 
 RC_token = os.environ.get("RC_token")
@@ -85,23 +97,54 @@ def main():
 
     followup_questions = get_relevant_questions(message, response, intent)
     if followup_questions:
+        # Generate emoji-labeled questions
+        question_blocks = []
+        for i, question in enumerate(followup_questions, start=1):
+            emoji = number_emojis.get(i, f"{i}.")  # fallback to regular numbers if > 10
+            question_blocks.append(f"{emoji} *{question}*")
 
-        attachments = [
+        # Build the message
+        question_text = "\n" + "\n".join(question_blocks)
+
+        # Buttons: you can still label them Q1, Q2, etc., or use same emoji
+        buttons = [
             {
-                "text": f"❓ *{question}*",
-                "actions": [
-                    {
-                        "type": "button",
-                        "text": "Answer this",
-                        "msg": question,
-                        "msg_in_chat_window": True
-                    }
-                ]
+                "type": "button",
+                "text": f"{number_emojis.get(i+1, str(i+1))}",
+                "msg": question,
+                "msg_in_chat_window": True
             }
             for i, question in enumerate(followup_questions)
         ]
 
-        send_direct_message("Want to keep going? You might find these questions interesting! 👉", room_id, attachments=attachments)
+        # Send as a single attachment
+        attachment = {
+            "text": question_text,
+            "actions": buttons
+        }
+
+        send_direct_message("Want to keep going? Here's more you can explore 👇", room_id, attachments=[attachment])
+
+
+    # followup_questions = get_relevant_questions(message, response, intent)
+    # if followup_questions:
+
+    #     attachments = [
+    #         {
+    #             "text": f"❓ *{question}*",
+    #             "actions": [
+    #                 {
+    #                     "type": "button",
+    #                     "text": "Answer this",
+    #                     "msg": question,
+    #                     "msg_in_chat_window": True
+    #                 }
+    #             ]
+    #         }
+    #         for i, question in enumerate(followup_questions)
+    #     ]
+
+    #     send_direct_message("Want to keep going? You might find these questions interesting! 👉", room_id, attachments=attachments)
 
     return jsonify({"success": True})
  
@@ -122,21 +165,21 @@ def get_relevant_questions(user_query: str, content: str, intent: str):
     Strictly respond ONLY with a Python list of the questions you come up with,
     like ["question1", "questions2"].
     """
-    if intent == "generic_response" or intent == "analyze_language":
-        return []
-    response = generate(
-        model="4o-mini",
-        system=GET_RELEVANT_QUESTIONS_PROMPT,
-        query=f"Here is the content {content}\nOriginal query: {user_query}",
-        temperature=0.3,
-        lastk=1,
-        session_id="get_relevan_questions_2",
-        rag_usage=False,
-    )
-    questions = eval(response["response"].strip())  # Safe only if you trust the output
-    assert isinstance(questions, list)
-    print(f"[INFO] Generated questions: {questions}")
-    return questions
+    if intent == "misinformation_analysis":
+        response = generate(
+            model="4o-mini",
+            system=GET_RELEVANT_QUESTIONS_PROMPT,
+            query=f"Here is the content {content}\nOriginal query: {user_query}",
+            temperature=0.3,
+            lastk=1,
+            session_id="get_relevan_questions_2",
+            rag_usage=False,
+        )
+        questions = eval(response["response"].strip())  # Safe only if you trust the output
+        assert isinstance(questions, list)
+        print(f"[INFO] Generated questions: {questions}")
+        return questions
+    return []
 
 if __name__ == "__main__":
     app.run()

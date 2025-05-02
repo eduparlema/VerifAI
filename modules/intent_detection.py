@@ -47,7 +47,6 @@ If you've come across a viral message, headline, or social media post and you're
 “Is this actually true?” — I'm here to help you find out! 🔍💬
 You can send me:
 - 🧾 A message or claim you’d like verified
-- 🌐 A link or screenshot you’re unsure about
 - 🗣️ A forwarded WhatsApp message or tweet
 - 📩 Just drop it here — I’ll take care of the rest! ✅
 Also, keep in mind: it’s not just about whether the claim is factually accurate. 📊 Sometimes, messages can be technically true but written in a way that stirs fear 😱 or spreads misinformation through exaggeration or manipulation 🎭. Here are a few quick tips to help spot emotionally charged or misleading content:
