@@ -137,12 +137,13 @@ def perform_search(original_input: str, user_name: str, chose_params: Dict = Non
         if summary == 'No relevant information found in the article.':
             id += 1
             continue
+
         
         results.append({
             "url": url,
             "title": title,
             "date": date,
-            "content": summary
+            "content": scraped_text[:min(6000, len(scraped_text))]
         })
         num += 1
         id += 1

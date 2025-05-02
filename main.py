@@ -69,11 +69,15 @@ def generate_response(user_input, room_id, user_name):
             search_content.extend(content["final_sources"])
         print("search content")
         print(search_content)
+        
 
 
         # Get language analysis
         # lang_analysis = language_analysis(user_input, user_name)
         language_flag = check_language(user_input, user_name)
+
+        finished_search = "I've finsihed pulling up the resources! Let" \
+        "me syntheisze them for you"
 
     
     # If follow_up_search: Skip getting the queries and just proceed to search (if needed)
