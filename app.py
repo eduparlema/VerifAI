@@ -29,9 +29,28 @@ def main():
     room_id = data.get("channel_id")
     print(data)
 
-    response = generate_response(message, room_id, user)
+    response, language_analysis = generate_response(message, room_id, user)
+
     print(f"\n\n Response: {response}")
-    send_direct_message(response, room_id)
+
+    if language_analysis:
+        attachement = [
+                {
+                    "actions": [
+                        {
+                            "type": "button",
+                            "text": "Press here to analyze the language",
+                            "msg": "Analyzing the language...",
+                            "msg_in_chat_window": True
+                        },
+                    ]
+                }
+            ]
+        send_direct_message(response, room_id,  attachement)
+    else: 
+        send_direct_message(response, room_id)
+
+
     return jsonify({"text": response})
  
 @app.errorhandler(404)

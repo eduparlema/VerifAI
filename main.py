@@ -34,6 +34,16 @@ def generate_response(user_input, room_id, user_name):
     intent = intent_detection(user_input, room_id, user_name).strip('"')
     print("intent", intent)
 
+    if intent == "analyze_language":
+        return analyze_language(user_input, user_name, room_id), False
+
+
+    if intent == "language_analysis":
+        print("in language analysis")
+        # Get language analysis
+        lang_analysis = language_analysis(user_input, user_name)
+        return lang_analysis
+
     # If generic_reponse: directly return
     if intent != "follow_up_search" and intent != "misinformation_analysis":
         print("in generic response")
@@ -43,6 +53,8 @@ def generate_response(user_input, room_id, user_name):
     search_content = []
     lang_analysis = ""
     rag_content = []
+
+    language_flag = "NO"
 
     # If misinformation_analysis: Get the queries and proceed to search
     if intent == "misinformation_analysis":
@@ -64,9 +76,10 @@ def generate_response(user_input, room_id, user_name):
         print("search content")
         print(search_content)
 
-        
+
         # Get language analysis
         lang_analysis = language_analysis(user_input, user_name)
+        language_flag = check_language(user_input, user_name)
 
     
     # If follow_up_search: Skip getting the queries and just proceed to search (if needed)
@@ -113,7 +126,13 @@ def generate_response(user_input, room_id, user_name):
     if lang_analysis:
         composer_input["language_analysis"] = lang_analysis
 
-    return composer(user_input, composer_input, user_name)
+
+    response = composer(user_input, composer_input, user_name)
+
+    if language_flag == "YES":
+        return response, True
+    else:
+        return response, False
    
 
 def rag_decide(user_question: str, rag_context: str):
