@@ -32,7 +32,7 @@ def main():
     room_id = data.get("channel_id")
     print(data)
 
-    if conversation_history.get("usernname") is None:
+    if conversation_history.get(user) is None:
         conversation_history[user] = [message]
     else:
         conversation_history[user].append(message)
