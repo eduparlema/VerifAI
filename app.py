@@ -79,7 +79,7 @@ def main():
     # print(f"\n\n Response: {response}")
 
     if language_analysis:
-        langua_analysis_update = "\nIt looks like this message uses some emotionally charged language 😮💬. Would you like me to analyze it and explain how it's written? 🔍😊"
+        language_analysis_update = "\nIt looks like this message uses some emotionally charged language 😮💬. Would you like me to analyze it and explain how it's written? 🔍😊"
         attachement = [
                 {   "actions": [
                         {
@@ -91,7 +91,7 @@ def main():
                     ]
                 }
             ]
-        send_direct_message(response + language_analysis, room_id, attachement)
+        send_direct_message(response + language_analysis_update, room_id, attachement)
     else: 
         send_direct_message(response, room_id)
 
