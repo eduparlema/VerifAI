@@ -23,25 +23,20 @@ def composer(user_query: str, composer_input: Dict, user_name: str):
 
     Write a friendly, clear, and evidence-based reply that:
 
-    1. 💬 **Explains the tone and intent** of the message, using the language analysis
-    - Is the message emotional, biased, urgent, exaggerated, manipulative?
-    - Use **emojis** to make the tone breakdown easy to understand.
-    - You could provide citations 
-
-    2. 📚 **Responds to the user’s main question or concern**
+    1. 📚 **Responds to the user’s main question or concern**
     - Use relevant facts from the RAG and search content
     - Acknowledge nuance if the issue is complex or contested
     - Don’t speculate — only use what’s in the sources
 
-    3. 🧠 **Explores multiple viewpoints if available**
+    2. 🧠 **Explores multiple viewpoints if available**
     - E.g., government vs. opposition, left vs. right, domestic vs. international
 
-    4. 📎 **Cites sources clearly** using:
+    3. 📎 **Cites sources clearly** using:
     *(Source: [Title](URL))*
 
-    5. 🤝 **Uses a warm, respectful tone** — assume the user is curious, not malicious.
+    4. 🤝 **Uses a warm, respectful tone** — assume the user is curious, not malicious.
 
-    6. 🧭 **End with a suggestion**, like:
+    5. 🧭 **End with a suggestion**, like:
     - "Feel free to ask follow-up questions if you're unsure!"
     - "You can also explore the sources I linked above. 😊"
 
