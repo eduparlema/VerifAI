@@ -80,6 +80,15 @@ only return analyze_language when the user specifically asks you to.
 
 ---
 
+reddit_search:
+Use this category when the user specifically asks you to ask the reddit community.
+This should be triggered when a sentence starts with "Ask Reddit ..."
+📌 Example inputs and bot behavior:
+➤ Input: "Ask Reddit ..."
+➤ Bot: reddit_search
+
+___
+
 Response Format by Type:
 misinformation_analysis → Respond strictly with the keyword "misinformation_analysis".
 follow_up_search → Respond strictly with the keyword "follow_up_search".

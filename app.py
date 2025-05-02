@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify, Response
 from llmproxy import generate
 import os
 from modules import *
+from modules.reddit_module import social_search
 from main import generate_response, send_direct_message
 # from pymongo import MongoClient
 
@@ -78,14 +79,29 @@ def main():
 
     # print(f"\n\n Response: {response}")
 
+    
+
     if language_analysis:
-        language_analysis_update = "\nIt looks like this message uses some emotionally charged language 😮💬. Would you like me to analyze it and explain how it's written? 🔍😊"
+        language_analysis_update = """ 😮💬 This message seems pretty emotionally charged.
+            Would you like me to:
+
+            🔍 Analyze the language to understand how it's written?
+
+            🗣️ Explore what Reddit community is saying about this topic?
+
+            👉 Just let me know what you'd like to do next!"""
         attachement = [
                 {   "actions": [
                         {
                             "type": "button",
                             "text": "Press here to analyze the language",
                             "msg": f"Analyze the language of {message}",
+                            "msg_in_chat_window": True
+                        },
+                        {
+                            "type": "button",
+                            "text": "Ask Reddit",
+                            "msg": f"Ask Reddit {message}",
                             "msg_in_chat_window": True
                         },
                     ]
@@ -104,7 +120,7 @@ def main():
             question_blocks.append(f"{emoji} *{question}*")
 
         # Build the message
-        question_text = "\n" + "\n".join(question_blocks)
+        question_text = "\n" + "\n\n".join(question_blocks)
 
         # Buttons: you can still label them Q1, Q2, etc., or use same emoji
         buttons = [

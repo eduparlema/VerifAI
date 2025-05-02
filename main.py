@@ -2,6 +2,7 @@ from modules.search_results import *
 from modules.composer import *
 from modules.intent_detection import *
 from modules.language_analysis import *
+from modules.reddit_module import social_search
 from llmproxy import retrieve, RAG_SESSION, text_upload
 from collections import defaultdict
 
@@ -38,6 +39,10 @@ def generate_response(user_input, room_id, user_name):
         print("in analyze_language")
         # Get language analysis
         return language_analysis(user_input, user_name), False, "analyze_language"
+    
+    if intent == "reddit_search":
+        print("in reddit_search")
+        return social_search(user_input, room_id, user_name), False, "reddit_search"
 
     # If generic_reponse: directly return
     if intent != "follow_up_search" and intent != "misinformation_analysis":
@@ -69,15 +74,19 @@ def generate_response(user_input, room_id, user_name):
             search_content.extend(content["final_sources"])
         print("search content")
         print(search_content)
-        
+
+        finished_search = "I've finished pulling up the resources! 📚 Let" \
+        "me syntheisze them for you. 🧠"
+
+        send_direct_message(finished_search, room_id)
+
 
 
         # Get language analysis
         # lang_analysis = language_analysis(user_input, user_name)
         language_flag = check_language(user_input, user_name)
 
-        finished_search = "I've finsihed pulling up the resources! Let" \
-        "me syntheisze them for you"
+    
 
     
     # If follow_up_search: Skip getting the queries and just proceed to search (if needed)
