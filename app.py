@@ -101,7 +101,7 @@ def main():
                     ]
                 },
                 {
-                    "action": [
+                    "actions": [
                         {
                             "type": "button",
                             "text": "Ask Reddit",
