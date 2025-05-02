@@ -9,13 +9,13 @@ from pymongo import MongoClient
 import os
 from pymongo import MongoClient
 
+app = Flask(__name__)
+
 MONGO_URI = os.environ.get("MONGO_URI")
 client = MongoClient(MONGO_URI)
 db = client["chatbot_db"]
 messages = db["messages"]  # Collection to store messages
 
-
-app = Flask(__name__)
 
 RC_token = os.environ.get("RC_token")
 RC_userId = os.environ.get("RC_userId")
